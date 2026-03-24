@@ -1,11 +1,12 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Proyecto 2 OLC1",
+  "license": "ISC",
+  "author": "Karen Ramos",
+  "type": "commonjs",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Karen Ramos",
-  "license": "ISC"
+  }
 }
