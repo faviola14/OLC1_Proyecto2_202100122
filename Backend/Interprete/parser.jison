@@ -5,6 +5,8 @@
 %%
 
 \s+                   /* skip whitespace */
+//COMENTARIOS 
+
 [0-9]+("."[0-9]+)?\b  return 'NUMBER';
 "*"                   return '*';
 "/"                   return '/';
