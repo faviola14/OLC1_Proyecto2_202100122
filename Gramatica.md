@@ -25,6 +25,7 @@
                 | <structuso>
                 | <structmodificacion>
                 | <print>
+                | <asignacion>
 
 <instruccionesswitch> ::= <instruccionesswitch> <instruccionswitch> 
 | <instruccionswitch> 
@@ -42,7 +43,8 @@
                 | <structuso>
                 | <structmodificacion>
                 | <print>
-                | <break>
+                | <asignacion>
+                | <break> 
 
 <instruccionesfor> ::= <instruccionesfor> <instruccionfor> 
 | <instruccionfor> 
@@ -60,6 +62,7 @@
                 | <structuso>
                 | <structmodificacion>
                 | <print>
+                | <asignacion>
                 | <break>
                 | <continue>
 
@@ -85,9 +88,31 @@
 <valor> ::= CADENA
 | NUMERO_DECIMAL
 | NUMERO 
-| <operaciones>
+| <operacion>
 | ID 
 | <funcionesestructura> 
+
+# OPERACIONES
+<operacion> ::= <operacion> MAS <operacionsimple>
+| <operacion> MENOS <operacionsimple>
+| <operacionsimple>
+
+<operacionsimple> ::= <operacionsimple> ASTERISCO <operacionmenossimple>
+| <operacionsimple> BARRA <operacionmenossimple>
+| <operacionsimple> MODULO <operacionmenossimple>
+| <operacionmenossimple>
+
+<operacionmenossimple> ::= MENOS <operacionmenossimple>
+| PARENTESIS_A <operacion> PARENTESIS_C
+| NUMERO
+| NUMERO_DECIMAL
+| ID 
+| <funcionesestructura> 
+| CADENA
+
+# ASIGNACIONES VARIABLES
+<asignacion> ::= ID ASIGNA_MAS <valor>
+| ID ASIGNA_MENOS <valor>
 
 <codigo> ::= LLAVE_A <instrucciones> LLAVE_C
 
