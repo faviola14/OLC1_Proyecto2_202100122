@@ -4,80 +4,65 @@
 %lex
 %%
 
-
-
 \s+                   /* skip whitespace */
 
-// COMENTARIOS
+/* COMENTARIOS*/
 /\/\/.*                     { /* comentario de una línea */ }
 /\/\*[^]*?\*\/              { /* comentario multilínea */ }
 
-// CADENA
-\"([^\"\\]|\\.)*\"          return 'CADENA';
-
-// ID
-[a-zA-Z_][a-zA-Z0-9_]*      return 'ID';
-
-// NÚMEROS 
--?[0-9]+"."[0-9]+           return 'NUMERO_DECIMAL';
--?[0-9]+                    return 'NUMERO';
-
-// TIPOS DE DATOS
+/* TIPOS DE DATOS */
 "int"                       return 'INT';
 "float64"                   return 'FLOAT';
 "string"                    return 'STRING';
 "bool"                      return 'BOOL';
 "rune"                      return 'RUNE';
 
-// TIPOS COMPUESTOS
+/* TIPOS COMPUESTOS */
 "slice"                     return 'SLICE';
 "struct"                    return 'STRUCT';
 
-// NULL
+/* NULL */
 "nil"                       return 'NULL';
 
-// SECUENCIAS DE ESCAPE
-"\""                        return 'COMILLA_DOBLE';
-"\\"                        return 'BARRA_INVERTIDA';
-"\n"                        return 'SALTO_LINEA';
-"\r"                        return 'RETORNO_CARRO';
-"\t"                        return 'TABULACION';
-
-// AGRUPACIÓN
+/* AGRUPACIÓN */
 "("                         return 'PARENTESIS_A';
-")"                         return 'PARENTESIS_B';
+")"                         return 'PARENTESIS_C';
 "["                         return 'CORCHETE_A';
 "]"                         return 'CORCHETE_C';
 
-// ARITMÉTICA
-"/"                         return 'BARRA';
-"%"                         return 'MODULO';
-"*"                         return 'ASTRISCO';
-"+"                         return 'MAS';
-
-// ASIGNACIÓN
+/* ASIGNACIÓN */
 "+="                        return 'ASIGNA_MAS';
 "-="                        return 'ASIGNA_MENOS';
 
-// NEGACIÓN 
+/* PARA FOR */
+"++"                        return 'INCREMENTO';
+"--"                        return 'DECREMENTO';
+
+/* ARITMÉTICA */
+"/"                         return 'BARRA';
+"%"                         return 'MODULO';
+"*"                         return 'ASTERISCO';
+"+"                         return 'MAS';
+
+/* NEGACIÓN */
 "-"                         return 'MENOS';
 
-// IGUALDAD Y DESIGUALDAD
+/* IGUALDAD Y DESIGUALDAD */
 "=="                        return 'IGUALDAD';
-"!="                        return 'DESIGUALDAD;
+"!="                        return 'DESIGUALDAD';
 
-// RELACIONALES
+/* RELACIONALES */
 ">="                        return 'MAYOR_IGUAL';
 "<="                        return 'MENOR_IGUAL';
 ">"                         return 'MAYOR';
 "<"                         return 'MENOR';
 
-// LÓGICOS
+/* LÓGICOS */
 "!"                         return 'NOT';
 "&&"                        return 'AND';
 "||"                        return 'OR';
 
-//SENTENCIAS
+/* SENTENCIAS */
 "var"                       return 'VAR';
 "if"                        return 'IF';
 "else"                      return 'ELSE';
@@ -99,7 +84,7 @@
 "strconv.ParseFloat"        return 'PARSEFLOAT';
 "reflect.TypeOf"            return 'TYPEOF';
 
-// OTROS SÍMBOLOS
+/* OTROS SÍMBOLOS */
 "="                         return 'IGUAL';
 "{"                         return 'LLAVE_A';
 "}"                         return 'LLAVE_C';
@@ -108,62 +93,76 @@
 ","                         return 'COMA';
 ";"                         return 'PUNTO_COMA';
 "."                         return 'PUNTO';
-"++"                        return 'INCREMENTO';
-"--"                        return 'DECREMENTO';
 
-// FIN DE DOCUMENTO
+/* CADENA */
+\"([^\"\\]|\\.)*\"          return 'CADENA';
+
+
+/* NÚMEROS */
+[0-9]+"."[0-9]+           return 'NUMERO_DECIMAL';
+[0-9]+                    return 'NUMERO';
+
+/* SECUENCIAS DE ESCAPE */
+"\""                        return 'COMILLA_DOBLE';
+"\\"                        return 'BARRA_INVERTIDA';
+"\n"                        return 'SALTO_LINEA';
+"\r"                        return 'RETORNO_CARRO';
+"\t"                        return 'TABULACION';
+
+/* ID */
+[a-zA-Z_][a-zA-Z0-9_]*      return 'ID';
+
+/* FIN DE DOCUMENTO */
 <<EOF>>                     return 'EOF';
 
-// ERRORES 
+/* ERRORES */
 .                           return 'INVALID';
 
 /lex
 
 /* operator associations and precedence */
+%token CADENA ID NUMERO NUMERO_DECIMAL 
+%token INT FLOAT STRING RUNE BOOL 
+%token SLICE STRUCT 
+%token NULL
+%token COMILLA_DOBLE BARRA_INVERTIDA SALTO_LINEA RETORNO_CARRO TABULACION
+%token PARENTESIS_A PARENTESIS_C CORCHETE_A CORCHETE_C 
+%token ASIGNA_MAS ASIGNA_MENOS
+%token BARRA MODULO ASTERISCO MAS 
+%token MENOS
+%token IGUALDAD DESIGUALDAD 
+%token MAYOR MAYOR_IGUAL MENOR MENOR_IGUAL
+%token NOT AND OR
+%token VAR IF ELSE SWITCH CASE DEFAULT PRINT FOR RANGE BREAK CONTINUE RETURN INDEX JOIN LEN APPEND FUNC ATOI PARSEFLOAT TYPEOF
+%token IGUAL LLAVE_A LLAVE_C DOS_PUNTOS PUNTO_IGUAL COMA PUNTO_COMA PUNTO INCREMENTO DECREMENTO 
+%token EOF
+%token INVALID 
 
-%left '+' '-'
-%left '*' '/'
-%left '^'
-%right '!'
-%right '%'
-%left UMINUS
-%token INVALID
 
-%start expressions
+%left PARENTESIS_A PARENTESIS_C CORCHETE_A CORCHETE_C 
+%right NOT UMINUS
+%left BARRA MODULO ASTERISCO
+%left MAS MENOS 
+%left MENOR MENOR_IGUAL MAYOR_IGUAL MAYOR
+%left IGUALDAD DESIGUALDAD
+%left AND
+
+
+
+%start programa
 
 %% /* language grammar */
 
-expressions
-    : e EOF
-        { typeof console !== 'undefined' ? console.log($1) : print($1);
-          return $1; }
-    ;
 
-e
-    : e '+' e
-        {$$ = $1 + $3;}
-    | e '-' e
-        {$$ = $1 - $3;}
-    | e '*' e
-        {$$ = $1 * $3;}
-    | e '/' e
-        {$$ = $1 / $3;}
-    | e '^' e
-        {$$ = Math.pow($1, $3);}
-    | e '!'
-        {{
-          $$ = (function fact(n) { return n == 0 ? 1 : fact(n - 1) * n; })($1);
-        }}
-    | e '%'
-        {$$ = $1 / 100;}
-    | '-' e %prec UMINUS
-        {$$ = -$2;}
-    | '(' e ')'
-        {$$ = $2;}
-    | NUMBER
-        {$$ = Number(yytext);}
-    | E
-        {$$ = Math.E;}
-    | PI
-        {$$ = Math.PI;}
-    ;
+
+programa: funciones EOF {}
+;
+
+funciones: funciones funcion
+| funcion 
+;
+
+funcion: ID
+;
+
+
