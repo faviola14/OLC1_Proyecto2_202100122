@@ -9,6 +9,20 @@
 <funciones> ::= <funciones> <funcion> 
 | <funcion> 
 
+#FUNCIONES 
+# func <nombreFuncion>() { // <cuerpo de la función> }
+# func <nombreFuncion>(<param1> <tipo1>, <param2> <tipo2>) { // <cuerpo de la función> }
+# func <nombreFuncion>(<param1> <tipo1>, <param2> <tipo2>) <tipoRetorno> { // <cuerpo de la función> return <valorDeRetorno> }
+
+<funcion> ::= FUNC ID PARENTESIS_A <parametros> PARENTESIS_C LLAVE_A <instrucciones> LLAVE_C 
+| FUNC ID PARENTESIS_A <parametros> PARENTESIS_C <tipo> LLAVE_A <instrucciones> <retorno> LLAVE_C 
+
+<parametros> ::= <parametros> COMA <parametro>
+|<parametro>
+| ε
+
+<parametro> ::= ID <tipo>
+
 <instrucciones> ::= <instrucciones> <instruccion> 
 | <instruccion> 
 
@@ -27,44 +41,9 @@
                 | <print>
                 | <asignacion>
 
-<instruccionesswitch> ::= <instruccionesswitch> <instruccionswitch> 
-| <instruccionswitch> 
-
-<instruccionswitch> ::= <variable>
-                | <ifs>
-                | <switch>
-                | <for>
-                | <slice>
-                | <append>
-                | <modificacionslice>
-                | <matrices>
-                | <asignacionmatriz>
-                | <struct>
-                | <structuso>
-                | <structmodificacion>
-                | <print>
-                | <asignacion>
-                | <break> 
-
-<instruccionesfor> ::= <instruccionesfor> <instruccionfor> 
-| <instruccionfor> 
-
-<instruccionfor> ::= <variable>
-                | <ifs>
-                | <switch>
-                | <for>
-                | <slice>
-                | <append>
-                | <modificacionslice>
-                | <matrices>
-                | <asignacionmatriz>
-                | <struct>
-                | <structuso>
-                | <structmodificacion>
-                | <print>
-                | <asignacion>
-                | <break>
-                | <continue>
+# RETURN
+<retorno> ::= RETURN <valor>
+| RETURN
 
 # VAR
 # var <identificador> <Tipo> = <Expresión> 
@@ -114,8 +93,6 @@
 <asignacion> ::= ID ASIGNA_MAS <valor>
 | ID ASIGNA_MENOS <valor>
 
-<codigo> ::= LLAVE_A <instrucciones> LLAVE_C
-
 # IF 
 # if condicion { // Bloque de sentencias para el if } else if condicion { // Bloque de sentencias para el else if } else { // Bloque de sentencias para el else }
 
@@ -130,6 +107,8 @@
 
 <elseif> ::= ELSE IF <condicion> <codigo>
 
+<codigo> ::= LLAVE_A <instrucciones> LLAVE_C
+
 <condicion> ::= <expresionRelacional>
 | ID 
 
@@ -141,10 +120,11 @@
 
 <comparacion> ::= <valor> IGUALDAD <valor>
 | <valor> DESIGUALDAD <valor>
-| <valor> MAYOR <valor>
-| <valor> MENOR <valor>
 | <valor> MAYOR_IGUAL <valor>
 | <valor> MENOR_IGUAL <valor>
+| <valor> MAYOR <valor>
+| <valor> MENOR <valor>
+
 
 # SWITCH
 # switch <expresión> {
@@ -169,6 +149,26 @@
 
 <default> ::= DEFAULT DOS_PUNTOS <instruccionesswitch>
 
+
+<instruccionesswitch> ::= <instruccionesswitch> <instruccionswitch> 
+| <instruccionswitch> 
+
+<instruccionswitch> ::= <variable>
+                | <ifs>
+                | <switch>
+                | <for>
+                | <slice>
+                | <append>
+                | <modificacionslice>
+                | <matrices>
+                | <asignacionmatriz>
+                | <struct>
+                | <structuso>
+                | <structmodificacion>
+                | <print>
+                | <asignacion>
+                | <break> 
+
 # FOR
 # for <condición> { // Bloque de sentencias }
 # for inicialización; condición; incremento { // Bloque de sentencias }
@@ -179,6 +179,26 @@
 | FOR <inicializacion> PUNTO_COMA <condicion> PUNTO_COMA ID <mento> <instruccionesfor>
 | FOR ID COMA <valor> PUNTO_IGUAL RANGE ID <instruccionesfor>
 
+<instruccionesfor> ::= <instruccionesfor> <instruccionfor> 
+| <instruccionfor> 
+
+<instruccionfor> ::= <variable>
+                | <ifs>
+                | <switch>
+                | <for>
+                | <slice>
+                | <append>
+                | <modificacionslice>
+                | <matrices>
+                | <asignacionmatriz>
+                | <struct>
+                | <structuso>
+                | <structmodificacion>
+                | <print>
+                | <asignacion>
+                | <break>
+                | <continue>
+
 <mento> ::= INCREMENTO
 | DECREMENTO
 
@@ -187,11 +207,6 @@
 
 # CONTINUE
 <continue> ::= CONTINUE
-
-# RETURN
-<return> ::= RETURN <valor>
-| RETURN
-
 
 # SLICE 
 # numbers := []int {1, 2, 3, 4, 5};
@@ -210,10 +225,9 @@
 | <accesoslice>
 | <accesomatriz>
 | <structacceso>
-| <aoti>
+| <atoi>
 | <parsefloat>
 | <typeof>
-
 
 # SLICE.INDEX slices.Index(numeros, 30)
 <index> ::= INDEX PARENTESIS_A ID COMA <valor> PARENTESIS_C
@@ -275,20 +289,6 @@
 
 # MODIFICACION STRUCT miInstancia.Nombre = "Bob"; 
 <structmodificacion> ::= <structacceso> IGUAL <valor> PUNTO_COMA
-
-#FUNCIONES 
-# func <nombreFuncion>() { // <cuerpo de la función> }
-# func <nombreFuncion>(<param1> <tipo1>, <param2> <tipo2>) { // <cuerpo de la función> }
-# func <nombreFuncion>(<param1> <tipo1>, <param2> <tipo2>) <tipoRetorno> { // <cuerpo de la función> return <valorDeRetorno> }
-
-<funcion> ::= FUNC ID PARENTESIS_A <parametros> PARENTESIS_C LLAVE_A <instrucciones> LLAVE_C 
-| FUNC ID PARENTESIS_A <parametros> PARENTESIS_C <tipo> LLAVE_A <instrucciones> <return> LLAVE_C 
-
-<parametros> ::= <parametros> COMA <parametro>
-|<parametro>
-
-<parametro> ::= ID <tipo>
-|
 
 # PRINT fmt.Println("cadena1", "cadena2")
 <print> ::= PRINT PARENTESIS_A <elementos> PARENTESIS_C
