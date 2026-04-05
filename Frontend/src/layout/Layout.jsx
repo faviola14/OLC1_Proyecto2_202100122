@@ -4,18 +4,25 @@ import Consola from "../components/Consola";
 import Archivos from "../components/Archivos";
 import "../styles/layout.css";
 
-function Layout() {
+
+function Layout({ contenidoEditor, setContenidoEditor, ejecutar, output }) {
   return (
-    <div className="container">
+     <div className="container">
       <Archivos />
 
-      <div className="main">
-        <Barra />
-        <Editor />
-        <Consola />
+        <div className="main">
+        <Barra ejecutar={ejecutar} />
+
+        <Editor
+          contenidoEditor={contenidoEditor}
+          setContenidoEditor={setContenidoEditor}
+        />
+         <Consola output={output} />
+
       </div>
-    </div>
+      </div>
   );
 }
+
 
 export default Layout;

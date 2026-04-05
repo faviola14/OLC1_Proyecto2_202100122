@@ -15,7 +15,8 @@
 # func <nombreFuncion>(<param1> <tipo1>, <param2> <tipo2>) <tipoRetorno> { // <cuerpo de la función> return <valorDeRetorno> }
 
 <funcion> ::= FUNC ID PARENTESIS_A <parametros> PARENTESIS_C LLAVE_A <instrucciones> LLAVE_C 
-| FUNC ID PARENTESIS_A <parametros> PARENTESIS_C <tipo> LLAVE_A <instrucciones> <retorno> LLAVE_C 
+| FUNC ID PARENTESIS_A <parametros> PARENTESIS_C <tipo> LLAVE_A <instrucciones> <retorno> LLAVE_C
+| FUNC ID PARENTESIS_A <parametros> PARENTESIS_C <tipo> LLAVE_A <retorno> LLAVE_C  
 
 <parametros> ::= <parametros> COMA <parametro>
 |<parametro>

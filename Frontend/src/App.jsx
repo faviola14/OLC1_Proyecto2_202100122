@@ -121,10 +121,50 @@ function App() {
 export default App
 */
 
+import { useState } from "react";
 import Layout from "./layout/Layout";
 
 function App() {
-  return <Layout />;
+
+ 
+  const [contenidoEditor, setContenidoEditor] = useState("");
+
+  
+  const [output, setOutput] = useState("");
+
+  const ejecutar = async () => {
+    try {
+      const res = await fetch("http://localhost:3000/analizar", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          codigo: contenidoEditor
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.ok) {
+        setOutput(data.resultado);
+      } else {
+        setOutput(data.error);
+      }
+
+    } catch (error) {
+      setOutput("Error de conexión con el servidor");
+    }
+  };
+
+  return (
+    <Layout
+      contenidoEditor={contenidoEditor}
+      setContenidoEditor={setContenidoEditor}
+      ejecutar={ejecutar}
+      output={output}
+    />
+  );
 }
 
 export default App;
