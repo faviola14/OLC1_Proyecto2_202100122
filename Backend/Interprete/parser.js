@@ -234,6 +234,9 @@ parse: function parse(input) {
     return true;
 }};
 
+    const Token = require('../Reports/Tokens');
+    const Simbolo = require('../Reports/Simbolos');
+    const Error = require('../Reports/Errores');
     const TablaTokens = require('../Reports/TablaTokens');
     const TablaSimbolos = require('../Reports/TablaSimbolos');
     const TablaErrores = require('../Reports/TablaErrores');
@@ -571,283 +574,352 @@ case 1: /* comentario de una línea */
 break;
 case 2: /* comentario multi-línea */ 
 break;
-case 3: 
-                            TablaTokens.agregarToken({tipo: "INT",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 3:   const intToken = new Token("INT", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(intToken);
                                 return 40;
                             
 break;
-case 4: TablaTokens.agregarToken({tipo: "FLOAT",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 4:   const float64Token = new Token("FLOAT", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(float64Token);
                                 return 41;
                             
 break;
-case 5: TablaTokens.agregarToken({tipo: "STRING",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 5:   const stringToken = new Token("STRING", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(stringToken);
                                 return 42;
                             
 break;
-case 6: TablaTokens.agregarToken({tipo: "BOOL",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 6:   const boolToken = new Token("BOOL", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(boolToken);
                                 return 43;
                             
 break;
-case 7: TablaTokens.agregarToken({tipo: "RUNE",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 7:   const runeToken = new Token("RUNE", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(runeToken);
                                 return 44;
                             
 break;
-case 8: TablaTokens.agregarToken({tipo: "SLICE",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 8:   const sliceToken = new Token("SLICE", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(sliceToken);
                                 return 'SLICE';
                             
 break;
-case 9: TablaTokens.agregarToken({tipo: "STRUCT",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 9:   const structToken = new Token("STRUCT", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(structToken);
                                 return 118;
                             
 break;
-case 10: TablaTokens.agregarToken({tipo: "NULL",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 10:   const nullToken = new Token("NULL", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(nullToken);
                                 return 'NULL';
                             
 break;
-case 11: TablaTokens.agregarToken({tipo: "PARENTESIS_A",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 11:   const parentesisAToken = new Token("PARENTESIS_A", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(parentesisAToken);
                                 return 9;
                             
 break;
-case 12: TablaTokens.agregarToken({tipo: "PARENTESIS_C",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 12:   const parentesisCToken = new Token("PARENTESIS_C", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(parentesisCToken);
                                 return 11;
                             
 break;
-case 13: TablaTokens.agregarToken({tipo: "CORCHETE_A",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 13:   const corcheteAToken = new Token("CORCHETE_A", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(corcheteAToken);
                                 return 45;
                             
 break;
-case 14: TablaTokens.agregarToken({tipo: "CORCHETE_C",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 14:   const corcheteCToken = new Token("CORCHETE_C", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(corcheteCToken);
                                 return 46;
                             
 break;
-case 15: TablaTokens.agregarToken({tipo: "ASIGNA_MAS",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 15:   const asignaMasToken = new Token("ASIGNA_MAS", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(asignaMasToken);
                                 return 59;
                             
 break;
-case 16: TablaTokens.agregarToken({tipo: "ASIGNA_MENOS",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 16:   const asignaMenosToken = new Token("ASIGNA_MENOS", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(asignaMenosToken);
                                 return 60;
                             
 break;
-case 17: TablaTokens.agregarToken({tipo: "INCREMENTO",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 17:   const incrementoToken = new Token("INCREMENTO", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(incrementoToken);
                                 return 96;
                             
 break;
-case 18: TablaTokens.agregarToken({tipo: "DECREMENTO",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 18:   const decrementoToken = new Token("DECREMENTO", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(decrementoToken);
                                 return 97;
                             
 break;
-case 19: TablaTokens.agregarToken({tipo: "BARRA",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 19:   const barraToken = new Token("BARRA", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(barraToken);
                                 return 57;
                             
 break;
-case 20: TablaTokens.agregarToken({tipo: "MODULO",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 20:   const moduloToken = new Token("MODULO", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(moduloToken);
                                 return 58;
                             
 break;
-case 21: TablaTokens.agregarToken({tipo: "ASTERISCO",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 21:   const asteriscoToken = new Token("ASTERISCO", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(asteriscoToken);
                                 return 55;
                             
 break;
-case 22: TablaTokens.agregarToken({tipo: "MAS",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 22:   const masToken = new Token("MAS", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(masToken);
                                 return 52;
                             
 break;
-case 23: TablaTokens.agregarToken({tipo: "MENOS",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 23:   const menosToken = new Token("MENOS", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(menosToken);
                                 return 54;
                             
 break;
-case 24: TablaTokens.agregarToken({tipo: "IGUALDAD",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 24:   const igualdadToken = new Token("IGUALDAD", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(igualdadToken);
                                 return 73;
                             
 break;
-case 25: TablaTokens.agregarToken({tipo: "DESIGUALDAD",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 25:   const desigualdadToken = new Token("DESIGUALDAD", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(desigualdadToken);
                                 return 74;
                             
 break;
-case 26: TablaTokens.agregarToken({tipo: "MAYOR_IGUAL",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 26:   const mayorIgualToken = new Token("MAYOR_IGUAL", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(mayorIgualToken);
                                 return 75;
                             
 break;
-case 27: TablaTokens.agregarToken({tipo: "MENOR_IGUAL",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 27:   const menorIgualToken = new Token("MENOR_IGUAL", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(menorIgualToken);
                                 return 76;
                             
 break;
-case 28: TablaTokens.agregarToken({tipo: "MAYOR",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 28:   const mayorToken = new Token("MAYOR", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(mayorToken);
                                 return 77;
                             
 break;
-case 29: TablaTokens.agregarToken({tipo: "MENOR",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 29:   const menorToken = new Token("MENOR", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(menorToken);
                                 return 78;
                             
 break;
-case 30: TablaTokens.agregarToken({tipo: "NOT",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 30:   const notToken = new Token("NOT", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(notToken);
                                 return 71;
                             
 break;
-case 31: TablaTokens.agregarToken({tipo: "AND",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 31:   const andToken = new Token("AND", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(andToken);
                                 return 70;
                             
 break;
-case 32: TablaTokens.agregarToken({tipo: "OR",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 32:   const orToken = new Token("OR", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(orToken);
                                 return 69;
                             
 break;
-case 33: TablaTokens.agregarToken({tipo: "VAR",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 33:   const varToken = new Token("VAR", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(varToken);
                                 return 36;
                             
 break;
-case 34: TablaTokens.agregarToken({tipo: "IF",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 34:   const ifToken = new Token("IF", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(ifToken);
                                 return 64;
                             
 break;
-case 35: TablaTokens.agregarToken({tipo: "ELSE",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 35:   const elseToken = new Token("ELSE", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(elseToken);
                                 return 67;
                             
 break;
-case 36: TablaTokens.agregarToken({tipo: "SWITCH",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 36:   const switchToken = new Token("SWITCH", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(switchToken);
                                 return 79;
                             
 break;
-case 37: TablaTokens.agregarToken({tipo: "CASE",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 37:   const caseToken = new Token("CASE", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(caseToken);
                                 return 83;
                             
 break;
-case 38: TablaTokens.agregarToken({tipo: "DEFAULT",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 38:   const defaultToken = new Token("DEFAULT", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(defaultToken);
                                 return 86;
                             
 break;
-case 39: TablaTokens.agregarToken({tipo: "PRINT",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 39:   const printToken = new Token("PRINT", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(printToken);
                                 return 124;
                             
 break;
-case 40: TablaTokens.agregarToken({tipo: "FOR",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 40:   const forToken = new Token("FOR", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(forToken);
                                 return 89;
                             
 break;
-case 41: TablaTokens.agregarToken({tipo: "RANGE",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 41:   const rangeToken = new Token("RANGE", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(rangeToken);
                                 return 93;
                             
 break;
-case 42: TablaTokens.agregarToken({tipo: "BREAK",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 42:   const breakToken = new Token("BREAK", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(breakToken);
                                 return 98;
                             
 break;
-case 43: TablaTokens.agregarToken({tipo: "CONTINUE",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 43:   const continueToken = new Token("CONTINUE", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(continueToken);
                                 return 99;
                             
 break;
-case 44: TablaTokens.agregarToken({tipo: "RETURN",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 44:   const returnToken = new Token("RETURN", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(returnToken);
                                 return 34;
                             
 break;
-case 45: TablaTokens.agregarToken({tipo: "INDEX",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 45:   const indexToken = new Token("INDEX", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(indexToken);
                                 return 110;
                             
 break;
-case 46: TablaTokens.agregarToken({tipo: "JOIN",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 46:   const joinToken = new Token("JOIN", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(joinToken);
                                 return 111;
                             
 break;
-case 47: TablaTokens.agregarToken({tipo: "LEN",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 47:   const lenToken = new Token("LEN", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(lenToken);
                                 return 112;
                             
 break;
-case 48: TablaTokens.agregarToken({tipo: "APPEND",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 48:   const appendToken = new Token("APPEND", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(appendToken);
                                 return 113;
                             
 break;
-case 49:   console.log("Función encontrada: " + yy_.yytext); 
-                                TablaTokens.agregarToken({tipo: "FUNC",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 49:   /*console.log("Función encontrada: " + yy_.yytext); */
+                                const funcToken = new Token("FUNC", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(funcToken);
                                 return 7;
                             
 break;
-case 50: TablaTokens.agregarToken({tipo: "ATOI",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 50:   const atoiToken = new Token("ATOI", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(atoiToken);
                                 return 125;
                             
 break;
-case 51: TablaTokens.agregarToken({tipo: "PARSEFLOAT",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 51:   const parseFloatToken = new Token("PARSEFLOAT", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(parseFloatToken);
                                 return 126;
                             
 break;
-case 52: TablaTokens.agregarToken({tipo: "TYPEOF",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 52:   const typeOfToken = new Token("TYPEOF", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(typeOfToken);
                                 return 127;
                             
 break;
-case 53: TablaTokens.agregarToken({tipo: "IGUAL",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 53:   const igualToken = new Token("IGUAL", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(igualToken);
                                 return 37;
                             
 break;
-case 54: TablaTokens.agregarToken({tipo: "LLAVE_A",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 54:   const llaveAToken = new Token("LLAVE_A", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(llaveAToken);
                                 return 12;
                             
 break;
-case 55: TablaTokens.agregarToken({tipo: "LLAVE_C",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 55:   const llaveCToken = new Token("LLAVE_C", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(llaveCToken);
                                 return 14;
                             
 break;
-case 56: TablaTokens.agregarToken({tipo: "DOS_PUNTOS",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 56:   const dosPuntosToken = new Token("DOS_PUNTOS", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(dosPuntosToken);
                                 return 84;
                             
 break;
-case 57: TablaTokens.agregarToken({tipo: "PUNTO_IGUAL",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 57:   const puntoIgualToken = new Token("PUNTO_IGUAL", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(puntoIgualToken);
                                 return 38;
                             
 break;
-case 58: TablaTokens.agregarToken({tipo: "COMA",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 58:   const comaToken = new Token("COMA", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(comaToken);
                                 return 17;
                             
 break;
-case 59: TablaTokens.agregarToken({tipo: "PUNTO_COMA",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 59:   const puntoComaToken = new Token("PUNTO_COMA", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(puntoComaToken);
                                 return 91;
                             
 break;
-case 60: TablaTokens.agregarToken({tipo: "PUNTO",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 60:   const puntoToken = new Token("PUNTO", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(puntoToken);
                                 return 123;
                             
 break;
-case 61: TablaTokens.agregarToken({tipo: "CADENA",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 61:   const cadenaToken = new Token("CADENA", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(cadenaToken);
                                 return 47;
                             
 break;
-case 62: TablaTokens.agregarToken({tipo: "NUMERO_DECIMAL",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 62:   const numeroDecimalToken = new Token("NUMERO_DECIMAL", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(numeroDecimalToken);
                                 return 48;
                             
 break;
-case 63: TablaTokens.agregarToken({tipo: "NUMERO",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 63:   const numeroToken = new Token("NUMERO", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(numeroToken);
                                 return 49;
                             
 break;
-case 64: TablaTokens.agregarToken({tipo: "COMILLA_DOBLE",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 64:   const comillaDobleToken = new Token("COMILLA_DOBLE", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(comillaDobleToken);
                                 return 'COMILLA_DOBLE';
                             
 break;
-case 65: TablaTokens.agregarToken({tipo: "BARRA_INVERTIDA",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 65:   const barraInvertidaToken = new Token("BARRA_INVERTIDA", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(barraInvertidaToken);
                                 return 'BARRA_INVERTIDA';
                             
 break;
-case 66: TablaTokens.agregarToken({tipo: "SALTO_LINEA",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 66:   const saltoLineaToken = new Token("SALTO_LINEA", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(saltoLineaToken);
                                 return 'SALTO_LINEA';
                             
 break;
-case 67: TablaTokens.agregarToken({tipo: "RETORNO_CARRO",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 67:   const retornoCarroToken = new Token("RETORNO_CARRO", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(retornoCarroToken);
                                 return 'RETORNO_CARRO';
                             
 break;
-case 68: TablaTokens.agregarToken({tipo: "TABULACION",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 68:   const tabulacionToken = new Token("TABULACION", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(tabulacionToken);
                                 return 'TABULACION';
                             
 break;
-case 69: TablaTokens.agregarToken({tipo: "ID",lexema: yy_.yytext,fila: yy_.yylineno,columna: yy_.yylloc.first_column});
+case 69:   const idToken = new Token("ID", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
+                                TablaTokens.agregarToken(idToken);
                                 return 8;
                             
 break;
 case 70:   
                                 TablaTokens.crearReporteTokens();
                                 TablaErrores.crearReporteErrores();
+                                TablaTokens.imprimirTabla();
+                                TablaErrores.imprimirTabla();
                                 return 5;
                             
 break;
-case 71:   TablaErrores.agregarError({tipo: "Lexico", descripcion: "Carácter inválido: " + yy_.yytext, fila: yy_.yylineno, columna: yy_.yylloc.first_column});
+case 71:   const error = new Error("El carácter " + yy_.yytext +" no pertenece al lenguaje", yy_.yylineno, yy_.yylloc.first_column);
+                                TablaErrores.agregarError(error);
                                 return 'INVALID';
                             
 break;

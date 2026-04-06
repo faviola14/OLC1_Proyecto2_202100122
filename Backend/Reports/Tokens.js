@@ -6,3 +6,5 @@ class Tokens{
         this.columna = columna;
     }
 }
+
+module.exports = Tokens;

@@ -6,3 +6,5 @@ class Errores{
     this.tipo = tipo;
   }
 }
+
+module.exports = Errores;

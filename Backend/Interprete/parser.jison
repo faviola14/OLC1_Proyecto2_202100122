@@ -1,4 +1,7 @@
 %{
+    const Token = require('../Reports/Tokens');
+    const Simbolo = require('../Reports/Simbolos');
+    const Error = require('../Reports/Errores');
     const TablaTokens = require('../Reports/TablaTokens');
     const TablaSimbolos = require('../Reports/TablaSimbolos');
     const TablaErrores = require('../Reports/TablaErrores');
@@ -14,240 +17,306 @@
 "/*"[^]*?"*/"             { /* comentario multi-línea */ }
 
 /* TIPOS DE DATOS */
-"int"                       { 
-                            TablaTokens.agregarToken({tipo: "INT",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"int"                       {   const intToken = new Token("INT", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(intToken);
                                 return 'INT';
                             }
-"float64"                   { TablaTokens.agregarToken({tipo: "FLOAT",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"float64"                   {   const float64Token = new Token("FLOAT", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(float64Token);
                                 return 'FLOAT';
                             }
-"string"                    { TablaTokens.agregarToken({tipo: "STRING",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"string"                    {   const stringToken = new Token("STRING", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(stringToken);
                                 return 'STRING';
                             }
-"bool"                      { TablaTokens.agregarToken({tipo: "BOOL",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"bool"                      {   const boolToken = new Token("BOOL", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(boolToken);
                                 return 'BOOL';
                             }
-"rune"                      { TablaTokens.agregarToken({tipo: "RUNE",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"rune"                      {   const runeToken = new Token("RUNE", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(runeToken);
                                 return 'RUNE';
                             }
 
 /* TIPOS COMPUESTOS */
-"slice"                     { TablaTokens.agregarToken({tipo: "SLICE",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"slice"                     {   const sliceToken = new Token("SLICE", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(sliceToken);
                                 return 'SLICE';
                             }
-"struct"                    { TablaTokens.agregarToken({tipo: "STRUCT",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"struct"                    {   const structToken = new Token("STRUCT", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(structToken);
                                 return 'STRUCT';
                             }
 
 /* NULL */
-"nil"                       { TablaTokens.agregarToken({tipo: "NULL",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"nil"                       {   const nullToken = new Token("NULL", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(nullToken);
                                 return 'NULL';
                             }
 
 /* AGRUPACIÓN */
-"("                         { TablaTokens.agregarToken({tipo: "PARENTESIS_A",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"("                         {   const parentesisAToken = new Token("PARENTESIS_A", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(parentesisAToken);
                                 return 'PARENTESIS_A';
                             }
-")"                         { TablaTokens.agregarToken({tipo: "PARENTESIS_C",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+")"                         {   const parentesisCToken = new Token("PARENTESIS_C", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(parentesisCToken);
                                 return 'PARENTESIS_C';
                             }
-"["                         { TablaTokens.agregarToken({tipo: "CORCHETE_A",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"["                         {   const corcheteAToken = new Token("CORCHETE_A", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(corcheteAToken);
                                 return 'CORCHETE_A';
                             }
-"]"                         { TablaTokens.agregarToken({tipo: "CORCHETE_C",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"]"                         {   const corcheteCToken = new Token("CORCHETE_C", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(corcheteCToken);
                                 return 'CORCHETE_C';
                             }
 
 /* ASIGNACIÓN */
-"+="                        { TablaTokens.agregarToken({tipo: "ASIGNA_MAS",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"+="                        {   const asignaMasToken = new Token("ASIGNA_MAS", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(asignaMasToken);
                                 return 'ASIGNA_MAS';
                             }
-"-="                        { TablaTokens.agregarToken({tipo: "ASIGNA_MENOS",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"-="                        {   const asignaMenosToken = new Token("ASIGNA_MENOS", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(asignaMenosToken);
                                 return 'ASIGNA_MENOS';
                             }
 
 /* PARA FOR */
-"++"                        { TablaTokens.agregarToken({tipo: "INCREMENTO",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"++"                        {   const incrementoToken = new Token("INCREMENTO", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(incrementoToken);
                                 return 'INCREMENTO';
                             }
-"--"                        { TablaTokens.agregarToken({tipo: "DECREMENTO",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"--"                        {   const decrementoToken = new Token("DECREMENTO", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(decrementoToken);
                                 return 'DECREMENTO';
                             }
 
 /* ARITMÉTICA */
-"/"                         { TablaTokens.agregarToken({tipo: "BARRA",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"/"                         {   const barraToken = new Token("BARRA", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(barraToken);
                                 return 'BARRA';
                             }
-"%"                         { TablaTokens.agregarToken({tipo: "MODULO",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"%"                         {   const moduloToken = new Token("MODULO", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(moduloToken);
                                 return 'MODULO';
                             }
-"*"                         { TablaTokens.agregarToken({tipo: "ASTERISCO",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"*"                         {   const asteriscoToken = new Token("ASTERISCO", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(asteriscoToken);
                                 return 'ASTERISCO';
                             }
-"+"                         { TablaTokens.agregarToken({tipo: "MAS",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"+"                         {   const masToken = new Token("MAS", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(masToken);
                                 return 'MAS';
                             }
 
 /* NEGACIÓN */
-"-"                         { TablaTokens.agregarToken({tipo: "MENOS",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"-"                         {   const menosToken = new Token("MENOS", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(menosToken);
                                 return 'MENOS';
                             }
 
 /* IGUALDAD Y DESIGUALDAD */
-"=="                        { TablaTokens.agregarToken({tipo: "IGUALDAD",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"=="                        {   const igualdadToken = new Token("IGUALDAD", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(igualdadToken);
                                 return 'IGUALDAD';
                             }
-"!="                        { TablaTokens.agregarToken({tipo: "DESIGUALDAD",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"!="                        {   const desigualdadToken = new Token("DESIGUALDAD", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(desigualdadToken);
                                 return 'DESIGUALDAD';
                             }
 
 /* RELACIONALES */
-">="                        { TablaTokens.agregarToken({tipo: "MAYOR_IGUAL",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+">="                        {   const mayorIgualToken = new Token("MAYOR_IGUAL", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(mayorIgualToken);
                                 return 'MAYOR_IGUAL';
                             }
-"<="                        { TablaTokens.agregarToken({tipo: "MENOR_IGUAL",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"<="                        {   const menorIgualToken = new Token("MENOR_IGUAL", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(menorIgualToken);
                                 return 'MENOR_IGUAL';
                             }
-">"                         { TablaTokens.agregarToken({tipo: "MAYOR",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+">"                         {   const mayorToken = new Token("MAYOR", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(mayorToken);
                                 return 'MAYOR';
                             }
-"<"                         { TablaTokens.agregarToken({tipo: "MENOR",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"<"                         {   const menorToken = new Token("MENOR", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(menorToken);
                                 return 'MENOR';
                             }
 
 /* LÓGICOS */
-"!"                         { TablaTokens.agregarToken({tipo: "NOT",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"!"                         {   const notToken = new Token("NOT", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(notToken);
                                 return 'NOT';
                             }
-"&&"                        { TablaTokens.agregarToken({tipo: "AND",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"&&"                        {   const andToken = new Token("AND", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(andToken);
                                 return 'AND';
                             }
-"||"                        { TablaTokens.agregarToken({tipo: "OR",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"||"                        {   const orToken = new Token("OR", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(orToken);
                                 return 'OR';
                             }
 
 /* SENTENCIAS */
-"var"                       { TablaTokens.agregarToken({tipo: "VAR",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"var"                       {   const varToken = new Token("VAR", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(varToken);
                                 return 'VAR';
                             }
-"if"                        { TablaTokens.agregarToken({tipo: "IF",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"if"                        {   const ifToken = new Token("IF", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(ifToken);
                                 return 'IF';
                             }
-"else"                      { TablaTokens.agregarToken({tipo: "ELSE",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"else"                      {   const elseToken = new Token("ELSE", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(elseToken);
                                 return 'ELSE';
                             }
-"switch"                    { TablaTokens.agregarToken({tipo: "SWITCH",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"switch"                    {   const switchToken = new Token("SWITCH", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(switchToken);
                                 return 'SWITCH';
                             }
-"case"                      { TablaTokens.agregarToken({tipo: "CASE",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"case"                      {   const caseToken = new Token("CASE", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(caseToken);
                                 return 'CASE';
                             }
-"default"                   { TablaTokens.agregarToken({tipo: "DEFAULT",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"default"                   {   const defaultToken = new Token("DEFAULT", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(defaultToken);
                                 return 'DEFAULT';
                             }
-"fmt.Println"               { TablaTokens.agregarToken({tipo: "PRINT",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"fmt.Println"               {   const printToken = new Token("PRINT", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(printToken);
                                 return 'PRINT';
                             }
-"for"                       { TablaTokens.agregarToken({tipo: "FOR",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"for"                       {   const forToken = new Token("FOR", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(forToken);
                                 return 'FOR';
                             }
-"range"                     { TablaTokens.agregarToken({tipo: "RANGE",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"range"                     {   const rangeToken = new Token("RANGE", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(rangeToken);
                                 return 'RANGE';
                             }
-"break"                     { TablaTokens.agregarToken({tipo: "BREAK",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"break"                     {   const breakToken = new Token("BREAK", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(breakToken);
                                 return 'BREAK';
                             }
-"continue"                  { TablaTokens.agregarToken({tipo: "CONTINUE",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"continue"                  {   const continueToken = new Token("CONTINUE", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(continueToken);
                                 return 'CONTINUE';
                             }
-"return"                    { TablaTokens.agregarToken({tipo: "RETURN",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"return"                    {   const returnToken = new Token("RETURN", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(returnToken);
                                 return 'RETURN';
                             }
-"slices.Index"              { TablaTokens.agregarToken({tipo: "INDEX",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"slices.Index"              {   const indexToken = new Token("INDEX", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(indexToken);
                                 return 'INDEX';
                             }
-"strings.Join"              { TablaTokens.agregarToken({tipo: "JOIN",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"strings.Join"              {   const joinToken = new Token("JOIN", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(joinToken);
                                 return 'JOIN';
                             }
-"len"                       { TablaTokens.agregarToken({tipo: "LEN",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"len"                       {   const lenToken = new Token("LEN", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(lenToken);
                                 return 'LEN';
                             }
-"append"                    { TablaTokens.agregarToken({tipo: "APPEND",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"append"                    {   const appendToken = new Token("APPEND", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(appendToken);
                                 return 'APPEND';
                             }
 "func"                      {   /*console.log("Función encontrada: " + yytext); */
-                                TablaTokens.agregarToken({tipo: "FUNC",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                const funcToken = new Token("FUNC", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(funcToken);
                                 return 'FUNC';
                             }
-"strconv.Atoi"              { TablaTokens.agregarToken({tipo: "ATOI",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"strconv.Atoi"              {   const atoiToken = new Token("ATOI", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(atoiToken);
                                 return 'ATOI';
                             }
-"strconv.ParseFloat"        { TablaTokens.agregarToken({tipo: "PARSEFLOAT",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"strconv.ParseFloat"        {   const parseFloatToken = new Token("PARSEFLOAT", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(parseFloatToken);
                                 return 'PARSEFLOAT';
                             }
-"reflect.TypeOf"            { TablaTokens.agregarToken({tipo: "TYPEOF",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"reflect.TypeOf"            {   const typeOfToken = new Token("TYPEOF", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(typeOfToken);
                                 return 'TYPEOF';
                             }
 
 /* OTROS SÍMBOLOS */
-"="                         { TablaTokens.agregarToken({tipo: "IGUAL",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"="                         {   const igualToken = new Token("IGUAL", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(igualToken);
                                 return 'IGUAL';
                             }
-"{"                         { TablaTokens.agregarToken({tipo: "LLAVE_A",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"{"                         {   const llaveAToken = new Token("LLAVE_A", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(llaveAToken);
                                 return 'LLAVE_A';
                             }
-"}"                         { TablaTokens.agregarToken({tipo: "LLAVE_C",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"}"                         {   const llaveCToken = new Token("LLAVE_C", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(llaveCToken);
                                 return 'LLAVE_C';
                             }
-":"                         { TablaTokens.agregarToken({tipo: "DOS_PUNTOS",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+":"                         {   const dosPuntosToken = new Token("DOS_PUNTOS", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(dosPuntosToken);
                                 return 'DOS_PUNTOS';
                             }
-":="                        { TablaTokens.agregarToken({tipo: "PUNTO_IGUAL",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+":="                        {   const puntoIgualToken = new Token("PUNTO_IGUAL", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(puntoIgualToken);
                                 return 'PUNTO_IGUAL';
                             }
-","                         { TablaTokens.agregarToken({tipo: "COMA",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+","                         {   const comaToken = new Token("COMA", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(comaToken);
                                 return 'COMA';
                             }
-";"                         { TablaTokens.agregarToken({tipo: "PUNTO_COMA",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+";"                         {   const puntoComaToken = new Token("PUNTO_COMA", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(puntoComaToken);
                                 return 'PUNTO_COMA';
                             }
-"."                         { TablaTokens.agregarToken({tipo: "PUNTO",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"."                         {   const puntoToken = new Token("PUNTO", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(puntoToken);
                                 return 'PUNTO';
                             }
 
 /* CADENA */
-\"([^\"\\]|\\.)*\"          { TablaTokens.agregarToken({tipo: "CADENA",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+\"([^\"\\]|\\.)*\"          {   const cadenaToken = new Token("CADENA", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(cadenaToken);
                                 return 'CADENA';
                             }
 
 
 /* NÚMEROS */
-[0-9]+"."[0-9]+           { TablaTokens.agregarToken({tipo: "NUMERO_DECIMAL",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+[0-9]+"."[0-9]+           {   const numeroDecimalToken = new Token("NUMERO_DECIMAL", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(numeroDecimalToken);
                                 return 'NUMERO_DECIMAL';
                             }
-[0-9]+                    { TablaTokens.agregarToken({tipo: "NUMERO",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+[0-9]+                    {   const numeroToken = new Token("NUMERO", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(numeroToken);
                                 return 'NUMERO';
                             }
 
 /* SECUENCIAS DE ESCAPE */
-"\""                        { TablaTokens.agregarToken({tipo: "COMILLA_DOBLE",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"\""                        {   const comillaDobleToken = new Token("COMILLA_DOBLE", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(comillaDobleToken);
                                 return 'COMILLA_DOBLE';
                             }
-"\\"                        { TablaTokens.agregarToken({tipo: "BARRA_INVERTIDA",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"\\"                        {   const barraInvertidaToken = new Token("BARRA_INVERTIDA", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(barraInvertidaToken);
                                 return 'BARRA_INVERTIDA';
                             }
-"\n"                        { TablaTokens.agregarToken({tipo: "SALTO_LINEA",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"\n"                        {   const saltoLineaToken = new Token("SALTO_LINEA", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(saltoLineaToken);
                                 return 'SALTO_LINEA';
                             }
-"\r"                        { TablaTokens.agregarToken({tipo: "RETORNO_CARRO",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"\r"                        {   const retornoCarroToken = new Token("RETORNO_CARRO", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(retornoCarroToken);
                                 return 'RETORNO_CARRO';
                             }
-"\t"                        { TablaTokens.agregarToken({tipo: "TABULACION",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+"\t"                        {   const tabulacionToken = new Token("TABULACION", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(tabulacionToken);
                                 return 'TABULACION';
                             }
 
 /* ID */
-[a-zA-Z_][a-zA-Z0-9_]*      { TablaTokens.agregarToken({tipo: "ID",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+[a-zA-Z_][a-zA-Z0-9_]*      {   const idToken = new Token("ID", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(idToken);
                                 return 'ID';
                             }
 
@@ -255,11 +324,14 @@
 <<EOF>>                     {   
                                 TablaTokens.crearReporteTokens();
                                 TablaErrores.crearReporteErrores();
+                                TablaTokens.imprimirTabla();
+                                TablaErrores.imprimirTabla();
                                 return 'EOF';
                             }
 
 /* ERRORES */
-.                           {   TablaErrores.agregarError({tipo: "Lexico", descripcion: "Carácter inválido: " + yytext, fila: yylineno, columna: yylloc.first_column});
+.                           {   const error = new Error("El carácter " + yytext +" no pertenece al lenguaje", yylineno, yylloc.first_column);
+                                TablaErrores.agregarError(error);
                                 return 'INVALID';
                             }
 

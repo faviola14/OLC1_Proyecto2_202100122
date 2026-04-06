@@ -9,3 +9,4 @@ class Simbolos {
   }
 
 }
+module.exports = Simbolos;
