@@ -1,10 +1,10 @@
-//console.log("hola mundo")
+console.log("hola mundo")
 
-//const parser = require("./Interprete/parser");
+const parser = require("./Interprete/parser");
 
-//console.log(parser.parse("func obtenerNumero() int {return 42}"));
+console.log(parser.parse("func obtenerNumero() int {return 42}"));
 
-
+/*
 const express = require("express");
 const cors = require("cors");
 
@@ -37,3 +37,4 @@ app.post("/analizar", (req, res) => {
 app.listen(3000, () => {
   console.log("Servidor corriendo en http://localhost:3000");
 });
+*/

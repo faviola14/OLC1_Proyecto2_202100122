@@ -1,125 +1,270 @@
-/* description: Parses and executes mathematical expressions. */
-
+%{
+    const TablaTokens = require('../Reports/TablaTokens');
+    const TablaSimbolos = require('../Reports/TablaSimbolos');
+    const TablaErrores = require('../Reports/TablaErrores');
+%}
 /* lexical grammar */
 %lex
 %%
 
-\s+                   /* skip whitespace */
+\s+                   {/* skip whitespace */}
 
 /* COMENTARIOS*/
-/\/\/.*                     { /* comentario de una línea */ }
-/\/\*[^]*?\*\/              { /* comentario multilínea */ }
+"//".*                    { /* comentario de una línea */ }
+"/*"[^]*?"*/"             { /* comentario multi-línea */ }
 
 /* TIPOS DE DATOS */
-"int"                       return 'INT';
-"float64"                   return 'FLOAT';
-"string"                    return 'STRING';
-"bool"                      return 'BOOL';
-"rune"                      return 'RUNE';
+"int"                       { 
+                            TablaTokens.agregarToken({tipo: "INT",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'INT';
+                            }
+"float64"                   { TablaTokens.agregarToken({tipo: "FLOAT",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'FLOAT';
+                            }
+"string"                    { TablaTokens.agregarToken({tipo: "STRING",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'STRING';
+                            }
+"bool"                      { TablaTokens.agregarToken({tipo: "BOOL",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'BOOL';
+                            }
+"rune"                      { TablaTokens.agregarToken({tipo: "RUNE",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'RUNE';
+                            }
 
 /* TIPOS COMPUESTOS */
-"slice"                     return 'SLICE';
-"struct"                    return 'STRUCT';
+"slice"                     { TablaTokens.agregarToken({tipo: "SLICE",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'SLICE';
+                            }
+"struct"                    { TablaTokens.agregarToken({tipo: "STRUCT",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'STRUCT';
+                            }
 
 /* NULL */
-"nil"                       return 'NULL';
+"nil"                       { TablaTokens.agregarToken({tipo: "NULL",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'NULL';
+                            }
 
 /* AGRUPACIÓN */
-"("                         return 'PARENTESIS_A';
-")"                         return 'PARENTESIS_C';
-"["                         return 'CORCHETE_A';
-"]"                         return 'CORCHETE_C';
+"("                         { TablaTokens.agregarToken({tipo: "PARENTESIS_A",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'PARENTESIS_A';
+                            }
+")"                         { TablaTokens.agregarToken({tipo: "PARENTESIS_C",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'PARENTESIS_C';
+                            }
+"["                         { TablaTokens.agregarToken({tipo: "CORCHETE_A",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'CORCHETE_A';
+                            }
+"]"                         { TablaTokens.agregarToken({tipo: "CORCHETE_C",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'CORCHETE_C';
+                            }
 
 /* ASIGNACIÓN */
-"+="                        return 'ASIGNA_MAS';
-"-="                        return 'ASIGNA_MENOS';
+"+="                        { TablaTokens.agregarToken({tipo: "ASIGNA_MAS",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'ASIGNA_MAS';
+                            }
+"-="                        { TablaTokens.agregarToken({tipo: "ASIGNA_MENOS",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'ASIGNA_MENOS';
+                            }
 
 /* PARA FOR */
-"++"                        return 'INCREMENTO';
-"--"                        return 'DECREMENTO';
+"++"                        { TablaTokens.agregarToken({tipo: "INCREMENTO",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'INCREMENTO';
+                            }
+"--"                        { TablaTokens.agregarToken({tipo: "DECREMENTO",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'DECREMENTO';
+                            }
 
 /* ARITMÉTICA */
-"/"                         return 'BARRA';
-"%"                         return 'MODULO';
-"*"                         return 'ASTERISCO';
-"+"                         return 'MAS';
+"/"                         { TablaTokens.agregarToken({tipo: "BARRA",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'BARRA';
+                            }
+"%"                         { TablaTokens.agregarToken({tipo: "MODULO",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'MODULO';
+                            }
+"*"                         { TablaTokens.agregarToken({tipo: "ASTERISCO",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'ASTERISCO';
+                            }
+"+"                         { TablaTokens.agregarToken({tipo: "MAS",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'MAS';
+                            }
 
 /* NEGACIÓN */
-"-"                         return 'MENOS';
+"-"                         { TablaTokens.agregarToken({tipo: "MENOS",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'MENOS';
+                            }
 
 /* IGUALDAD Y DESIGUALDAD */
-"=="                        return 'IGUALDAD';
-"!="                        return 'DESIGUALDAD';
+"=="                        { TablaTokens.agregarToken({tipo: "IGUALDAD",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'IGUALDAD';
+                            }
+"!="                        { TablaTokens.agregarToken({tipo: "DESIGUALDAD",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'DESIGUALDAD';
+                            }
 
 /* RELACIONALES */
-">="                        return 'MAYOR_IGUAL';
-"<="                        return 'MENOR_IGUAL';
-">"                         return 'MAYOR';
-"<"                         return 'MENOR';
+">="                        { TablaTokens.agregarToken({tipo: "MAYOR_IGUAL",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'MAYOR_IGUAL';
+                            }
+"<="                        { TablaTokens.agregarToken({tipo: "MENOR_IGUAL",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'MENOR_IGUAL';
+                            }
+">"                         { TablaTokens.agregarToken({tipo: "MAYOR",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'MAYOR';
+                            }
+"<"                         { TablaTokens.agregarToken({tipo: "MENOR",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'MENOR';
+                            }
 
 /* LÓGICOS */
-"!"                         return 'NOT';
-"&&"                        return 'AND';
-"||"                        return 'OR';
+"!"                         { TablaTokens.agregarToken({tipo: "NOT",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'NOT';
+                            }
+"&&"                        { TablaTokens.agregarToken({tipo: "AND",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'AND';
+                            }
+"||"                        { TablaTokens.agregarToken({tipo: "OR",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'OR';
+                            }
 
 /* SENTENCIAS */
-"var"                       return 'VAR';
-"if"                        return 'IF';
-"else"                      return 'ELSE';
-"switch"                    return 'SWITCH';
-"case"                      return 'CASE';
-"default"                   return 'DEFAULT';
-"fmt.Println"               return 'PRINT';
-"for"                       return 'FOR';
-"range"                     return 'RANGE';
-"break"                     return 'BREAK';
-"continue"                  return 'CONTINUE';
-"return"                    return 'RETURN';
-"slices.Index"              return 'INDEX';
-"strings.Join"              return 'JOIN';
-"len"                       return 'LEN';
-"append"                    return 'APPEND';
-"func"                      return 'FUNC';
-"strconv.Atoi"              return 'ATOI';
-"strconv.ParseFloat"        return 'PARSEFLOAT';
-"reflect.TypeOf"            return 'TYPEOF';
+"var"                       { TablaTokens.agregarToken({tipo: "VAR",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'VAR';
+                            }
+"if"                        { TablaTokens.agregarToken({tipo: "IF",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'IF';
+                            }
+"else"                      { TablaTokens.agregarToken({tipo: "ELSE",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'ELSE';
+                            }
+"switch"                    { TablaTokens.agregarToken({tipo: "SWITCH",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'SWITCH';
+                            }
+"case"                      { TablaTokens.agregarToken({tipo: "CASE",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'CASE';
+                            }
+"default"                   { TablaTokens.agregarToken({tipo: "DEFAULT",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'DEFAULT';
+                            }
+"fmt.Println"               { TablaTokens.agregarToken({tipo: "PRINT",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'PRINT';
+                            }
+"for"                       { TablaTokens.agregarToken({tipo: "FOR",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'FOR';
+                            }
+"range"                     { TablaTokens.agregarToken({tipo: "RANGE",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'RANGE';
+                            }
+"break"                     { TablaTokens.agregarToken({tipo: "BREAK",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'BREAK';
+                            }
+"continue"                  { TablaTokens.agregarToken({tipo: "CONTINUE",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'CONTINUE';
+                            }
+"return"                    { TablaTokens.agregarToken({tipo: "RETURN",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'RETURN';
+                            }
+"slices.Index"              { TablaTokens.agregarToken({tipo: "INDEX",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'INDEX';
+                            }
+"strings.Join"              { TablaTokens.agregarToken({tipo: "JOIN",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'JOIN';
+                            }
+"len"                       { TablaTokens.agregarToken({tipo: "LEN",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'LEN';
+                            }
+"append"                    { TablaTokens.agregarToken({tipo: "APPEND",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'APPEND';
+                            }
+"func"                      {   /*console.log("Función encontrada: " + yytext); */
+                                TablaTokens.agregarToken({tipo: "FUNC",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'FUNC';
+                            }
+"strconv.Atoi"              { TablaTokens.agregarToken({tipo: "ATOI",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'ATOI';
+                            }
+"strconv.ParseFloat"        { TablaTokens.agregarToken({tipo: "PARSEFLOAT",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'PARSEFLOAT';
+                            }
+"reflect.TypeOf"            { TablaTokens.agregarToken({tipo: "TYPEOF",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'TYPEOF';
+                            }
 
 /* OTROS SÍMBOLOS */
-"="                         return 'IGUAL';
-"{"                         return 'LLAVE_A';
-"}"                         return 'LLAVE_C';
-":"                         return 'DOS_PUNTOS';
-":="                        return 'PUNTO_IGUAL';
-","                         return 'COMA';
-";"                         return 'PUNTO_COMA';
-"."                         return 'PUNTO';
+"="                         { TablaTokens.agregarToken({tipo: "IGUAL",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'IGUAL';
+                            }
+"{"                         { TablaTokens.agregarToken({tipo: "LLAVE_A",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'LLAVE_A';
+                            }
+"}"                         { TablaTokens.agregarToken({tipo: "LLAVE_C",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'LLAVE_C';
+                            }
+":"                         { TablaTokens.agregarToken({tipo: "DOS_PUNTOS",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'DOS_PUNTOS';
+                            }
+":="                        { TablaTokens.agregarToken({tipo: "PUNTO_IGUAL",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'PUNTO_IGUAL';
+                            }
+","                         { TablaTokens.agregarToken({tipo: "COMA",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'COMA';
+                            }
+";"                         { TablaTokens.agregarToken({tipo: "PUNTO_COMA",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'PUNTO_COMA';
+                            }
+"."                         { TablaTokens.agregarToken({tipo: "PUNTO",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'PUNTO';
+                            }
 
 /* CADENA */
-\"([^\"\\]|\\.)*\"          return 'CADENA';
+\"([^\"\\]|\\.)*\"          { TablaTokens.agregarToken({tipo: "CADENA",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'CADENA';
+                            }
 
 
 /* NÚMEROS */
-[0-9]+"."[0-9]+           return 'NUMERO_DECIMAL';
-[0-9]+                    return 'NUMERO';
+[0-9]+"."[0-9]+           { TablaTokens.agregarToken({tipo: "NUMERO_DECIMAL",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'NUMERO_DECIMAL';
+                            }
+[0-9]+                    { TablaTokens.agregarToken({tipo: "NUMERO",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'NUMERO';
+                            }
 
 /* SECUENCIAS DE ESCAPE */
-"\""                        return 'COMILLA_DOBLE';
-"\\"                        return 'BARRA_INVERTIDA';
-"\n"                        return 'SALTO_LINEA';
-"\r"                        return 'RETORNO_CARRO';
-"\t"                        return 'TABULACION';
+"\""                        { TablaTokens.agregarToken({tipo: "COMILLA_DOBLE",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'COMILLA_DOBLE';
+                            }
+"\\"                        { TablaTokens.agregarToken({tipo: "BARRA_INVERTIDA",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'BARRA_INVERTIDA';
+                            }
+"\n"                        { TablaTokens.agregarToken({tipo: "SALTO_LINEA",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'SALTO_LINEA';
+                            }
+"\r"                        { TablaTokens.agregarToken({tipo: "RETORNO_CARRO",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'RETORNO_CARRO';
+                            }
+"\t"                        { TablaTokens.agregarToken({tipo: "TABULACION",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'TABULACION';
+                            }
 
 /* ID */
-[a-zA-Z_][a-zA-Z0-9_]*      return 'ID';
+[a-zA-Z_][a-zA-Z0-9_]*      { TablaTokens.agregarToken({tipo: "ID",lexema: yytext,fila: yylineno,columna: yylloc.first_column});
+                                return 'ID';
+                            }
 
 /* FIN DE DOCUMENTO */
-<<EOF>>                     return 'EOF';
+<<EOF>>                     {   
+                                TablaTokens.crearReporteTokens();
+                                TablaErrores.crearReporteErrores();
+                                return 'EOF';
+                            }
 
 /* ERRORES */
-.                           return 'INVALID';
+.                           {   TablaErrores.agregarError({tipo: "Lexico", descripcion: "Carácter inválido: " + yytext, fila: yylineno, columna: yylloc.first_column});
+                                return 'INVALID';
+                            }
 
 /lex
-
+%locations 
 /* operator associations and precedence */
 %token CADENA ID NUMERO NUMERO_DECIMAL 
 %token INT FLOAT STRING RUNE BOOL 
