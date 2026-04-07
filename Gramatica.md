@@ -183,6 +183,8 @@
 | FOR <inicializacion> PUNTO_COMA <condicion> PUNTO_COMA ID <mento> <instruccionesfor>
 | FOR ID COMA <valor> PUNTO_IGUAL RANGE ID <instruccionesfor>
 
+<inicializacion> ::= ID PUNTO_IGUAL <valor>
+
 <instruccionesfor> ::= <instruccionesfor> <instruccionfor> 
 | <instruccionfor> 
 

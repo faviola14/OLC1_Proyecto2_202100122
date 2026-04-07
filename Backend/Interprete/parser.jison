@@ -1,10 +1,13 @@
 %{
     const Token = require('../Reports/Tokens');
     const Simbolo = require('../Reports/Simbolos');
-    const Error = require('../Reports/Errores');
+    const ErrorL = require('../Reports/Errores');
     const TablaTokens = require('../Reports/TablaTokens');
     const TablaSimbolos = require('../Reports/TablaSimbolos');
     const TablaErrores = require('../Reports/TablaErrores');
+
+    let ambito= "";
+    let contadorBloques=0;
 %}
 /* lexical grammar */
 %lex
@@ -330,9 +333,9 @@
                             }
 
 /* ERRORES */
-.                           {   const error = new Error("Error léxico","El carácter " + yytext +" no pertenece al lenguaje", yylineno, yylloc.first_column);
-                                TablaErrores.agregarError(error);
-                                
+.                           {   const errorL = new ErrorL("Error léxico","El carácter " + yytext +" no pertenece al lenguaje", yylineno, yylloc.first_column);
+                                TablaErrores.agregarError(errorL);
+                                /* return 'INVALID' */
                             }
 
 /lex
@@ -372,7 +375,10 @@
 
 
 
-programa: funciones EOF {}
+programa: funciones EOF {  
+    TablaSimbolos.crearReporteSimbolos();
+    TablaSimbolos.imprimirTabla();
+}
 ;
 
 funciones: funciones funcion
@@ -382,8 +388,23 @@ funciones: funciones funcion
 /* FUNCIONES */ 
 
 funcion: FUNC ID PARENTESIS_A parametros PARENTESIS_C LLAVE_A instrucciones LLAVE_C
+{
+    const simbolo = new Simbolo($2,"Función","Función","Global", @2.first_line, @2.first_column);
+    TablaSimbolos.agregarSimbolo(simbolo);
+    ambito=$2;
+}
 | FUNC ID PARENTESIS_A parametros PARENTESIS_C tipo LLAVE_A instrucciones retorno LLAVE_C
+{
+    const simboloT = new Simbolo($2,"Función",$6,"Global",@2.first_line, @2.first_column);
+    TablaSimbolos.agregarSimbolo(simboloT);
+    ambito=$2;
+}
 | FUNC ID PARENTESIS_A parametros PARENTESIS_C tipo LLAVE_A retorno LLAVE_C
+{
+    const simboloR = new Simbolo($2,"Función",$6,"Global",@2.first_line, @2.first_column);
+    TablaSimbolos.agregarSimbolo(simboloR);
+    ambito=$2;
+}
 ;
 
 parametros: parametros COMA parametro
@@ -423,13 +444,29 @@ retorno: RETURN valor
 
 /* BLOQUE INDEPENDIENTE */
 bloqueindependiente: LLAVE_A instrucciones LLAVE_C
+{
+    contadorBloques=contadorBloques+1;
+    ambito="bloque"+String(contadorBloques);
+}
 ;
 
 
 /* VARIABLES */
 variable: VAR ID tipo IGUAL valor
+{
+    const variableI = new Simbolo($2,"Variable",$3,ambito, @2.first_line, @2.first_column);
+    TablaSimbolos.agregarSimbolo(variableI);
+}
 | VAR ID tipo
+{
+    const variable = new Simbolo($2,"Variable",$3,ambito, @2.first_line, @2.first_column);
+    TablaSimbolos.agregarSimbolo(variable);
+}
 | ID PUNTO_IGUAL valor
+{
+    const variableST = new Simbolo($1,"Variable","",ambito, @1.first_line, @1.first_column);
+    TablaSimbolos.agregarSimbolo(variableST);
+}
 ;
 
 
@@ -594,7 +631,15 @@ continue: CONTINUE
 
 /* SLICE */
 slice: ID PUNTO_IGUAL CORCHETE_A CORCHETE_C tipo CORCHETE_A elementos CORCHETE_C
+{
+    const slice = new Simbolo($1,"Slice",$6,ambito, @1.first_line, @1.first_column);
+    TablaSimbolos.agregarSimbolo(slice);
+}
 | VAR ID CORCHETE_A CORCHETE_C tipo
+{
+    const sliceV = new Simbolo($2,"Slice",$5,ambito, @2.first_line, @2.first_column);
+    TablaSimbolos.agregarSimbolo(sliceV);
+}
 ;
 
 elementos: elementos COMA valor
@@ -642,6 +687,10 @@ posicionslice: PARENTESIS_A NUMERO PARENTESIS_C
 
 /* MATRICES INICIALIZACION MULTIDIMENSIONAL */
 matrices: ID PUNTO_IGUAL CORCHETE_A CORCHETE_C CORCHETE_A CORCHETE_C tipo LLAVE_A FILAS LLAVE_C
+{
+    const matriz = new Simbolo($1,"Matriz",$6,ambito, @1.first_line, @1.first_column);
+    TablaSimbolos.agregarSimbolo(matriz);
+}
 ;
 
 filas: filas COMA fila
@@ -661,6 +710,10 @@ accesomatriz: ID CORCHETE_A NUMERO CORCHETE_C CORCHETE_A NUMERO CORCHETE_C
 
 /* STRUCT */
 struct: STRUCT ID LLAVE_A atributos LLAVE_C
+{
+    const struct = new Simbolo($2,"Struct","struct",ambito, @2.first_line, @2.first_column);
+    TablaSimbolos.agregarSimbolo(struct);
+}
 ;
 
 atributos: atributos atributo
