@@ -26,6 +26,7 @@
 
 <instrucciones> ::= <instrucciones> <instruccion> 
 | <instruccion> 
+| ε
 
 <instruccion> ::= <variable>
                 | <ifs>
@@ -41,10 +42,15 @@
                 | <structmodificacion>
                 | <print>
                 | <asignacion>
+                | <bloqueindependiente>
 
 # RETURN
 <retorno> ::= RETURN <valor>
 | RETURN
+
+# BLOQUE INDEPENDIENTE {instrucciones}
+<bloqueindependiente> ::= LLAVE_A <instrucciones> LLAVE_C
+
 
 # VAR
 # var <identificador> <Tipo> = <Expresión> 
@@ -54,9 +60,6 @@
 <variable> ::= VAR ID <tipo> IGUAL <valor>
 | VAR ID <tipo>
 | ID PUNTO_IGUAL <valor>
-| <inicializacion>
-
-<inicializacion> ::= ID IGUAL <valor> 
 
 <tipo> ::= INT
 | FLOAT
@@ -68,7 +71,6 @@
 <valor> ::= CADENA
 | NUMERO_DECIMAL
 | NUMERO 
-| <operacion>
 | ID 
 | <funcionesestructura> 
 
@@ -91,8 +93,9 @@
 | CADENA
 
 # ASIGNACIONES VARIABLES
-<asignacion> ::= ID ASIGNA_MAS <valor>
-| ID ASIGNA_MENOS <valor>
+<asignacion> ::= ID IGUAL <operacion>
+| ID ASIGNA_MAS <operacion>
+| ID ASIGNA_MENOS <operacion>
 
 # IF 
 # if condicion { // Bloque de sentencias para el if } else if condicion { // Bloque de sentencias para el else if } else { // Bloque de sentencias para el else }

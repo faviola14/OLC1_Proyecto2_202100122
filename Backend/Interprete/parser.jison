@@ -242,10 +242,6 @@
                             }
 
 /* OTROS SÍMBOLOS */
-"="                         {   const igualToken = new Token("IGUAL", yytext, yylineno, yylloc.first_column);
-                                TablaTokens.agregarToken(igualToken);
-                                return 'IGUAL';
-                            }
 "{"                         {   const llaveAToken = new Token("LLAVE_A", yytext, yylineno, yylloc.first_column);
                                 TablaTokens.agregarToken(llaveAToken);
                                 return 'LLAVE_A';
@@ -254,13 +250,17 @@
                                 TablaTokens.agregarToken(llaveCToken);
                                 return 'LLAVE_C';
                             }
-":"                         {   const dosPuntosToken = new Token("DOS_PUNTOS", yytext, yylineno, yylloc.first_column);
-                                TablaTokens.agregarToken(dosPuntosToken);
-                                return 'DOS_PUNTOS';
-                            }
 ":="                        {   const puntoIgualToken = new Token("PUNTO_IGUAL", yytext, yylineno, yylloc.first_column);
                                 TablaTokens.agregarToken(puntoIgualToken);
                                 return 'PUNTO_IGUAL';
+                            }
+"="                         {   const igualToken = new Token("IGUAL", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(igualToken);
+                                return 'IGUAL';
+                            }
+":"                         {   const dosPuntosToken = new Token("DOS_PUNTOS", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(dosPuntosToken);
+                                return 'DOS_PUNTOS';
                             }
 ","                         {   const comaToken = new Token("COMA", yytext, yylineno, yylloc.first_column);
                                 TablaTokens.agregarToken(comaToken);
@@ -330,9 +330,9 @@
                             }
 
 /* ERRORES */
-.                           {   const error = new Error("El carácter " + yytext +" no pertenece al lenguaje", yylineno, yylloc.first_column);
+.                           {   const error = new Error("Error léxico","El carácter " + yytext +" no pertenece al lenguaje", yylineno, yylloc.first_column);
                                 TablaErrores.agregarError(error);
-                                return 'INVALID';
+                                
                             }
 
 /lex
@@ -396,6 +396,7 @@ parametro: ID tipo
 
 instrucciones: instrucciones instruccion
 | instruccion
+| /* vacío */
 ; 
 
 instruccion: variable
@@ -412,6 +413,7 @@ instruccion: variable
 | structmodificacion
 | print 
 | asignacion 
+| bloqueindependiente
 ;
 
 /* RETURN */
@@ -419,15 +421,18 @@ retorno: RETURN valor
 | RETURN
 ;
 
+/* BLOQUE INDEPENDIENTE */
+bloqueindependiente: LLAVE_A instrucciones LLAVE_C
+;
+
+
 /* VARIABLES */
 variable: VAR ID tipo IGUAL valor
 | VAR ID tipo
 | ID PUNTO_IGUAL valor
-| inicializacion
 ;
 
-inicializacion: ID IGUAL valor
-;
+
 
 tipo: INT
 | FLOAT
@@ -440,7 +445,6 @@ tipo: INT
 valor: CADENA
 | NUMERO_DECIMAL
 | NUMERO
-| operacion
 | ID
 | funcionesestructura
 ;
@@ -467,8 +471,9 @@ operacionmenossimple: MENOS operacionmenossimple %prec UMINUS
 ;
 
 /* ASIGNACIONES VARIABLES */
-asignacion: ID ASIGNA_MAS valor
-| ID ASIGNA_MENOS valor
+asignacion: ID IGUAL operacion
+| ID ASIGNA_MAS operacion
+| ID ASIGNA_MENOS operacion
 ;
 
 /* IF */
