@@ -17,6 +17,7 @@
 <funcion> ::= FUNC ID PARENTESIS_A <parametros> PARENTESIS_C LLAVE_A <instrucciones> LLAVE_C 
 | FUNC ID PARENTESIS_A <parametros> PARENTESIS_C <tipo> LLAVE_A <instrucciones> <retorno> LLAVE_C
 | FUNC ID PARENTESIS_A <parametros> PARENTESIS_C <tipo> LLAVE_A <retorno> LLAVE_C  
+| <struct>
 
 <parametros> ::= <parametros> COMA <parametro>
 |<parametro>
@@ -24,7 +25,9 @@
 
 <parametro> ::= ID <tipo>
 
-<instrucciones> ::= <instrucciones> <instruccion> 
+<instrucciones> ::= <instrucciones> <instruccion> PUNTO_COMA 
+| <instrucciones> <instruccion> 
+| <instruccion> PUNTO COMA;
 | <instruccion> 
 | ε
 
@@ -42,6 +45,9 @@
                 | <structmodificacion>
                 | <print>
                 | <asignacion>
+                | <accesofunc>
+                | <break>
+                | <continue>
                 | <bloqueindependiente>
 
 # RETURN
@@ -68,10 +74,8 @@
 | RUNE
 | CORCHETE_A CORCHETE_C <tipo>
 
-<valor> ::= CADENA
-| NUMERO_DECIMAL
-| NUMERO 
-| ID 
+<valor> ::= operacion
+| CADENA
 | <funcionesestructura> 
 
 # OPERACIONES
@@ -105,11 +109,13 @@
 | <if> <else>
 | <if>
 
-<if> ::= IF <condicion> <codigo>
+<if> ::= IF <expresionRelacional> <codigo>
+| IF ID <codigo>
 
 <else> ::= ELSE <codigo>
 
-<elseif> ::= ELSE IF <condicion> <codigo>
+<elseif> ::= ELSE IF <expresionRelacional> <codigo>
+| ELSE IF <expresionRelacional> <codigo>
 
 <codigo> ::= LLAVE_A <instrucciones> LLAVE_C
 
@@ -141,10 +147,10 @@
 # // Declaraciones ejecutadas si ningún caso coincide
 # }
 
-<switch> ::= SWITCH <expresionRelacional> LLAVE_A <cases> <default> LLAVE_C 
-| SWITCH PARENTESIS_A <expresionRelacional> PARENTESIS_C LLAVE_A <cases> <default> LLAVE_C
-| SWITCH <expresionRelacional> LLAVE_A <cases> LLAVE_C 
-| SWITCH PARENTESIS_A <expresionRelacional> PARENTESIS_C LLAVE_A <cases>  LLAVE_C
+<switch> ::= SWITCH <condicion> LLAVE_A <cases> <default> LLAVE_C 
+| SWITCH PARENTESIS_A <condicion> PARENTESIS_C LLAVE_A <cases> <default> LLAVE_C
+| SWITCH <condicion> LLAVE_A <cases> LLAVE_C 
+| SWITCH PARENTESIS_A <condicion> PARENTESIS_C LLAVE_A <cases>  LLAVE_C
 
 <cases> ::= <cases> <case>
 | <case>
@@ -171,7 +177,9 @@
                 | <structmodificacion>
                 | <print>
                 | <asignacion>
-                | <break> 
+                | <accesofunc>
+                | <break>
+                | <continue>
 
 # FOR
 # for <condición> { // Bloque de sentencias }
@@ -179,9 +187,11 @@
 # for índice, valor := range slice { //...}
 
 
-<for> ::= FOR <condicion> <instruccionesfor>
-| FOR <inicializacion> PUNTO_COMA <condicion> PUNTO_COMA ID <mento> <instruccionesfor>
-| FOR ID COMA <valor> PUNTO_IGUAL RANGE ID <instruccionesfor>
+<for> ::= FOR <expresionRelacional> LLAVE_A <instruccionesfor> LLAVE_C
+| FOR ID LLAVE_A <instruccionesfor> LLAVE_C
+| FOR <inicializacion> PUNTO_COMA <expresionRelacional> PUNTO_COMA <mento> LLAVE_A <instruccionesfor> LLAVE_C
+| FOR ID PUNTO_COMA <expresionRelacional> PUNTO_COMA <mento> LLAVE_A <instruccionesfor> LLAVE_C
+| FOR ID COMA <valor> PUNTO_IGUAL RANGE ID LLAVE_A <instruccionesfor> LLAVE_C
 
 <inicializacion> ::= ID PUNTO_IGUAL <valor>
 
@@ -202,11 +212,12 @@
                 | <structmodificacion>
                 | <print>
                 | <asignacion>
+                | <accesofunc>
                 | <break>
                 | <continue>
 
-<mento> ::= INCREMENTO
-| DECREMENTO
+<mento> ::= ID INCREMENTO
+| ID DECREMENTO
 
 # BREAK
 <break> ::= BREAK 
@@ -218,8 +229,9 @@
 # numbers := []int {1, 2, 3, 4, 5};
 # var slice []int
 
-<slice> ::= ID PUNTO_IGUAL CORCHETE_A CORCHETE_C <tipo> CORCHETE_A <elementos> CORCHETE_C 
-| VAR ID CORCHETE_A CORCHETE_C <tipo>
+<slice> ::= ID IGUAL  <tipo> CORCHETE_A <elementos> CORCHETE_C 
+| ID PUNTO_IGUAL  <tipo> CORCHETE_A <elementos> CORCHETE_C
+| VAR ID  <tipo>
 
 <elementos> ::= <elementos> COMA <valor>
 |<valor>
@@ -234,6 +246,7 @@
 | <atoi>
 | <parsefloat>
 | <typeof>
+| <accesofunc>
 
 # SLICE.INDEX slices.Index(numeros, 30)
 <index> ::= INDEX PARENTESIS_A ID COMA <valor> PARENTESIS_C
@@ -251,9 +264,9 @@
 <accesoslice> ::= ID <posicionslice>
 
 # MODIFICACIÓN SLICE numeros[2] = 100
-<modificacionslice> ::= <posicionslice> <valor>
+<modificacionslice> ::= ID <posicionslice> IGUAL <valor>
 
-<posicionslice> ::=  PARENTESIS_A NUMERO PARENTESIS_C
+<posicionslice> ::=  CORCHETE_A NUMERO CORCHETE_C
 
 #MATRICES INICIALIZACIÓN MATRIZ MULTIDIMENSIONAL
 # mtx2 := [][]int{ {0, 0, 0}, // Fila 1 {0, 0, 0}, // Fila 2 {0, 0, 0}, // Fila 3 }
@@ -261,7 +274,8 @@
 <matrices> ::= ID PUNTO_IGUAL CORCHETE_A CORCHETE_C CORCHETE_A CORCHETE_C <tipo> LLAVE_A <filas> LLAVE_C
 
 <filas> ::= <filas> COMA <fila>
-|<fila>
+| <filas> COMA
+| <fila>
 
 <fila> ::= LLAVE_A <elementos> LLAVE_C
 
@@ -300,12 +314,17 @@
 <print> ::= PRINT PARENTESIS_A <elementos> PARENTESIS_C
 
 # ATOI strconv.Atoi("123")
-<atoi> ATOI PARENTESIS_A <valor> PARENTESIS_C
+<atoi>  ::= ATOI PARENTESIS_A <valor> PARENTESIS_C
 
 # PARSEFLOAT strconv.ParseFloat("123.45")
-<parsefloat> PARSEFLOAT PARENTESIS_A <valor> PARENTESIS_C
+<parsefloat>  ::= PARSEFLOAT PARENTESIS_A <valor> PARENTESIS_C
 
 #TYPEOF
-<typeof> ID PUNTO TYPEOF PARENTESIS_A <valor> PARENTESIS_C
+<typeof> ::=  ID PUNTO TYPEOF PARENTESIS_A <valor> PARENTESIS_C
+
+# acceso función suma(3, 7)
+<accesofunc> ::= ID PARENTESIS_A <elementos> PARENTESIS_C
+
+
 
 ```

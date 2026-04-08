@@ -405,6 +405,7 @@ funcion: FUNC ID PARENTESIS_A parametros PARENTESIS_C LLAVE_A instrucciones LLAV
     TablaSimbolos.agregarSimbolo(simboloR);
     ambito=$2;
 }
+| struct
 ;
 
 parametros: parametros COMA parametro
@@ -416,7 +417,9 @@ parametro: ID tipo
 ;
 
 instrucciones: instrucciones instruccion
+| instrucciones instruccion PUNTO_COMA
 | instruccion
+| instruccion PUNTO_COMA
 | /* vacío */
 ; 
 
@@ -424,9 +427,9 @@ instruccion: variable
 | ifs
 | switch
 | for
+| modificacionslice
 | slice
 | append
-| modificacionslice
 | matrices
 | asignacionmatriz 
 | struct 
@@ -434,13 +437,19 @@ instruccion: variable
 | structmodificacion
 | print 
 | asignacion 
+| mento
+| accesofunc
 | bloqueindependiente
+| break
+| continue
 ;
 
 /* RETURN */
 retorno: RETURN valor
 | RETURN
 ;
+
+
 
 /* BLOQUE INDEPENDIENTE */
 bloqueindependiente: LLAVE_A instrucciones LLAVE_C
@@ -449,7 +458,6 @@ bloqueindependiente: LLAVE_A instrucciones LLAVE_C
     ambito="bloque"+String(contadorBloques);
 }
 ;
-
 
 /* VARIABLES */
 variable: VAR ID tipo IGUAL valor
@@ -469,20 +477,16 @@ variable: VAR ID tipo IGUAL valor
 }
 ;
 
-
-
-tipo: INT
-| FLOAT
-| STRING
-| BOOL
-| RUNE
-| CORCHETE_A CORCHETE_C tipo
+tipo: INT { $$ = "int"; }
+| FLOAT { $$ = "float64"; }
+| STRING { $$ = "string"; }
+| BOOL { $$ = "bool"; }
+| RUNE { $$ = "rune"; }
+| CORCHETE_A CORCHETE_C tipo { $$ = "[]" + $3; }
 ;
 
-valor: CADENA
-| NUMERO_DECIMAL
-| NUMERO
-| ID
+valor: operacion
+| CADENA
 | funcionesestructura
 ;
 
@@ -520,20 +524,22 @@ ifs: if elseif else
 | if
 ;
 
-if: IF condicion codigo
+if: IF expresionRelacional codigo
+| IF ID codigo
 ;
 
 else: ELSE codigo
 ;
 
-elseif: ELSE IF condicion codigo
+elseif: ELSE IF expresionRelacional codigo
+| ELSE IF ID codigo
 ;
 
 codigo: LLAVE_A instrucciones LLAVE_C
 ;
 
 condicion: expresionRelacional
-| ID 
+| ID
 ;
 
 expresionRelacional: expresionRelacional OR expresionRelacional
@@ -552,10 +558,10 @@ comparacion: valor IGUALDAD valor
 ;
 
 /* SWITCH */
-switch: SWITCH expresionRelacional LLAVE_A cases default LLAVE_C
-| SWITCH PARENTESIS_A expresionRelacional PARENTESIS_C LLAVE_A cases default LLAVE_C
-| SWITCH expresionRelacional LLAVE_A cases LLAVE_C
-| SWITCH PARENTESIS_A expresionRelacional PARENTESIS_C LLAVE_A cases LLAVE_C
+switch: SWITCH condicion LLAVE_A cases default LLAVE_C
+| SWITCH PARENTESIS_A condicion PARENTESIS_C LLAVE_A cases default LLAVE_C
+| SWITCH condicion LLAVE_A cases LLAVE_C
+| SWITCH PARENTESIS_A condicion PARENTESIS_C LLAVE_A cases LLAVE_C
 ;
 
 cases: cases case
@@ -576,9 +582,9 @@ instruccionswitch: variable
 | ifs
 | switch
 | for
+| modificacionslice
 | slice
 | append
-| modificacionslice
 | matrices
 | asignacionmatriz 
 | struct 
@@ -586,13 +592,20 @@ instruccionswitch: variable
 | structmodificacion
 | print 
 | asignacion 
+| mento
+| accesofunc
 | break
+| continue
 ;
 
 /* FOR */ 
-for: FOR condicion instruccionesfor
-| FOR inicializacion PUNTO_COMA condicion PUNTO_COMA ID mento instruccionesfor
-| FOR ID COMA valor PUNTO_IGUAL RANGE ID instruccionesfor
+for: FOR expresionRelacional LLAVE_A instruccionesfor LLAVE_C
+| FOR ID LLAVE_A instruccionesfor LLAVE_C
+| FOR inicializacion PUNTO_COMA expresionRelacional PUNTO_COMA mento LLAVE_A instruccionesfor LLAVE_C
+| FOR inicializacion PUNTO_COMA ID PUNTO_COMA mento LLAVE_A instruccionesfor LLAVE_C
+| FOR ID COMA valor PUNTO_IGUAL RANGE ID LLAVE_A instruccionesfor LLAVE_C
+;
+inicializacion: ID PUNTO_IGUAL valor
 ;
 
 instruccionesfor: instruccionesfor instruccionfor 
@@ -603,9 +616,9 @@ instruccionfor: variable
 | ifs
 | switch
 | for
+| modificacionslice
 | slice
 | append
-| modificacionslice
 | matrices
 | asignacionmatriz 
 | struct 
@@ -613,12 +626,14 @@ instruccionfor: variable
 | structmodificacion
 | print 
 | asignacion 
+| mento
+| accesofunc
 | break
 | continue
 ;
 
-mento: INCREMENTO
-| DECREMENTO
+mento: ID INCREMENTO
+| ID DECREMENTO
 ;
 
 /* BREAK */
@@ -630,14 +645,19 @@ continue: CONTINUE
 ;
 
 /* SLICE */
-slice: ID PUNTO_IGUAL CORCHETE_A CORCHETE_C tipo CORCHETE_A elementos CORCHETE_C
+slice: ID IGUAL tipo LLAVE_A elementos LLAVE_C
 {
-    const slice = new Simbolo($1,"Slice",$6,ambito, @1.first_line, @1.first_column);
+    const slice = new Simbolo($1,"Slice",$3,ambito, @1.first_line, @1.first_column);
     TablaSimbolos.agregarSimbolo(slice);
 }
-| VAR ID CORCHETE_A CORCHETE_C tipo
+| ID PUNTO_IGUAL tipo LLAVE_A elementos LLAVE_C
 {
-    const sliceV = new Simbolo($2,"Slice",$5,ambito, @2.first_line, @2.first_column);
+    const slice = new Simbolo($1,"Slice",$3,ambito, @1.first_line, @1.first_column);
+    TablaSimbolos.agregarSimbolo(slice);
+}
+| VAR ID tipo
+{
+    const sliceV = new Simbolo($2,"Slice",$3,ambito, @2.first_line, @2.first_column);
     TablaSimbolos.agregarSimbolo(sliceV);
 }
 ;
@@ -656,6 +676,7 @@ funcionesestructura: index
 | atoi 
 | parsefloat 
 | typeof 
+| accesofunc
 ;
 
 /* SLICE.INDEX */
@@ -679,14 +700,14 @@ accesoslice: ID posicionslice
 ;
 
 /* MODIFICACION SLICE */
-modificacionslice: posicionslice valor
+modificacionslice: ID posicionslice IGUAL valor
 ;
 
-posicionslice: PARENTESIS_A NUMERO PARENTESIS_C
+posicionslice: CORCHETE_A NUMERO CORCHETE_C
 ;
 
 /* MATRICES INICIALIZACION MULTIDIMENSIONAL */
-matrices: ID PUNTO_IGUAL CORCHETE_A CORCHETE_C CORCHETE_A CORCHETE_C tipo LLAVE_A FILAS LLAVE_C
+matrices: ID PUNTO_IGUAL CORCHETE_A CORCHETE_C CORCHETE_A CORCHETE_C tipo LLAVE_A filas LLAVE_C
 {
     const matriz = new Simbolo($1,"Matriz",$6,ambito, @1.first_line, @1.first_column);
     TablaSimbolos.agregarSimbolo(matriz);
@@ -694,6 +715,7 @@ matrices: ID PUNTO_IGUAL CORCHETE_A CORCHETE_C CORCHETE_A CORCHETE_C tipo LLAVE_
 ;
 
 filas: filas COMA fila
+| filas COMA
 | fila
 ;
 
@@ -756,4 +778,8 @@ parsefloat: PARSEFLOAT PARENTESIS_A valor PARENTESIS_C
 
 /* TYPEOF */
 typeof: ID PUNTO TYPEOF PARENTESIS_A valor PARENTESIS_C
+;
+
+/* ACCESO FUNC */
+accesofunc: ID PARENTESIS_A elementos PARENTESIS_C
 ;
