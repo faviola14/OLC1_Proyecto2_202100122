@@ -70,6 +70,10 @@ function crearReporteSimbolos() {
     console.log("Reporte de simbolos creado: reporte_simbolos.html");
 }
 
+function existeSimbolo(id) {
+    return listaSimbolos.some(simbolo => simbolo.id === id);
+}
+
 module.exports = {
     inicializarTablaSimbolos,
     getListaSimbolos,
@@ -79,5 +83,6 @@ module.exports = {
     imprimirTabla,
     generarReporteHTML,
     guardarArchivoHTML,
-    crearReporteSimbolos
+    crearReporteSimbolos,
+    existeSimbolo
 };
