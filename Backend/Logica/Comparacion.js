@@ -30,3 +30,5 @@ class Comparacion {
         return obj;
     }
 }
+
+module.exports = Comparacion;

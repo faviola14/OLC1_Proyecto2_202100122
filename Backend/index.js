@@ -2,6 +2,8 @@ console.log("hola mundo")
 
 const parser = require("./Interprete/parser");
 
+
+
 const codigo = `
 func main() {
 // Variable global
@@ -164,7 +166,17 @@ fmt.Println("Resultado:", resultado)
 }
 `;
 
-console.log(parser.parse(codigo));
+const cod2 = `func x() {
+
+i = 1 + 9
+for 4 <= 5 {
+fmt.Println(w)
+w++
+}
+fmt.Println("Resultado:", resultado)
+}`;
+
+console.log(parser.parse(cod2));
 
 /*
 const express = require("express");

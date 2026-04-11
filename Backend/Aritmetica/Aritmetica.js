@@ -34,3 +34,5 @@ class Aritmetica {
         return obj;
     }
 }
+
+module.exports = Aritmetica;

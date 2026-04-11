@@ -5,6 +5,11 @@
     const TablaTokens = require('../Reports/TablaTokens');
     const TablaSimbolos = require('../Reports/TablaSimbolos');
     const TablaErrores = require('../Reports/TablaErrores');
+    const Comparacion=require('../Logica/Comparacion');
+    const Logica=require('../Logica/Logica');
+    const Not=require('../Logica/Not');
+    const Aritmetica=require('../Aritmetica/Aritmetica');
+    const Negativo=require('../Aritmetica/Negativo');
 
     let ambito= "";
     let contadorBloques=0;
@@ -486,29 +491,46 @@ tipo: INT { $$ = "int"; }
 ;
 
 valor: operacion
+{ $$ = $1;
+    console.log("Condición: " + $1);
+    }
 | CADENA
+{ $$ = yytext; }
 | funcionesestructura
 ;
 
 /* OPERACIONES */
 operacion: operacion MAS operacionsimple
+{ $$ = new Aritmetica($1, "+", $3); }
 | operacion MENOS operacionsimple
+{ $$ = new Aritmetica($1, "-", $3); }
 | operacionsimple
+{ $$ = $1; }
 ;
 
 operacionsimple: operacionsimple ASTERISCO operacionmenossimple
+ { $$ = new Aritmetica($1, "*", $3); }
 | operacionsimple BARRA operacionmenossimple
+ { $$ = new Aritmetica($1, "/", $3); }
 | operacionsimple MODULO operacionmenossimple
+{ $$ = new Aritmetica($1, "%", $3); }
 | operacionmenossimple
+{ $$ = $1; }
 ;
 
 operacionmenossimple: MENOS operacionmenossimple %prec UMINUS
+{ $$ = new Negativo($2); }
 | PARENTESIS_A operacion PARENTESIS_C
+{ $$ = $2; }
 | NUMERO
+ { $$ = Number(yytext); }
 | NUMERO_DECIMAL
+{ $$ = Number(yytext); }
 | ID
+{ $$ = $1; } 
 | funcionesestructura
 | CADENA
+{ $$ = yytext; }
 ;
 
 /* ASIGNACIONES VARIABLES */
@@ -539,22 +561,37 @@ codigo: LLAVE_A instrucciones LLAVE_C
 ;
 
 condicion: expresionRelacional
-| ID
+{ $$ = $1; 
+    //console.log("Condición: " + $1);
+}
+| ID 
+{ $$ = $1; }
 ;
 
 expresionRelacional: expresionRelacional OR expresionRelacional
+{ $$ = new Logica($1, "OR", $3); }
 | expresionRelacional AND expresionRelacional
+{ $$ = new Logica($1, "AND", $3); }
 | NOT expresionRelacional
+{ $$ = new Not($2); }
 | PARENTESIS_A expresionRelacional PARENTESIS_C
+{ $$ = $2; }
 | comparacion
+{ $$ = $1; }
 ;
 
 comparacion: valor IGUALDAD valor
+{ $$ = new Comparacion($1, "==", $3); }
 | valor DESIGUALDAD valor
+{ $$ = new Comparacion($1, "!=", $3); }
 | valor MAYOR_IGUAL valor
+{ $$ = new Comparacion($1, ">=", $3); }
 | valor MENOR_IGUAL valor
+{ $$ = new Comparacion($1, "<=", $3); }
 | valor MAYOR valor
+{ $$ = new Comparacion($1, ">", $3); }
 | valor MENOR valor
+{ $$ = new Comparacion($1, "<", $3); }
 ;
 
 /* SWITCH */

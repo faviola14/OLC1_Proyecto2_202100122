@@ -15,3 +15,5 @@ class Logica {
         return false;
     }
 }
+
+module.exports = Logica;

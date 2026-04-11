@@ -7,3 +7,5 @@ class Negativo {
         return -Number(this.expr.evaluar(registro));
     }
 }
+
+module.exports = Negativo;

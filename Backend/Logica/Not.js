@@ -7,3 +7,5 @@ class Not {
         return !this.expr.evaluar(registro);
     }
 }
+
+module.exports = Not;

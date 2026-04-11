@@ -152,6 +152,73 @@ break;
 case 47:
  this.$ = "[]" + $$[$0]; 
 break;
+case 48:
+ this.$ = $$[$0];
+    console.log("Condición: " + $$[$0]);
+    
+break;
+case 49: case 64:
+ this.$ = yytext; 
+break;
+case 51:
+ this.$ = new Aritmetica($$[$0-2], "+", $$[$0]); 
+break;
+case 52:
+ this.$ = new Aritmetica($$[$0-2], "-", $$[$0]); 
+break;
+case 53: case 57: case 62: case 79: case 84:
+ this.$ = $$[$0]; 
+break;
+case 54:
+ this.$ = new Aritmetica($$[$0-2], "*", $$[$0]); 
+break;
+case 55:
+ this.$ = new Aritmetica($$[$0-2], "/", $$[$0]); 
+break;
+case 56:
+ this.$ = new Aritmetica($$[$0-2], "%", $$[$0]); 
+break;
+case 58:
+ this.$ = new Negativo($$[$0]); 
+break;
+case 59: case 83:
+ this.$ = $$[$0-1]; 
+break;
+case 60: case 61:
+ this.$ = Number(yytext); 
+break;
+case 78:
+ this.$ = $$[$0]; 
+    console.log("Condición: " + $$[$0]);
+
+break;
+case 80:
+ this.$ = new Logica($$[$0-2], "OR", $$[$0]); 
+break;
+case 81:
+ this.$ = new Logica($$[$0-2], "AND", $$[$0]); 
+break;
+case 82:
+ this.$ = new Not($$[$0]); 
+break;
+case 85:
+ this.$ = new Comparacion($$[$0-2], "==", $$[$0]); 
+break;
+case 86:
+ this.$ = new Comparacion($$[$0-2], "!=", $$[$0]); 
+break;
+case 87:
+ this.$ = new Comparacion($$[$0-2], ">=", $$[$0]); 
+break;
+case 88:
+ this.$ = new Comparacion($$[$0-2], "<=", $$[$0]); 
+break;
+case 89:
+ this.$ = new Comparacion($$[$0-2], ">", $$[$0]); 
+break;
+case 90:
+ this.$ = new Comparacion($$[$0-2], "<", $$[$0]); 
+break;
 case 149: case 150:
 
     const slice = new Simbolo($$[$0-5],"Slice",$$[$0-3],ambito, _$[$0-5].first_line, _$[$0-5].first_column);
@@ -333,6 +400,11 @@ parse: function parse(input) {
     const TablaTokens = require('../Reports/TablaTokens');
     const TablaSimbolos = require('../Reports/TablaSimbolos');
     const TablaErrores = require('../Reports/TablaErrores');
+    const Comparacion=require('../Logica/Comparacion');
+    const Logica=require('../Logica/Logica');
+    const Not=require('../Logica/Not');
+    const Aritmetica=require('../Aritmetica/Aritmetica');
+    const Negativo=require('../Aritmetica/Negativo');
 
     let ambito= "";
     let contadorBloques=0;
