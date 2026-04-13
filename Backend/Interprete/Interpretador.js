@@ -10,21 +10,21 @@ const Negativo = require("../Aritmetica/Negativo");
 function aNodo(nodo){
     if (!nodo || typeof nodo !== 'object') return null;
 
-    switch (nodo.type) {
+    switch (nodo.tipo) {
         case 'Numero':
-            return new Numero(nodo.value);
+            return new Numero(nodo.valor);
         case 'Cadena':
-            return new Cadena(nodo.value);
+            return new Cadena(nodo.valor);
         case 'Identificador':
-            return new Identificador(nodo.value);
+            return new Identificador(nodo.valor);
         case 'Booleano':
-            return new Booleano(nodo.value);
+            return new Booleano(nodo.valor);
         case 'Bloque':
             const instrucciones = nodo.instrucciones.map(instr => aNodo(instr));
             return new Bloque(instrucciones);
         case 'Declaracion':
             const valorDecl = aNodo(nodo.valor);
-            return new Declaracion(nodo.id, valorDecl);
+            return new Declaracion(nodo.id, nodo.tipoDato, valorDecl);
         case 'Asignacion':
             const valorAsig = aNodo(nodo.valor);
             return new Asignacion(nodo.id, valorAsig);
@@ -43,7 +43,7 @@ function aNodo(nodo){
             return new For(idFor, condicionFor, incrementoFor, instruccionesFor);
         case 'Switch':
             const exprSwitch = aNodo(nodo.expresion);
-            const casosSwitch = nodo.casos.map(caso => ({
+            const casosSwitch = nodo.cases.map(caso => ({
                 valor: aNodo(caso.valor),
                 instrucciones: caso.instrucciones.map(instr => aNodo(instr))
             }));
@@ -55,19 +55,32 @@ function aNodo(nodo){
         case 'Logica':
             const izquierdaLog = aNodo(nodo.izquierda);
             const derechaLog = aNodo(nodo.derecha);
-            return new Logica(izquierdaLog, derechaLog, nodo.operador); 
+            return new Logica(izquierdaLog, nodo.operador, derechaLog); 
         case 'Not':
             const valorNot = aNodo(nodo.valor);
             return new Not(valorNot);
         case 'Comparacion':
             const izquierdaComp = aNodo(nodo.izquierda);
             const derechaComp = aNodo(nodo.derecha);
-            return new Comparacion(izquierdaComp, derechaComp, nodo.operador);
+            return new Comparacion(izquierdaComp, nodo.operador, derechaComp);
         case 'Negativo':
             const valorNeg = aNodo(nodo.valor);
             return new Negativo(valorNeg);
+        case 'Función':
+            const parametrosFunc = nodo.parametros.map(param => ({ id: param.id, tipoDato: param.tipoDato }));
+            const instruccionesFunc = nodo.instrucciones.map(instr => aNodo(instr));
+            return new Función(nodo.id, parametrosFunc, nodo.tipoRetorno, instruccionesFunc);
+        case 'Slice':
+            const valorSlice = aNodo(nodo.valor);
+            return new Slice(nodo.id, nodo.tipoDato, valorSlice);
+        case 'Struct':
+            return new Struct(nodo.id, nodo.tipoDato, null);
+        case 'Matriz':
+            const valorMatriz = aNodo(nodo.valor);
+            return new Matriz(nodo.id, nodo.tipoDato, valorMatriz);
+        
         default:
-            throw new Error(`Tipo de nodo desconocido: ${nodo.type}`);
+            throw new Error(`Tipo de nodo desconocido: ${nodo.tipo}`);
     }
 }
 

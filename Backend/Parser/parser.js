@@ -90,22 +90,18 @@ case 1:
     TablaSimbolos.imprimirTabla();
 
 break;
-case 2:
-
-    $$[$0-1].push($$[$0]);
-    this.$ = $$[$0-1];
-
+case 2: case 12: case 95: case 99: case 128: case 185:
+ $$[$0-1].push($$[$0]); this.$ = $$[$0-1]; 
 break;
-case 3:
-
-    this.$ = [$$[$0]];
-
+case 3: case 159: case 180: case 186: case 190:
+ this.$ = [$$[$0]]; 
 break;
 case 4:
 
     const simbolo = new Simbolo($$[$0-6],"Función","Función","Global", _$[$0-6].first_line, _$[$0-6].first_column);
     TablaSimbolos.agregarSimbolo(simbolo);
     ambito=$$[$0-6];
+    this.$={ tipo: 'Funcion', id: $$[$0-6], parametros: $$[$0-4], tipoRetorno: null, instrucciones: $$[$0-1] };
 
 break;
 case 5:
@@ -113,6 +109,7 @@ case 5:
     const simboloT = new Simbolo($$[$0-8],"Función",$$[$0-4],"Global",_$[$0-8].first_line, _$[$0-8].first_column);
     TablaSimbolos.agregarSimbolo(simboloT);
     ambito=$$[$0-8];
+    this.$={ tipo: 'Funcion', id: $$[$0-8], parametros: $$[$0-6], tipoRetorno: $$[$0-4], instrucciones: $$[$0-2]};
 
 break;
 case 6:
@@ -120,45 +117,53 @@ case 6:
     const simboloR = new Simbolo($$[$0-7],"Función",$$[$0-3],"Global",_$[$0-7].first_line, _$[$0-7].first_column);
     TablaSimbolos.agregarSimbolo(simboloR);
     ambito=$$[$0-7];
+    this.$={ tipo: 'Funcion', id: $$[$0-7], parametros: $$[$0-5], tipoRetorno: $$[$0-3], instrucciones: []};
 
 break;
-case 12: case 99: case 128:
- $$[$0-1].push($$[$0]); this.$ = $$[$0-1]; 
+case 8: case 158: case 178: case 189:
+ $$[$0-2].push($$[$0]); this.$ = $$[$0-2]; 
+break;
+case 9: case 14: case 96: case 101: case 130:
+ this.$ = [$$[$0]];
+break;
+case 10: case 16: case 103: case 132:
+ this.$ = [];
+break;
+case 11:
+this.$ = { id: $$[$0-1], tipoDato: $$[$0] }; 
 break;
 case 13: case 100: case 129:
  $$[$0-2].push($$[$0-1]); this.$ = $$[$0-2]; 
 break;
-case 14: case 101: case 130:
- this.$ = [$$[$0]];
-break;
 case 15: case 102: case 131:
  this.$ = [$$[$0-1]];
-break;
-case 16: case 103: case 132:
- this.$ = [];
 break;
 case 38:
 
     contadorBloques=contadorBloques+1;
     ambito="bloque"+String(contadorBloques);
 
+
 break;
 case 39:
 
     const variableI = new Simbolo($$[$0-3],"Variable",$$[$0-2],ambito, _$[$0-3].first_line, _$[$0-3].first_column);
     TablaSimbolos.agregarSimbolo(variableI);
+    this.$={ tipo: 'Declaracion', id: $$[$0-3], tipoDato: $$[$0-2], valor: $$[$0] };
 
 break;
 case 40:
 
     const variable = new Simbolo($$[$0-1],"Variable",$$[$0],ambito, _$[$0-1].first_line, _$[$0-1].first_column);
     TablaSimbolos.agregarSimbolo(variable);
+    this.$={ tipo: 'Declaracion', id: $$[$0-1], tipoDato: $$[$0], valor: null };
 
 break;
 case 41:
 
     const variableST = new Simbolo($$[$0-2],"Variable","",ambito, _$[$0-2].first_line, _$[$0-2].first_column);
     TablaSimbolos.agregarSimbolo(variableST);
+    this.$={ tipo: 'Declaracion', id: $$[$0-2], tipoDato: "", valor: $$[$0] };
 
 break;
 case 42:
@@ -179,96 +184,110 @@ break;
 case 47:
  this.$ = "[]" + $$[$0]; 
 break;
-case 48:
- this.$ = $$[$0];
-    console.log("Condición: " + $$[$0]);
-    
-break;
-case 49: case 64:
- this.$ = yytext; 
-break;
-case 51:
- this.$ = new Aritmetica($$[$0-2], "+", $$[$0]); 
-break;
-case 52:
- this.$ = new Aritmetica($$[$0-2], "-", $$[$0]); 
-break;
-case 53: case 57: case 62: case 79: case 84:
+case 48: case 53: case 57: case 62: case 84:
  this.$ = $$[$0]; 
 break;
+case 49:
+this.$= { tipo: 'Cadena', valor: yytext };
+break;
+case 51:
+ this.$ = { tipo: 'Aritmetica', izquierda: $$[$0-2], operador: '+', derecha: $$[$0] }; 
+break;
+case 52:
+ this.$ = { tipo: 'Aritmetica', izquierda: $$[$0-2], operador: '-', derecha: $$[$0] }; 
+break;
 case 54:
- this.$ = new Aritmetica($$[$0-2], "*", $$[$0]); 
+ this.$ = { tipo: 'Aritmetica', izquierda: $$[$0-2], operador: '*', derecha: $$[$0] }; 
 break;
 case 55:
- this.$ = new Aritmetica($$[$0-2], "/", $$[$0]); 
+ this.$ = { tipo: 'Aritmetica', izquierda: $$[$0-2], operador: '/', derecha: $$[$0] }; 
 break;
 case 56:
- this.$ = new Aritmetica($$[$0-2], "%", $$[$0]); 
+ this.$ = { tipo: 'Aritmetica', izquierda: $$[$0-2], operador: '%', derecha: $$[$0] }; 
 break;
 case 58:
- this.$ = new Negativo($$[$0]); 
+ this.$ = { tipo: 'Negativo', valor: $$[$0] }; 
 break;
-case 59: case 83:
+case 59: case 83: case 179: case 181:
  this.$ = $$[$0-1]; 
 break;
 case 60: case 61:
- this.$ = Number(yytext); 
+ this.$ = { tipo: 'Numero', valor: Number(yytext) }; 
+break;
+case 64:
+ this.$ = { tipo: 'Cadena', valor: yytext }; 
+break;
+case 65: case 66: case 67:
+ this.$ = { tipo: 'Asignacion', id: $$[$0-2], valor: $$[$0] }; 
 break;
 case 78:
  this.$ = $$[$0]; 
     //console.log("Condición: " + $$[$0]);
 
 break;
+case 79:
+ this.$= {tipo: 'Identificador', valor: $$[$0]}; 
+break;
 case 80:
- this.$ = new Logica($$[$0-2], "OR", $$[$0]); 
+ this.$= { tipo: 'Logica', izquierda: $$[$0-2], operador: 'OR', derecha: $$[$0] }; 
 break;
 case 81:
- this.$ = new Logica($$[$0-2], "AND", $$[$0]); 
+ this.$ = { tipo: 'Logica', izquierda: $$[$0-2], operador: 'AND', derecha: $$[$0] }; 
 break;
 case 82:
- this.$ = new Not($$[$0]); 
+ this.$ = { tipo: 'Logica', izquierda: null, operador: 'NOT', derecha: $$[$0] }; 
 break;
 case 85:
- this.$ = new Comparacion($$[$0-2], "==", $$[$0]);
+ this.$ = { tipo: 'Comparacion', izquierda: $$[$0-2], operador: '==', derecha: $$[$0] }; 
 break;
 case 86:
- this.$ = new Comparacion($$[$0-2], "!=", $$[$0]); 
+ this.$ = { tipo: 'Comparacion', izquierda: $$[$0-2], operador: '!=', derecha: $$[$0] }; 
 break;
 case 87:
- this.$ = new Comparacion($$[$0-2], ">=", $$[$0]); 
+ this.$ = { tipo: 'Comparacion', izquierda: $$[$0-2], operador: '>=', derecha: $$[$0] }; 
 break;
 case 88:
- this.$ = new Comparacion($$[$0-2], "<=", $$[$0]); 
+ this.$ = { tipo: 'Comparacion', izquierda: $$[$0-2], operador: '<=', derecha: $$[$0] }; 
 break;
 case 89:
- this.$ = new Comparacion($$[$0-2], ">", $$[$0]); 
+ this.$ = { tipo: 'Comparacion', izquierda: $$[$0-2], operador: '>', derecha: $$[$0] }; 
 break;
 case 90:
- this.$ = new Comparacion($$[$0-2], "<", $$[$0]); 
+ this.$ = { tipo: 'Comparacion', izquierda: $$[$0-2], operador: '<', derecha: $$[$0] }; 
 break;
 case 155: case 156:
 
     const slice = new Simbolo($$[$0-5],"Slice",$$[$0-3],ambito, _$[$0-5].first_line, _$[$0-5].first_column);
     TablaSimbolos.agregarSimbolo(slice);
+    this.$={ tipo: 'Slice', id: $$[$0-5], tipoDato: $$[$0-3], valor: $$[$0-1] };
 
 break;
 case 157:
 
     const sliceV = new Simbolo($$[$0-1],"Slice",$$[$0],ambito, _$[$0-1].first_line, _$[$0-1].first_column);
     TablaSimbolos.agregarSimbolo(sliceV);
+    this.$={ tipo: 'Slice', id: $$[$0-1], tipoDato: $$[$0], valor: null };
 
 break;
 case 177:
 
     const matriz = new Simbolo($$[$0-9],"Matriz",$$[$0-4],ambito, _$[$0-9].first_line, _$[$0-9].first_column);
     TablaSimbolos.agregarSimbolo(matriz);
+    this.$={ tipo: 'Matriz', id: $$[$0-9], tipoDato: $$[$0-4], valor: $$[$0-1] };
 
 break;
 case 184:
 
     const struct = new Simbolo($$[$0-3],"Struct","struct",ambito, _$[$0-3].first_line, _$[$0-3].first_column);
     TablaSimbolos.agregarSimbolo(struct);
+    this.$={ tipo: 'Struct', id: $$[$0-3], tipoDato: "struct", valor: $$[$0-1] };
 
+break;
+case 187:
+ this.$ = { tipo: 'Atributo', id: $$[$0-1], tipoDato: $$[$0-2] }; 
+break;
+case 191:
+ this.$ = { id: $$[$0-2], valor: $$[$0] }; 
 break;
 }
 },
@@ -312,7 +331,7 @@ parse: function parse(input) {
         vstack.length = vstack.length - n;
         lstack.length = lstack.length - n;
     }
-    _token_stack:
+
         var lex = function () {
             var token;
             token = lexer.lex() || EOF;
@@ -427,12 +446,13 @@ parse: function parse(input) {
     const TablaTokens = require('../Reports/TablaTokens');
     const TablaSimbolos = require('../Reports/TablaSimbolos');
     const TablaErrores = require('../Reports/TablaErrores');
-    const Comparacion=require('../Logica/Comparacion');
+    /*const Comparacion=require('../Logica/Comparacion');
     const Logica=require('../Logica/Logica');
     const Not=require('../Logica/Not');
     const Aritmetica=require('../Aritmetica/Aritmetica');
     const Negativo=require('../Aritmetica/Negativo');
-
+    const {Declaracion, Asignacion, Imprimir, If, For, Switch, Slice, Struct, Matriz, Funcion,} = require('../Instrucciones/Instrucciones');
+    */
     let ambito= "";
     let contadorBloques=0;
 /* generated by jison-lex 0.3.4 */

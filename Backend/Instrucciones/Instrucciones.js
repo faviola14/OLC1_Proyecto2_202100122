@@ -33,7 +33,7 @@ class Asignacion {
 }
 
 class Imprimir {
-    constructor(expresion, linea, columna) {
+    constructor(expresion) {
         this.expresion = expresion;
     }
 
@@ -45,7 +45,7 @@ class Imprimir {
 }
 
 class If { 
-    constructor(condicion, instrucciones, linea, columna) {
+    constructor(condicion, instrucciones) {
         this.condicion = condicion;
         this.instrucciones = instrucciones;
     }
@@ -65,7 +65,7 @@ class If {
 }
 
 class For {
-    constructor(id, condicion, incremento, instrucciones, linea, columna) {
+    constructor(id, condicion, incremento, instrucciones) {
         this.id = id;
         this.condicion = condicion;
         this.incremento = incremento;
@@ -83,16 +83,16 @@ class For {
 }
 
 class Switch{
-    constructor(expresion, casos, linea, columna){
+    constructor(expresion, cases){
         this.expresion = expresion;
-        this.casos = casos;
+        this.casos = cases;
     }
 
     evaluar(registro) {
         const valorEvaluado = this.expresion.evaluar(registro);
         let casoEncontrado = false;
-        for (let i = 0; i < this.casos.length; i++) {
-            const caso = this.casos[i];
+        for (let i = 0; i < this.cases.length; i++) {
+            const caso = this.cases[i];
             const valorCaso = caso.valor.evaluar(registro);
             if (valorEvaluado === valorCaso) {
                 casoEncontrado = true;
@@ -111,4 +111,74 @@ class Switch{
     }
 }
 
-module.exports = { Declaracion, Asignacion, Imprimir, If, For, Switch };
+class Slice{
+    constructor(id, tipo, valor){
+        this.id = id;
+        this.tipo = tipo;
+        this.valor = valor;
+    }
+
+    evaluar(registro){
+        if (registro[this.id]) {
+            throw new Error(`La variable ${this.id} ya ha sido declarada.`);
+        }
+        const valorEvaluado = this.valor ? this.valor.evaluar(registro) : null;
+        registro[this.id] = { tipo: this.tipo, valor: valorEvaluado };
+        return null;
+    }
+}
+
+class Struct{
+    constructor(id, tipo, valor){
+        this.id = id;
+        this.tipo = tipo;
+        this.valor = valor;
+}
+
+    evaluar(registro){
+        if (registro[this.id]) {
+            throw new Error(`La variable ${this.id} ya ha sido declarada.`);
+        }
+        const valorEvaluado = this.valor ? this.valor.evaluar(registro) : null;
+        registro[this.id] = { tipo: this.tipo, valor: valorEvaluado };
+        return null;
+    }
+}
+
+class Matriz{
+    constructor(id, tipo, valor){
+        this.id = id;
+        this.tipo = tipo;
+        this.valor = valor; 
+    }
+
+    evaluar(registro){
+        if (registro[this.id]) {
+            throw new Error(`La variable ${this.id} ya ha sido declarada.`);
+        }
+        const valorEvaluado = this.valor ? this.valor.evaluar(registro) : null;
+        registro[this.id] = { tipo: this.tipo, valor: valorEvaluado };
+        return null;
+    }
+}
+
+
+class Funcion{
+    constructor(id, parametros,  retorno, instrucciones){
+        this.id = id;
+        this.parametros = parametros;
+        this.instrucciones = instrucciones;
+        this.retorno = retorno;
+    }
+
+    evaluar(registro){
+        if (registro[this.id]) {
+            throw new Error(`La función ${this.id} ya ha sido declarada.`);
+        }
+        registro[this.id] = { tipo: 'Función', valor: this };
+        return null;
+    }
+}
+
+
+module.exports = { Declaracion, Asignacion, Imprimir, If, For, Switch, Slice, Struct, Matriz, Funcion };

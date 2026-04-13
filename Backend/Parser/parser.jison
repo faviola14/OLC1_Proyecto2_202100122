@@ -5,12 +5,13 @@
     const TablaTokens = require('../Reports/TablaTokens');
     const TablaSimbolos = require('../Reports/TablaSimbolos');
     const TablaErrores = require('../Reports/TablaErrores');
-    const Comparacion=require('../Logica/Comparacion');
+    /*const Comparacion=require('../Logica/Comparacion');
     const Logica=require('../Logica/Logica');
     const Not=require('../Logica/Not');
     const Aritmetica=require('../Aritmetica/Aritmetica');
     const Negativo=require('../Aritmetica/Negativo');
-
+    const {Declaracion, Asignacion, Imprimir, If, For, Switch, Slice, Struct, Matriz, Funcion,} = require('../Instrucciones/Instrucciones');
+    */
     let ambito= "";
     let contadorBloques=0;
 %}
@@ -387,15 +388,8 @@ programa: funciones EOF {
 }
 ;
 
-funciones: funciones funcion
-{
-    $1.push($2);
-    $$ = $1;
-}
-| funcion 
-{
-    $$ = [$1];
-}
+funciones: funciones funcion{ $1.push($2); $$ = $1; }
+| funcion { $$ = [$1]; }
 ;
 
 /* FUNCIONES */ 
@@ -405,28 +399,31 @@ funcion: FUNC ID PARENTESIS_A parametros PARENTESIS_C LLAVE_A instrucciones LLAV
     const simbolo = new Simbolo($2,"Función","Función","Global", @2.first_line, @2.first_column);
     TablaSimbolos.agregarSimbolo(simbolo);
     ambito=$2;
+    $$={ tipo: 'Funcion', id: $2, parametros: $4, tipoRetorno: null, instrucciones: $7 };
 }
 | FUNC ID PARENTESIS_A parametros PARENTESIS_C tipo LLAVE_A instrucciones retorno LLAVE_C
 {
     const simboloT = new Simbolo($2,"Función",$6,"Global",@2.first_line, @2.first_column);
     TablaSimbolos.agregarSimbolo(simboloT);
     ambito=$2;
+    $$={ tipo: 'Funcion', id: $2, parametros: $4, tipoRetorno: $6, instrucciones: $8};
 }
 | FUNC ID PARENTESIS_A parametros PARENTESIS_C tipo LLAVE_A retorno LLAVE_C
 {
     const simboloR = new Simbolo($2,"Función",$6,"Global",@2.first_line, @2.first_column);
     TablaSimbolos.agregarSimbolo(simboloR);
     ambito=$2;
+    $$={ tipo: 'Funcion', id: $2, parametros: $4, tipoRetorno: $6, instrucciones: []};
 }
 | struct
 ;
 
-parametros: parametros COMA parametro
-| parametro
-| /* vacío */
+parametros: parametros COMA parametro { $1.push($3); $$ = $1; }
+| parametro { $$ = [$1];}
+| /* vacío */ { $$ = [];}
 ;
 
-parametro: ID tipo
+parametro: ID tipo {$$ = { id: $1, tipoDato: $2 }; }
 ;
 
 instrucciones: instrucciones instruccion { $1.push($2); $$ = $1; }
@@ -469,6 +466,7 @@ bloqueindependiente: LLAVE_A instrucciones LLAVE_C
 {
     contadorBloques=contadorBloques+1;
     ambito="bloque"+String(contadorBloques);
+
 }
 ;
 
@@ -477,16 +475,19 @@ variable: VAR ID tipo IGUAL valor
 {
     const variableI = new Simbolo($2,"Variable",$3,ambito, @2.first_line, @2.first_column);
     TablaSimbolos.agregarSimbolo(variableI);
+    $$={ tipo: 'Declaracion', id: $2, tipoDato: $3, valor: $5 };
 }
 | VAR ID tipo
 {
     const variable = new Simbolo($2,"Variable",$3,ambito, @2.first_line, @2.first_column);
     TablaSimbolos.agregarSimbolo(variable);
+    $$={ tipo: 'Declaracion', id: $2, tipoDato: $3, valor: null };
 }
 | ID PUNTO_IGUAL valor
 {
     const variableST = new Simbolo($1,"Variable","",ambito, @1.first_line, @1.first_column);
     TablaSimbolos.agregarSimbolo(variableST);
+    $$={ tipo: 'Declaracion', id: $1, tipoDato: "", valor: $3 };
 }
 ;
 
@@ -498,53 +499,52 @@ tipo: INT { $$ = "int"; }
 | CORCHETE_A CORCHETE_C tipo { $$ = "[]" + $3; }
 ;
 
-valor: operacion
-{ $$ = $1;
-    console.log("Condición: " + $1);
-    }
-| CADENA
-{ $$ = yytext; }
-| funcionesestructura
+valor: operacion { $$ = $1; }
+| CADENA {$$= { tipo: 'Cadena', valor: yytext };}
+| funcionesestructura 
 ;
 
 /* OPERACIONES */
 operacion: operacion MAS operacionsimple
-{ $$ = new Aritmetica($1, "+", $3); }
+{ $$ = { tipo: 'Aritmetica', izquierda: $1, operador: '+', derecha: $3 }; }
 | operacion MENOS operacionsimple
-{ $$ = new Aritmetica($1, "-", $3); }
+{ $$ = { tipo: 'Aritmetica', izquierda: $1, operador: '-', derecha: $3 }; }
 | operacionsimple
 { $$ = $1; }
 ;
 
 operacionsimple: operacionsimple ASTERISCO operacionmenossimple
- { $$ = new Aritmetica($1, "*", $3); }
+{ $$ = { tipo: 'Aritmetica', izquierda: $1, operador: '*', derecha: $3 }; }
 | operacionsimple BARRA operacionmenossimple
- { $$ = new Aritmetica($1, "/", $3); }
+ { $$ = { tipo: 'Aritmetica', izquierda: $1, operador: '/', derecha: $3 }; }
 | operacionsimple MODULO operacionmenossimple
-{ $$ = new Aritmetica($1, "%", $3); }
+{ $$ = { tipo: 'Aritmetica', izquierda: $1, operador: '%', derecha: $3 }; }
 | operacionmenossimple
 { $$ = $1; }
 ;
 
 operacionmenossimple: MENOS operacionmenossimple %prec UMINUS
-{ $$ = new Negativo($2); }
+{ $$ = { tipo: 'Negativo', valor: $2 }; }
 | PARENTESIS_A operacion PARENTESIS_C
 { $$ = $2; }
 | NUMERO
- { $$ = Number(yytext); }
+{ $$ = { tipo: 'Numero', valor: Number(yytext) }; }
 | NUMERO_DECIMAL
-{ $$ = Number(yytext); }
+{ $$ = { tipo: 'Numero', valor: Number(yytext) }; }
 | ID
 { $$ = $1; } 
 | funcionesestructura
 | CADENA
-{ $$ = yytext; }
+{ $$ = { tipo: 'Cadena', valor: yytext }; }
 ;
 
 /* ASIGNACIONES VARIABLES */
 asignacion: ID IGUAL operacion
+{ $$ = { tipo: 'Asignacion', id: $1, valor: $3 }; }
 | ID ASIGNA_MAS operacion
+{ $$ = { tipo: 'Asignacion', id: $1, valor: $3 }; }
 | ID ASIGNA_MENOS operacion
+{ $$ = { tipo: 'Asignacion', id: $1, valor: $3 }; }
 ;
 
 /* IF */
@@ -573,15 +573,15 @@ condicion: expresionRelacional
     //console.log("Condición: " + $1);
 }
 | ID 
-{ $$ = $1; }
+{ $$= {tipo: 'Identificador', valor: $1}; }
 ;
 
 expresionRelacional: expresionRelacional OR expresionRelacional
-{ $$ = new Logica($1, "OR", $3); }
+{ $$= { tipo: 'Logica', izquierda: $1, operador: 'OR', derecha: $3 }; }
 | expresionRelacional AND expresionRelacional
-{ $$ = new Logica($1, "AND", $3); }
+{ $$ = { tipo: 'Logica', izquierda: $1, operador: 'AND', derecha: $3 }; }
 | NOT expresionRelacional
-{ $$ = new Not($2); }
+{ $$ = { tipo: 'Logica', izquierda: null, operador: 'NOT', derecha: $2 }; }
 | PARENTESIS_A expresionRelacional PARENTESIS_C
 { $$ = $2; }
 | comparacion
@@ -589,17 +589,17 @@ expresionRelacional: expresionRelacional OR expresionRelacional
 ;
 
 comparacion: valor IGUALDAD valor
-{ $$ = new Comparacion($1, "==", $3);}
+{ $$ = { tipo: 'Comparacion', izquierda: $1, operador: '==', derecha: $3 }; }
 | valor DESIGUALDAD valor
-{ $$ = new Comparacion($1, "!=", $3); }
+{ $$ = { tipo: 'Comparacion', izquierda: $1, operador: '!=', derecha: $3 }; }
 | valor MAYOR_IGUAL valor
-{ $$ = new Comparacion($1, ">=", $3); }
+{ $$ = { tipo: 'Comparacion', izquierda: $1, operador: '>=', derecha: $3 }; }
 | valor MENOR_IGUAL valor
-{ $$ = new Comparacion($1, "<=", $3); }
+{ $$ = { tipo: 'Comparacion', izquierda: $1, operador: '<=', derecha: $3 }; }
 | valor MAYOR valor
-{ $$ = new Comparacion($1, ">", $3); }
+{ $$ = { tipo: 'Comparacion', izquierda: $1, operador: '>', derecha: $3 }; }
 | valor MENOR valor
-{ $$ = new Comparacion($1, "<", $3); }
+{ $$ = { tipo: 'Comparacion', izquierda: $1, operador: '<', derecha: $3 }; }
 ;
 
 /* SWITCH */
@@ -609,11 +609,11 @@ switch: SWITCH condicion LLAVE_A cases default LLAVE_C
 | SWITCH PARENTESIS_A condicion PARENTESIS_C LLAVE_A cases LLAVE_C
 ;
 
-cases: cases case
-| case
+cases: cases case { $1.push($2); $$ = $1; }
+| case { $$ = [$1];}
 ;
 
-case: CASE valor DOS_PUNTOS instruccionesswitch
+case: CASE valor DOS_PUNTOS instruccionesswitch {}
 ;
 
 default: DEFAULT DOS_PUNTOS instruccionesswitch 
@@ -700,21 +700,24 @@ slice: ID IGUAL tipo LLAVE_A elementos LLAVE_C
 {
     const slice = new Simbolo($1,"Slice",$3,ambito, @1.first_line, @1.first_column);
     TablaSimbolos.agregarSimbolo(slice);
+    $$={ tipo: 'Slice', id: $1, tipoDato: $3, valor: $5 };
 }
 | ID PUNTO_IGUAL tipo LLAVE_A elementos LLAVE_C
 {
     const slice = new Simbolo($1,"Slice",$3,ambito, @1.first_line, @1.first_column);
     TablaSimbolos.agregarSimbolo(slice);
+    $$={ tipo: 'Slice', id: $1, tipoDato: $3, valor: $5 };
 }
 | VAR ID tipo
 {
     const sliceV = new Simbolo($2,"Slice",$3,ambito, @2.first_line, @2.first_column);
     TablaSimbolos.agregarSimbolo(sliceV);
+    $$={ tipo: 'Slice', id: $2, tipoDato: $3, valor: null };
 }
 ;
 
-elementos: elementos COMA valor
-| valor
+elementos: elementos COMA valor { $1.push($3); $$ = $1; }
+| valor { $$ = [$1]; }
 ;
 
 /* FUNCIONES DE ESTRUCTURAS */
@@ -762,15 +765,16 @@ matrices: ID PUNTO_IGUAL CORCHETE_A CORCHETE_C CORCHETE_A CORCHETE_C tipo LLAVE_
 {
     const matriz = new Simbolo($1,"Matriz",$6,ambito, @1.first_line, @1.first_column);
     TablaSimbolos.agregarSimbolo(matriz);
+    $$={ tipo: 'Matriz', id: $1, tipoDato: $6, valor: $9 };
 }
 ;
 
-filas: filas COMA fila
-| filas COMA
-| fila
+filas: filas COMA fila { $1.push($3); $$ = $1; }
+| filas COMA { $$ = $1; }
+| fila { $$ = [$1]; }
 ;
 
-fila: LLAVE_A elementos LLAVE_C
+fila: LLAVE_A elementos LLAVE_C { $$ = $2; }
 ;
 
 /* ASIGNACIÓN MATRICES */
@@ -786,25 +790,26 @@ struct: STRUCT ID LLAVE_A atributos LLAVE_C
 {
     const struct = new Simbolo($2,"Struct","struct",ambito, @2.first_line, @2.first_column);
     TablaSimbolos.agregarSimbolo(struct);
+    $$={ tipo: 'Struct', id: $2, tipoDato: "struct", valor: $4 };
 }
 ;
 
-atributos: atributos atributo
-| atributo
+atributos: atributos atributo { $1.push($2); $$ = $1; }
+| atributo { $$ = [$1]; }
 ;
 
-atributo: tipo ID PUNTO_COMA
+atributo: tipo ID PUNTO_COMA { $$ = { tipo: 'Atributo', id: $2, tipoDato: $1 }; }
 ;
 
 /* USO STRUCT */
-structuso: ID ID IGUAL LLAVE_A datos LLAVE_C PUNTO_COMA
+structuso: ID ID IGUAL LLAVE_A datos LLAVE_C PUNTO_COMA {}
 ;
 
-datos: datos COMA dato
-| dato
+datos: datos COMA dato { $1.push($3); $$ = $1; }
+| dato { $$ = [$1]; }
 ;
 
-dato: ID DOS_PUNTOS valor
+dato: ID DOS_PUNTOS valor { $$ = { id: $1, valor: $3 }; }
 ;
 
 /* ACCESO STRUCT */
