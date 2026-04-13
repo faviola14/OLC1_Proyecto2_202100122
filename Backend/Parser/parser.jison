@@ -380,14 +380,22 @@
 
 
 
-programa: funciones EOF {  
+programa: funciones EOF { 
+    $$ = $1;
     TablaSimbolos.crearReporteSimbolos();
     TablaSimbolos.imprimirTabla();
 }
 ;
 
 funciones: funciones funcion
+{
+    $1.push($2);
+    $$ = $1;
+}
 | funcion 
+{
+    $$ = [$1];
+}
 ;
 
 /* FUNCIONES */ 
@@ -421,11 +429,11 @@ parametros: parametros COMA parametro
 parametro: ID tipo
 ;
 
-instrucciones: instrucciones instruccion
-| instrucciones instruccion PUNTO_COMA
-| instruccion
-| instruccion PUNTO_COMA
-| /* vacío */
+instrucciones: instrucciones instruccion { $1.push($2); $$ = $1; }
+| instrucciones instruccion PUNTO_COMA { $1.push($2); $$ = $1; }
+| instruccion { $$ = [$1];}
+| instruccion PUNTO_COMA { $$ = [$1];}
+| /* vacío */ { $$ = [];}
 ; 
 
 instruccion: variable
@@ -581,7 +589,7 @@ expresionRelacional: expresionRelacional OR expresionRelacional
 ;
 
 comparacion: valor IGUALDAD valor
-{ $$ = new Comparacion($1, "==", $3); }
+{ $$ = new Comparacion($1, "==", $3);}
 | valor DESIGUALDAD valor
 { $$ = new Comparacion($1, "!=", $3); }
 | valor MAYOR_IGUAL valor
@@ -611,9 +619,12 @@ case: CASE valor DOS_PUNTOS instruccionesswitch
 default: DEFAULT DOS_PUNTOS instruccionesswitch 
 ;
 
-instruccionesswitch: instruccionesswitch instruccionswitch 
-| instruccionswitch
-;
+instruccionesswitch: instruccionesswitch instruccionswitch { $1.push($2); $$ = $1; }
+| instruccionesswitch instruccionswitch PUNTO_COMA { $1.push($2); $$ = $1; }
+| instruccionswitch { $$ = [$1];}
+| instruccionswitch PUNTO_COMA { $$ = [$1];}
+| /* vacío */ { $$ = [];}
+; 
 
 instruccionswitch: variable
 | ifs
@@ -645,9 +656,12 @@ for: FOR expresionRelacional LLAVE_A instruccionesfor LLAVE_C
 inicializacion: ID PUNTO_IGUAL valor
 ;
 
-instruccionesfor: instruccionesfor instruccionfor 
-|instruccionfor
-;
+instruccionesfor: instruccionesfor instruccionfor { $1.push($2); $$ = $1; }
+| instruccionesfor instruccionfor PUNTO_COMA { $1.push($2); $$ = $1; }
+| instruccionfor { $$ = [$1];}
+| instruccionfor PUNTO_COMA { $$ = [$1];}
+| /* vacío */ { $$ = [];}
+; 
 
 instruccionfor: variable
 | ifs

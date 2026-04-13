@@ -161,8 +161,10 @@
 
 
 <instruccionesswitch> ::= <instruccionesswitch> <instruccionswitch> 
+| <instruccionesswitch> <instruccionswitch> PUNTO_COMA
 | <instruccionswitch> 
-
+| <instruccionswitch> PUNTO_COMA
+| ε
 <instruccionswitch> ::= <variable>
                 | <ifs>
                 | <switch>
@@ -196,7 +198,10 @@
 <inicializacion> ::= ID PUNTO_IGUAL <valor>
 
 <instruccionesfor> ::= <instruccionesfor> <instruccionfor> 
+| <instruccionesfor> <instruccionfor> PUNTO_COMA
 | <instruccionfor> 
+| <instruccionfor> PUNTO_COMA
+| ε
 
 <instruccionfor> ::= <variable>
                 | <ifs>

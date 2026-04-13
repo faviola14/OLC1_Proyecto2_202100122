@@ -1,6 +1,8 @@
 console.log("hola mundo")
 
-const parser = require("./Interprete/parser");
+const parser = require("./Parser/parser");
+const Interpretador = require("./Interprete/Interpretador");
+const Entorno = require("./Instrucciones/Entorno");
 
 
 
@@ -169,14 +171,17 @@ fmt.Println("Resultado:", resultado)
 const cod2 = `func x() {
 
 i = 1 + 9
-for 4 <= 5 {
+for 4 == 5 {
 fmt.Println(w)
 w++
 }
 fmt.Println("Resultado:", resultado)
 }`;
 
-console.log(parser.parse(cod2));
+const ast = parser.parse(cod2)
+const resultado= Interpretador(ast);
+
+console.log();
 
 /*
 const express = require("express");
