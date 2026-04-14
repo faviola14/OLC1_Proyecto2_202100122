@@ -85,9 +85,10 @@ var $0 = $$.length - 1;
 switch (yystate) {
 case 1:
  
-    this.$ = $$[$0-1];
-    TablaSimbolos.crearReporteSimbolos();
-    TablaSimbolos.imprimirTabla();
+    console.log("Programa analizado correctamente.");
+    this.$ = { tipo: 'Programa', funciones: $$[$0-1] };
+    /*TablaSimbolos.crearReporteSimbolos();
+    TablaSimbolos.imprimirTabla();*/
 
 break;
 case 2: case 12: case 95: case 99: case 128: case 185:
@@ -120,6 +121,9 @@ case 6:
     this.$={ tipo: 'Funcion', id: $$[$0-7], parametros: $$[$0-5], tipoRetorno: $$[$0-3], instrucciones: []};
 
 break;
+case 7:
+ this.$ = $$[$0];
+break;
 case 8: case 158: case 178: case 189:
  $$[$0-2].push($$[$0]); this.$ = $$[$0-2]; 
 break;
@@ -138,11 +142,26 @@ break;
 case 15: case 102: case 131:
  this.$ = [$$[$0-1]];
 break;
+case 17: case 18: case 19: case 20: case 21: case 22: case 23: case 24: case 25: case 26: case 27: case 28: case 29: case 30: case 33: case 50: case 104: case 105: case 106: case 107: case 108: case 109: case 110: case 111: case 112: case 113: case 114: case 115: case 116: case 117: case 118: case 119: case 120: case 121: case 133: case 134: case 135: case 136: case 137: case 138: case 139: case 140: case 141: case 142: case 143: case 144: case 145: case 146: case 147: case 148: case 149: case 150: case 160: case 161: case 162: case 163: case 164: case 165: case 166: case 167: case 168: case 169:
+this.$ = $$[$0];
+break;
+case 31: case 32:
+this.$= $$[$0];
+break;
+case 34: case 35:
+this.$ = $$[$0]; 
+break;
+case 36:
+this.$ = { tipo: 'Return', valor: $$[$0] };
+break;
+case 37:
+this.$ = { tipo: 'Return', valor: null }; 
+break;
 case 38:
 
     contadorBloques=contadorBloques+1;
     ambito="bloque"+String(contadorBloques);
-
+    this.$ = { tipo: 'BloqueIndependiente', instrucciones: $$[$0-1] };
 
 break;
 case 39:
@@ -184,7 +203,7 @@ break;
 case 47:
  this.$ = "[]" + $$[$0]; 
 break;
-case 48: case 53: case 57: case 62: case 84:
+case 48: case 53: case 57: case 63: case 71: case 84:
  this.$ = $$[$0]; 
 break;
 case 49:
@@ -214,11 +233,41 @@ break;
 case 60: case 61:
  this.$ = { tipo: 'Numero', valor: Number(yytext) }; 
 break;
+case 62:
+ this.$ = { tipo: 'Identificador', valor: $$[$0] }; 
+break;
 case 64:
  this.$ = { tipo: 'Cadena', valor: yytext }; 
 break;
 case 65: case 66: case 67:
  this.$ = { tipo: 'Asignacion', id: $$[$0-2], valor: $$[$0] }; 
+break;
+case 68:
+ this.$ = { tipo: 'IfCompleto', if: $$[$0-2], elseif: $$[$0-1], else: $$[$0] }; 
+break;
+case 69:
+ this.$ = { tipo: 'IfElseIf', if: $$[$0-1], elseif: $$[$0] }; 
+break;
+case 70:
+ this.$ = { tipo: 'IfCompleto', if: $$[$0-1], elseif: $$[$0], else: $$[$01] }; 
+break;
+case 72:
+ this.$ = { tipo: 'If', condicion: $$[$0-1], instrucciones: $$[$01] }; 
+break;
+case 73:
+ this.$ = { tipo: 'If', condicion: { tipo: 'Identificador', valor: $$[$0-1] }, instrucciones: $$[$0] }; 
+break;
+case 74:
+ this.$ = { tipo: 'Else', instrucciones: $$[$0] }; 
+break;
+case 75:
+this.$ = { tipo: 'ElseIf', condicion: $$[$0-1], instrucciones: $$[$0] };
+break;
+case 76:
+this.$ = { tipo: 'ElseIf', condicion: { tipo: 'Identificador', valor: $$[$0-1] }, instrucciones: $$[$0] };
+break;
+case 77:
+this.$=$$[$0-1];
 break;
 case 78:
  this.$ = $$[$0]; 
@@ -255,6 +304,54 @@ break;
 case 90:
  this.$ = { tipo: 'Comparacion', izquierda: $$[$0-2], operador: '<', derecha: $$[$0] }; 
 break;
+case 91:
+ this.$ = { tipo: 'Switch', condicion: $$[$0-4], cases: $$[$0-2], default: $$[$0-1] };
+break;
+case 92:
+ this.$ = { tipo: 'Switch', condicion: $$[$0-5], cases: $$[$0-2], default: $$[$0-1] };
+break;
+case 93:
+ this.$ = { tipo: 'Switch', condicion: $$[$0-3], cases: $$[$0-1], default: null };
+break;
+case 94:
+ this.$ = { tipo: 'Switch', condicion: $$[$0-4], cases: $$[$0-1], default: null };
+break;
+case 97:
+this.$ = { tipo: 'Case', valor: $$[$0-2], instrucciones: $$[$0] };
+break;
+case 98:
+this.$ = { tipo: 'Default', instrucciones: $$[$0] };
+break;
+case 122:
+ this.$ = { tipo: 'For', condicion: $$[$0-3], instrucciones: $$[$0-1] }; 
+break;
+case 123:
+ this.$ = { tipo: 'For', condicion: { tipo: 'Identificador', valor: $$[$0-3] }, instrucciones: $$[$0-1] }; 
+break;
+case 124:
+ this.$ = { tipo: 'For', condicion: $$[$0-5],inicializacion: $$[$0-7], instrucciones: $$[$0-2] }; 
+break;
+case 125:
+ this.$ = { tipo: 'For', condicion: { tipo: 'Identificador', valor: $$[$0-5] }, inicializacion: $$[$0-7], instrucciones: $$[$0-2] }; 
+break;
+case 126:
+ this.$ = { tipo: 'ForRange', indice: { tipo: 'Identificador', valor: $$[$0-8] }, valor: { tipo: 'Identificador', valor: $$[$0-6] }, slice: { tipo: 'Identificador', valor: $$[$0-3] }, instrucciones: $$[$0-2] }; 
+break;
+case 127:
+ this.$={ tipo: 'Inicializacion', id: { tipo: 'Identificador', valor: $$[$0-2] }, valor: $$[$0] }; 
+break;
+case 151:
+ this.$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $$[$0-1] }, operador: '++' }; 
+break;
+case 152:
+ this.$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $$[$0-1] }, operador: '--' }; 
+break;
+case 153:
+this.$ = { tipo: 'Break' }; 
+break;
+case 154:
+this.$ = { tipo: 'Continue' }; 
+break;
 case 155: case 156:
 
     const slice = new Simbolo($$[$0-5],"Slice",$$[$0-3],ambito, _$[$0-5].first_line, _$[$0-5].first_column);
@@ -269,12 +366,39 @@ case 157:
     this.$={ tipo: 'Slice', id: $$[$0-1], tipoDato: $$[$0], valor: null };
 
 break;
+case 170:
+ this.$ = { tipo: 'Index', id: $$[$0-3], valor: $$[$0-1] }; 
+break;
+case 171:
+ this.$ = { tipo: 'Join', id: $$[$0-3], valor: $$[$0-1] }; 
+break;
+case 172:
+ this.$ = { tipo: 'Len', id: $$[$0-1] }; 
+break;
+case 173:
+ this.$ = { tipo: 'Append', id: $$[$0-7], slice: $$[$0-3], valor: $$[$0-2] }; 
+break;
+case 174:
+ this.$ = { tipo: 'AccesoSlice', id: $$[$0-1], posicion: $$[$0].posicion }; 
+break;
+case 175:
+ this.$ = { tipo: 'ModificacionSlice', id: $$[$0-3], posicion: $$[$0-2].posicion, valor: $$[$01] }; 
+break;
+case 176:
+ this.$ = { posicion: Number(yytext) } 
+break;
 case 177:
 
     const matriz = new Simbolo($$[$0-9],"Matriz",$$[$0-4],ambito, _$[$0-9].first_line, _$[$0-9].first_column);
     TablaSimbolos.agregarSimbolo(matriz);
     this.$={ tipo: 'Matriz', id: $$[$0-9], tipoDato: $$[$0-4], valor: $$[$0-1] };
 
+break;
+case 182:
+ this.$ = { tipo: 'AsignacionMatriz', id: $$[$0-2].id, fila: $$[$0-2].fila, columna: $$[$0-2].columna, valor: $$[$0] }; 
+break;
+case 183:
+ this.$ = { tipo: 'AccesoMatriz', id: $$[$0-6], fila: Number($$[$0-4]), columna: Number($$[$0-1]) }; 
 break;
 case 184:
 
@@ -284,10 +408,36 @@ case 184:
 
 break;
 case 187:
- this.$ = { tipo: 'Atributo', id: $$[$0-1], tipoDato: $$[$0-2] }; 
+ this.$ = {id: $$[$0-1], tipoDato: $$[$0-2] }; 
+break;
+case 188:
+
+    this.$={ tipo: 'UsoStruct', id: $$[$0-6], tipoDato: $$[$0-5], valor: $$[$0-1] };
+
 break;
 case 191:
  this.$ = { id: $$[$0-2], valor: $$[$0] }; 
+break;
+case 192:
+ this.$ = { tipo: 'AccesoStruct', id: $$[$0-2], atributo: $$[$0] }; 
+break;
+case 193:
+ this.$ = { tipo: 'ModificacionStruct', id: $$[$0-3], atributo: $$[$0-1], valor: $$[$01] }; 
+break;
+case 194:
+ this.$ = {tipo: 'Imprimir',expresiones: $$[$0-1]};
+break;
+case 195:
+ this.$ = { tipo: 'Atoi', valor: $$[$0-1] }; 
+break;
+case 196:
+ this.$ = { tipo: 'ParseFloat', valor: $$[$0-1] }; 
+break;
+case 197:
+ this.$ = { tipo: 'TypeOf', id: $$[$0-5], valor: $$[$0-1] }; 
+break;
+case 198:
+this.$ = { tipo: 'AccesoFuncion', id: $$[$0-3], argumentos: $$[$0-1] }; 
 break;
 }
 },
@@ -331,7 +481,7 @@ parse: function parse(input) {
         vstack.length = vstack.length - n;
         lstack.length = lstack.length - n;
     }
-
+    _token_stack:
         var lex = function () {
             var token;
             token = lexer.lex() || EOF;
@@ -1126,14 +1276,14 @@ case 69:   const idToken = new Token("ID", yy_.yytext, yy_.yylineno, yy_.yylloc.
                             
 break;
 case 70:   
-                                TablaTokens.crearReporteTokens();
+                                /*TablaTokens.crearReporteTokens();
                                 TablaErrores.crearReporteErrores();
                                 TablaTokens.imprimirTabla();
-                                TablaErrores.imprimirTabla();
+                                TablaErrores.imprimirTabla();*/
                                 return 5;
                             
 break;
-case 71:   const errorL = new ErrorL("Error léxico","El carácter " + yy_.yytext +" no pertenece al lenguaje", yy_.yylineno, yy_.yylloc.first_column);
+case 71:   const errorL = new ErrorL("Error léxico","El carácter: " + yy_.yytext +" no pertenece al lenguaje", yy_.yylineno, yy_.yylloc.first_column);
                                 TablaErrores.agregarError(errorL);
                                 /* return 'INVALID' */
                             

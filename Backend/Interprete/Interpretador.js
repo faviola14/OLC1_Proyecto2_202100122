@@ -29,18 +29,35 @@ function aNodo(nodo){
             const valorAsig = aNodo(nodo.valor);
             return new Asignacion(nodo.id, valorAsig);
         case 'Imprimir':
-            const exprImp = aNodo(nodo.expresion);
-            return new Imprimir(exprImp);
+            const expresiones = nodo.expresiones.map(e => aNodo(e));
+            return new Imprimir(expresiones);
         case 'If':
             const condicionIf = aNodo(nodo.condicion);
             const instruccionesIf = nodo.instrucciones.map(instr => aNodo(instr));
             return new If(condicionIf, instruccionesIf);
+        case 'ElseIf':
+            const condicionElseIf = aNodo(nodo.condicion);
+            const instruccionesElseIf = nodo.instrucciones.map(instr => aNodo(instr));
+            return new ElseIf(condicionElseIf, instruccionesElseIf);
+        case 'Else':
+            const instruccionesElse = nodo.instrucciones.map(instr => aNodo(instr));
+            return new Else(instruccionesElse);
+        case 'IfCompleto':
+            const condicionIfComp = aNodo(nodo.condicion);
+            const instruccionesIfComp = nodo.instrucciones.map(instr => aNodo(instr));
+            return new IfCompleto(condicionIfComp, instruccionesIfComp);
         case 'For':
             const idFor = nodo.id;
             const condicionFor = aNodo(nodo.condicion);
             const incrementoFor = aNodo(nodo.incremento);
             const instruccionesFor = nodo.instrucciones.map(instr => aNodo(instr));
             return new For(idFor, condicionFor, incrementoFor, instruccionesFor);
+        case 'ForRange':
+            const indice = nodo.indice;
+            const valor = aNodo(nodo.valor);
+            const slice = aNodo(nodo.slice);
+            const instruccionesForRange = nodo.instrucciones.map(instr => aNodo(instr));
+            return new ForRange( indice, valor,slice, instruccionesForRange);
         case 'Switch':
             const exprSwitch = aNodo(nodo.expresion);
             const casosSwitch = nodo.cases.map(caso => ({
@@ -48,6 +65,10 @@ function aNodo(nodo){
                 instrucciones: caso.instrucciones.map(instr => aNodo(instr))
             }));
             return new Switch(exprSwitch, casosSwitch);
+        case 'Case':
+            const valorCase = aNodo(nodo.valor);
+            const instruccionesCase = nodo.instrucciones.map(instr => aNodo(instr));
+            return new Case(valorCase, instruccionesCase);
         case 'Aritmetica':
             const izquierdaArit = aNodo(nodo.izquierda);
             const derechaArit = aNodo(nodo.derecha);
@@ -66,18 +87,40 @@ function aNodo(nodo){
         case 'Negativo':
             const valorNeg = aNodo(nodo.valor);
             return new Negativo(valorNeg);
-        case 'Función':
+        case 'Funcion':
             const parametrosFunc = nodo.parametros.map(param => ({ id: param.id, tipoDato: param.tipoDato }));
             const instruccionesFunc = nodo.instrucciones.map(instr => aNodo(instr));
             return new Función(nodo.id, parametrosFunc, nodo.tipoRetorno, instruccionesFunc);
         case 'Slice':
-            const valorSlice = aNodo(nodo.valor);
+            const valorSlice = nodo.valor ? nodo.valor.map(v => aNodo(v)) : [];
             return new Slice(nodo.id, nodo.tipoDato, valorSlice);
         case 'Struct':
             return new Struct(nodo.id, nodo.tipoDato, null);
         case 'Matriz':
-            const valorMatriz = aNodo(nodo.valor);
+            const valorMatriz = nodo.valor.map(fila =>
+                fila.map(elem => aNodo(elem))
+            );
             return new Matriz(nodo.id, nodo.tipoDato, valorMatriz);
+        case 'Programa':
+            return new Programa(
+                nodo.funciones
+                .map(f => aNodo(f))
+                .filter(f => f !== null));
+        case 'Return':
+            const valorReturn = aNodo(nodo.valor);
+            return new Return(valorReturn);
+        case 'Break':
+            return new Break();
+        case 'Continue':
+            return new Continue();
+        case 'Mento':
+            return new Mento(nodo.id, nodo.operador);
+        case 'BloqueIndependiente':
+            const instruccionesBloque = nodo.instrucciones.map(instr => aNodo(instr));
+            return new BloqueIndependiente(instruccionesBloque);
+        case 'Default':
+            const instruccionesDefault = nodo.instrucciones.map(instr => aNodo(instr));
+            return new Default(instruccionesDefault);
         
         default:
             throw new Error(`Tipo de nodo desconocido: ${nodo.tipo}`);

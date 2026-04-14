@@ -331,15 +331,15 @@
 
 /* FIN DE DOCUMENTO */
 <<EOF>>                     {   
-                                TablaTokens.crearReporteTokens();
+                                /*TablaTokens.crearReporteTokens();
                                 TablaErrores.crearReporteErrores();
                                 TablaTokens.imprimirTabla();
-                                TablaErrores.imprimirTabla();
+                                TablaErrores.imprimirTabla();*/
                                 return 'EOF';
                             }
 
 /* ERRORES */
-.                           {   const errorL = new ErrorL("Error léxico","El carácter " + yytext +" no pertenece al lenguaje", yylineno, yylloc.first_column);
+.                           {   const errorL = new ErrorL("Error léxico","El carácter: " + yytext +" no pertenece al lenguaje", yylineno, yylloc.first_column);
                                 TablaErrores.agregarError(errorL);
                                 /* return 'INVALID' */
                             }
@@ -382,9 +382,10 @@
 
 
 programa: funciones EOF { 
-    $$ = $1;
-    TablaSimbolos.crearReporteSimbolos();
-    TablaSimbolos.imprimirTabla();
+    console.log("Programa analizado correctamente.");
+    $$ = { tipo: 'Programa', funciones: $1 };
+    /*TablaSimbolos.crearReporteSimbolos();
+    TablaSimbolos.imprimirTabla();*/
 }
 ;
 
@@ -415,7 +416,7 @@ funcion: FUNC ID PARENTESIS_A parametros PARENTESIS_C LLAVE_A instrucciones LLAV
     ambito=$2;
     $$={ tipo: 'Funcion', id: $2, parametros: $4, tipoRetorno: $6, instrucciones: []};
 }
-| struct
+| struct { $$ = $1;}
 ;
 
 parametros: parametros COMA parametro { $1.push($3); $$ = $1; }
@@ -433,30 +434,32 @@ instrucciones: instrucciones instruccion { $1.push($2); $$ = $1; }
 | /* vacío */ { $$ = [];}
 ; 
 
-instruccion: variable
-| ifs
-| switch
-| for
-| modificacionslice
-| slice
-| append
-| matrices
-| asignacionmatriz 
-| struct 
-| structuso
-| structmodificacion
-| print 
-| asignacion 
-| mento
-| accesofunc
-| bloqueindependiente
-| break
-| continue
+instruccion: variable {$$ = $1;}
+| ifs {$$ = $1;}
+| switch {$$ = $1;}
+| for {$$ = $1;}
+| modificacionslice {$$ = $1;}
+| slice {$$ = $1;}
+| append {$$ = $1;}
+| matrices {$$ = $1;}
+| asignacionmatriz {$$ = $1;}
+| struct {$$ = $1;}
+| structuso {$$ = $1;}
+| structmodificacion {$$ = $1;}
+| print {$$ = $1;}
+| asignacion {$$ = $1;}
+| mento {$$= $1;}
+| accesofunc {$$= $1;}
+| bloqueindependiente {$$ = $1;}
+| break {$$ = $1; }
+| continue {$$ = $1; }
 ;
 
 /* RETURN */
 retorno: RETURN valor
+{$$ = { tipo: 'Return', valor: $2 };}
 | RETURN
+{$$ = { tipo: 'Return', valor: null }; }
 ;
 
 
@@ -466,7 +469,7 @@ bloqueindependiente: LLAVE_A instrucciones LLAVE_C
 {
     contadorBloques=contadorBloques+1;
     ambito="bloque"+String(contadorBloques);
-
+    $$ = { tipo: 'BloqueIndependiente', instrucciones: $2 };
 }
 ;
 
@@ -501,7 +504,7 @@ tipo: INT { $$ = "int"; }
 
 valor: operacion { $$ = $1; }
 | CADENA {$$= { tipo: 'Cadena', valor: yytext };}
-| funcionesestructura 
+| funcionesestructura {$$ = $1;}
 ;
 
 /* OPERACIONES */
@@ -532,8 +535,9 @@ operacionmenossimple: MENOS operacionmenossimple %prec UMINUS
 | NUMERO_DECIMAL
 { $$ = { tipo: 'Numero', valor: Number(yytext) }; }
 | ID
-{ $$ = $1; } 
+{ $$ = { tipo: 'Identificador', valor: $1 }; } 
 | funcionesestructura
+{ $$ = $1; }
 | CADENA
 { $$ = { tipo: 'Cadena', valor: yytext }; }
 ;
@@ -549,23 +553,33 @@ asignacion: ID IGUAL operacion
 
 /* IF */
 ifs: if elseif else
+{ $$ = { tipo: 'IfCompleto', if: $1, elseif: $2, else: $3 }; }
 | if elseif 
+{ $$ = { tipo: 'IfElseIf', if: $1, elseif: $2 }; }
 | if else
+{ $$ = { tipo: 'IfCompleto', if: $1, elseif: $2, else: $3 }; }
 | if
+{ $$ = $1; }
 ;
 
 if: IF expresionRelacional codigo
+{ $$ = { tipo: 'If', condicion: $2, instrucciones: $4 }; }
 | IF ID codigo
+{ $$ = { tipo: 'If', condicion: { tipo: 'Identificador', valor: $2 }, instrucciones: $3 }; }
 ;
 
 else: ELSE codigo
+{ $$ = { tipo: 'Else', instrucciones: $2 }; }
 ;
 
 elseif: ELSE IF expresionRelacional codigo
+{$$ = { tipo: 'ElseIf', condicion: $3, instrucciones: $4 };}
 | ELSE IF ID codigo
+{$$ = { tipo: 'ElseIf', condicion: { tipo: 'Identificador', valor: $3 }, instrucciones: $4 };}
 ;
 
 codigo: LLAVE_A instrucciones LLAVE_C
+{$$=$2;}
 ;
 
 condicion: expresionRelacional
@@ -603,20 +617,26 @@ comparacion: valor IGUALDAD valor
 ;
 
 /* SWITCH */
-switch: SWITCH condicion LLAVE_A cases default LLAVE_C
+switch: SWITCH condicion LLAVE_A cases default LLAVE_C 
+{ $$ = { tipo: 'Switch', condicion: $2, cases: $4, default: $5 };}
 | SWITCH PARENTESIS_A condicion PARENTESIS_C LLAVE_A cases default LLAVE_C
+{ $$ = { tipo: 'Switch', condicion: $3, cases: $6, default: $7 };}
 | SWITCH condicion LLAVE_A cases LLAVE_C
+{ $$ = { tipo: 'Switch', condicion: $2, cases: $4, default: null };}
 | SWITCH PARENTESIS_A condicion PARENTESIS_C LLAVE_A cases LLAVE_C
+{ $$ = { tipo: 'Switch', condicion: $3, cases: $6, default: null };}
 ;
 
 cases: cases case { $1.push($2); $$ = $1; }
 | case { $$ = [$1];}
 ;
 
-case: CASE valor DOS_PUNTOS instruccionesswitch {}
+case: CASE valor DOS_PUNTOS instruccionesswitch 
+{$$ = { tipo: 'Case', valor: $2, instrucciones: $4 };}
 ;
 
 default: DEFAULT DOS_PUNTOS instruccionesswitch 
+{$$ = { tipo: 'Default', instrucciones: $3 };}
 ;
 
 instruccionesswitch: instruccionesswitch instruccionswitch { $1.push($2); $$ = $1; }
@@ -626,34 +646,40 @@ instruccionesswitch: instruccionesswitch instruccionswitch { $1.push($2); $$ = $
 | /* vacío */ { $$ = [];}
 ; 
 
-instruccionswitch: variable
-| ifs
-| switch
-| for
-| modificacionslice
-| slice
-| append
-| matrices
-| asignacionmatriz 
-| struct 
-| structuso
-| structmodificacion
-| print 
-| asignacion 
-| mento
-| accesofunc
-| break
-| continue
+instruccionswitch: variable {$$ = $1;}
+| ifs {$$ = $1;}
+| switch {$$ = $1;}
+| for {$$ = $1;}
+| modificacionslice {$$ = $1;}
+| slice {$$ = $1;}
+| append {$$ = $1;}
+| matrices {$$ = $1;}
+| asignacionmatriz {$$ = $1;}
+| struct {$$ = $1;}
+| structuso {$$ = $1;}
+| structmodificacion {$$ = $1;}
+| print {$$ = $1;}
+| asignacion {$$ = $1;}
+| mento {$$ = $1;}
+| accesofunc {$$ = $1;}
+| break {$$ = $1;}
+| continue {$$ = $1;}
 ;
 
 /* FOR */ 
 for: FOR expresionRelacional LLAVE_A instruccionesfor LLAVE_C
+{ $$ = { tipo: 'For', condicion: $2, instrucciones: $4 }; }
 | FOR ID LLAVE_A instruccionesfor LLAVE_C
+{ $$ = { tipo: 'For', condicion: { tipo: 'Identificador', valor: $2 }, instrucciones: $4 }; }
 | FOR inicializacion PUNTO_COMA expresionRelacional PUNTO_COMA mento LLAVE_A instruccionesfor LLAVE_C
+{ $$ = { tipo: 'For', condicion: $4,inicializacion: $2, instrucciones: $7 }; }
 | FOR inicializacion PUNTO_COMA ID PUNTO_COMA mento LLAVE_A instruccionesfor LLAVE_C
+{ $$ = { tipo: 'For', condicion: { tipo: 'Identificador', valor: $4 }, inicializacion: $2, instrucciones: $7 }; }
 | FOR ID COMA valor PUNTO_IGUAL RANGE ID LLAVE_A instruccionesfor LLAVE_C
+{ $$ = { tipo: 'ForRange', indice: { tipo: 'Identificador', valor: $2 }, valor: { tipo: 'Identificador', valor: $4 }, slice: { tipo: 'Identificador', valor: $7 }, instrucciones: $8 }; }
 ;
-inicializacion: ID PUNTO_IGUAL valor
+inicializacion: ID PUNTO_IGUAL valor 
+{ $$={ tipo: 'Inicializacion', id: { tipo: 'Identificador', valor: $1 }, valor: $3 }; }
 ;
 
 instruccionesfor: instruccionesfor instruccionfor { $1.push($2); $$ = $1; }
@@ -663,36 +689,40 @@ instruccionesfor: instruccionesfor instruccionfor { $1.push($2); $$ = $1; }
 | /* vacío */ { $$ = [];}
 ; 
 
-instruccionfor: variable
-| ifs
-| switch
-| for
-| modificacionslice
-| slice
-| append
-| matrices
-| asignacionmatriz 
-| struct 
-| structuso
-| structmodificacion
-| print 
-| asignacion 
-| mento
-| accesofunc
-| break
-| continue
+instruccionfor: variable {$$ = $1;}
+| ifs {$$ = $1;}
+| switch {$$ = $1;}
+| for {$$ = $1;}
+| modificacionslice {$$ = $1;}
+| slice {$$ = $1;}
+| append {$$ = $1;}
+| matrices {$$ = $1;}
+| asignacionmatriz {$$ = $1;}
+| struct {$$ = $1;}
+| structuso {$$ = $1;}
+| structmodificacion {$$ = $1;}
+| print {$$ = $1;}
+| asignacion {$$ = $1;}
+| mento {$$ = $1;}
+| accesofunc {$$ = $1;}
+| break {$$ = $1;}
+| continue {$$ = $1;}
 ;
 
 mento: ID INCREMENTO
+{ $$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $1 }, operador: '++' }; }
 | ID DECREMENTO
+{ $$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $1 }, operador: '--' }; }
 ;
 
 /* BREAK */
 break: BREAK
+{$$ = { tipo: 'Break' }; }
 ;
 
 /* CONTINUE */
-continue: CONTINUE
+continue: CONTINUE 
+{$$ = { tipo: 'Continue' }; }
 ;
 
 /* SLICE */
@@ -721,43 +751,50 @@ elementos: elementos COMA valor { $1.push($3); $$ = $1; }
 ;
 
 /* FUNCIONES DE ESTRUCTURAS */
-funcionesestructura: index 
-| join 
-| len 
-| accesoslice
-| accesomatriz
-| structacceso
-| atoi 
-| parsefloat 
-| typeof 
-| accesofunc
+funcionesestructura: index {$$ = $1;}
+| join {$$ = $1;}
+| len {$$ = $1;}
+| accesoslice{$$ = $1;}
+| accesomatriz{$$ = $1;}
+| structacceso{$$ = $1;}
+| atoi {$$ = $1;}
+| parsefloat {$$ = $1;}
+| typeof {$$ = $1;}
+| accesofunc {$$ = $1;}
 ;
 
 /* SLICE.INDEX */
 index: INDEX PARENTESIS_A ID COMA valor PARENTESIS_C
+{ $$ = { tipo: 'Index', id: $3, valor: $5 }; }
 ;
 
 /* STRING.JOIN */
 join: JOIN PARENTESIS_A ID COMA valor PARENTESIS_C
+{ $$ = { tipo: 'Join', id: $3, valor: $5 }; }
 ;
 
 /* LEN */
 len: LEN PARENTESIS_A ID PARENTESIS_C
+{ $$ = { tipo: 'Len', id: $3 }; }
 ;
 
 /* APPEND */
 append: ID IGUAL APPEND PARENTESIS_A ID COMA valor PARENTESIS_C
+{ $$ = { tipo: 'Append', id: $1, slice: $5, valor: $6 }; }
 ;
 
 /* ACCESO SLICE */
 accesoslice: ID posicionslice
+{ $$ = { tipo: 'AccesoSlice', id: $1, posicion: $2.posicion }; }
 ;
 
 /* MODIFICACION SLICE */
 modificacionslice: ID posicionslice IGUAL valor
+{ $$ = { tipo: 'ModificacionSlice', id: $1, posicion: $2.posicion, valor: $5 }; }
 ;
 
 posicionslice: CORCHETE_A NUMERO CORCHETE_C
+{ $$ = { posicion: Number(yytext) } }
 ;
 
 /* MATRICES INICIALIZACION MULTIDIMENSIONAL */
@@ -779,10 +816,12 @@ fila: LLAVE_A elementos LLAVE_C { $$ = $2; }
 
 /* ASIGNACIÓN MATRICES */
 asignacionmatriz: accesomatriz IGUAL valor
+{ $$ = { tipo: 'AsignacionMatriz', id: $1.id, fila: $1.fila, columna: $1.columna, valor: $3 }; }
 ;
 
 /* ACCESO MATRIZ */
 accesomatriz: ID CORCHETE_A NUMERO CORCHETE_C CORCHETE_A NUMERO CORCHETE_C
+{ $$ = { tipo: 'AccesoMatriz', id: $1, fila: Number($3), columna: Number($6) }; }
 ;
 
 /* STRUCT */
@@ -798,11 +837,13 @@ atributos: atributos atributo { $1.push($2); $$ = $1; }
 | atributo { $$ = [$1]; }
 ;
 
-atributo: tipo ID PUNTO_COMA { $$ = { tipo: 'Atributo', id: $2, tipoDato: $1 }; }
+atributo: tipo ID PUNTO_COMA { $$ = {id: $2, tipoDato: $1 }; }
 ;
 
 /* USO STRUCT */
-structuso: ID ID IGUAL LLAVE_A datos LLAVE_C PUNTO_COMA {}
+structuso: ID ID IGUAL LLAVE_A datos LLAVE_C PUNTO_COMA {
+    $$={ tipo: 'UsoStruct', id: $1, tipoDato: $2, valor: $6 };
+}
 ;
 
 datos: datos COMA dato { $1.push($3); $$ = $1; }
@@ -814,28 +855,35 @@ dato: ID DOS_PUNTOS valor { $$ = { id: $1, valor: $3 }; }
 
 /* ACCESO STRUCT */
 structacceso: ID PUNTO ID
+{ $$ = { tipo: 'AccesoStruct', id: $1, atributo: $3 }; }
 ;
 
 /* MODIFICACION STRUCT */
 structmodificacion: structacceso IGUAL valor PUNTO_COMA
+{ $$ = { tipo: 'ModificacionStruct', id: $1, atributo: $3, valor: $5 }; }
 ;
 
 /* PRINT */
-print: PRINT PARENTESIS_A elementos PARENTESIS_C
+print: PRINT PARENTESIS_A elementos PARENTESIS_C 
+{ $$ = {tipo: 'Imprimir',expresiones: $3};}
 ;
 
 /* ATOI */
 atoi: ATOI PARENTESIS_A valor PARENTESIS_C
+{ $$ = { tipo: 'Atoi', valor: $3 }; }
 ;
 
 /* PARSEFLOAT */
 parsefloat: PARSEFLOAT PARENTESIS_A valor PARENTESIS_C
+{ $$ = { tipo: 'ParseFloat', valor: $3 }; }
 ;
 
 /* TYPEOF */
 typeof: ID PUNTO TYPEOF PARENTESIS_A valor PARENTESIS_C
+{ $$ = { tipo: 'TypeOf', id: $1, valor: $5 }; }
 ;
 
 /* ACCESO FUNC */
-accesofunc: ID PARENTESIS_A elementos PARENTESIS_C
+accesofunc: ID PARENTESIS_A elementos PARENTESIS_C 
+{$$ = { tipo: 'AccesoFuncion', id: $1, argumentos: $3 }; }
 ;

@@ -6,6 +6,37 @@ const Entorno = require("./Instrucciones/Entorno");
 
 
 
+
+
+const cod2 = `func x() {
+fmt.Println("Dentro de función")
+var condicion bool = true
+var condicion2 bool= true
+if condicion {
+// Bloque de sentencias para el if
+fmt.Println("Dentro de if: ", condicion)
+fmt.Println("Dentro de if: ", condicion2)
+} else if condicion {
+// Bloque de sentencias para el else if
+fmt.Println("Dentro de else-if: ", condicion)
+fmt.Println("Dentro de else-if: ", condicion2)
+} else {
+fmt.Println("Dentro de else: ", condicion)
+fmt.Println("Dentro de else: ", condicion2)
+}
+
+}`;
+
+const codTest = `func x() {}`;
+const ast = parser.parse(codTest);
+console.log(ast);
+//console.log(JSON.stringify(ast, null, 2));
+//const resultado= Interpretador(ast);
+
+console.log();
+
+
+
 const codigo = `
 func main() {
 // Variable global
@@ -167,21 +198,6 @@ resultado := suma(3, 7)
 fmt.Println("Resultado:", resultado)
 }
 `;
-
-const cod2 = `func x() {
-
-i = 1 + 9
-for 4 == 5 {
-fmt.Println(w)
-w++
-}
-fmt.Println("Resultado:", resultado)
-}`;
-
-const ast = parser.parse(cod2)
-const resultado= Interpretador(ast);
-
-console.log();
 
 /*
 const express = require("express");

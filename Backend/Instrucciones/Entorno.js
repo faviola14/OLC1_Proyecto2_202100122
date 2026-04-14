@@ -37,5 +37,11 @@ class Entorno {
         this.errores.push(`Variable no definida: ${id}`);
         throw new Error("Variable no definida: " + id);
     }
+
+    existe(id) {
+    if (id in this.valores) return true;
+    if (this.padre) return this.padre.existe(id);
+    return false;
+    }
 }
 module.exports = Entorno;
