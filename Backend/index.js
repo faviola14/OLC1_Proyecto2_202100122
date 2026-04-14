@@ -27,9 +27,10 @@ fmt.Println("Dentro de else: ", condicion2)
 
 }`;
 
-const codTest = `func x() {}`;
-const ast = parser.parse(codTest);
+const ast = parser.parse(cod2)
 console.log(ast);
+console.log(typeof ast);
+//console.log("AST:", ast);
 //console.log(JSON.stringify(ast, null, 2));
 //const resultado= Interpretador(ast);
 
