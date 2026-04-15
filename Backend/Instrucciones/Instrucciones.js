@@ -5,6 +5,8 @@ class Declaracion {
         this.valor = valor;
     }
     evaluar(entorno) {
+        console.log("entorno:", entorno);
+        console.log("existe:", typeof entorno.existe);
         if (entorno.existe(this.id)) {
             throw new Error(`La variable ${this.id} ya ha sido declarada.`);
         }
@@ -34,7 +36,7 @@ class Imprimir {
         this.expresiones = expresiones;
     }
     evaluar(entorno) {
-        const valores = this.expresiones.map(exp => exp.evaluar(entorno));
+        const valores = this.expresiones.map(exp => exp.evaluar(entorno)).filter(instr => instr !== null && instr !== undefined);
         console.log(...valores);
         return null;
     }
@@ -75,6 +77,30 @@ class ElseIf {
     }
 }
 
+class IfElse{
+    constructor(condicion, instruccionesIf, instruccionesElse) {
+        this.condicion = condicion;
+        this.instruccionesIf = instruccionesIf;
+        this.instruccionesElse = instruccionesElse;
+    }
+    evaluar(entorno) {
+        const condicionEvaluada = this.condicion.evaluar(entorno);
+        if (condicionEvaluada) {
+            const nuevoEntorno = { ...entorno };
+            for (let i = 0; i < this.instruccionesIf.length; i++) {
+                const instruccion = this.instruccionesIf[i];
+                instruccion.evaluar(nuevoEntorno);
+            }
+        } else {
+            const nuevoEntorno = { ...entorno };
+            for (let i = 0; i < this.instruccionesElse.length; i++) {
+                const instruccion = this.instruccionesElse[i];
+                instruccion.evaluar(nuevoEntorno);
+            }
+        }
+        return null;
+    }
+}
 class Else {
     constructor(instrucciones) {
         this.instrucciones = instrucciones;
@@ -89,19 +115,25 @@ class Else {
     }
 }
 
-class IfCompleto {
-    constructor(condicion, instrucciones) {
-        this.condicion = condicion;
-        this.instrucciones = instrucciones;
+class IfCompleto { //{ tipo: 'IfCompleto', if: $1, elseif: $2, else: $3 };
+    constructor(instruccionesIf, instruccionesElseIf, instruccionesElse) {
+        this.instruccionesIf = instruccionesIf;
+        this.instruccionesElseIf = instruccionesElseIf;
+        this.instruccionesElse = instruccionesElse; 
     }
     evaluar(entorno) {
-        const condicionEvaluada = this.condicion.evaluar(entorno);
-        if (condicionEvaluada) {
-            const nuevoEntorno = { ...entorno };
-            for (let i = 0; i < this.instrucciones.length; i++) {
-                const instruccion = this.instrucciones[i];
-                instruccion.evaluar(nuevoEntorno);
-            }
+        const nuevoEntorno = { ...entorno };
+        for (let i = 0; i < this.instruccionesIf.length; i++) {
+            const instruccion = this.instruccionesIf[i];
+            instruccion.evaluar(nuevoEntorno);
+        }
+        for (let i = 0; i < this.instruccionesElseIf.length; i++) {
+            const instruccion = this.instruccionesElseIf[i];
+            instruccion.evaluar(nuevoEntorno);
+        }
+        for (let i = 0; i < this.instruccionesElse.length; i++) {
+            const instruccion = this.instruccionesElse[i];
+            instruccion.evaluar(nuevoEntorno);
         }
         return null;
     }
@@ -225,7 +257,7 @@ class Funcion{
         this.retorno = retorno;
     }
     evaluar(entorno){
-        if (entorno.obtener(this.id)) {
+        if (entorno.existe(this.id)) {
             throw new Error(`La función ${this.id} ya ha sido declarada.`);
         }
         entorno.declarar(this.id, { tipo: 'Función', valor: this });
@@ -234,16 +266,14 @@ class Funcion{
 }
 
 class Programa {
-    constructor(funciones) {
+    constructor(funciones, instrucciones) {
         this.funciones = funciones;
+        this.instrucciones = instrucciones;
     }
     evaluar(entorno) {
-        for (let i = 0; i < this.funciones.length; i++) {
-            const funcion = this.funciones[i];
-            funcion.evaluar(entorno);
-        }
-        return null;
-    }   
+        this.funciones.forEach(f => f.evaluar(entorno));
+        this.instrucciones.forEach(i => i.evaluar(entorno));
+    }
 }
 
 class Return{
@@ -662,7 +692,7 @@ class AccesoFuncion{
 }
 
 module.exports = {
-    Declaracion, Asignacion, Imprimir, If, ElseIf, Else, IfCompleto, For, Switch, Slice,
+    Declaracion, Asignacion, Imprimir, If, ElseIf, Else,IfElse, IfCompleto, For, Switch, Slice,
     Struct, Matriz, Funcion, Programa, Return, Break, Continue, Mento, BloqueIndependiente,
     Cases, Default, Inicializacion, Index, Join, Len, Append, AccesoSlice, ModificacionSlice,
     AsignacionMatriz, AccesoMatriz, UsoStruct, AccesoStruct, ModificacionStruct, Atoi, ParseFloat, TypeOf,

@@ -4,7 +4,7 @@
 
 ```bnf
 ...
-<programa> ::= <funciones>
+<programa> ::= <funciones> <instrucciones> EOF
 
 <funciones> ::= <funciones> <funcion> 
 | <funcion> 
@@ -329,6 +329,7 @@
 
 # acceso función suma(3, 7)
 <accesofunc> ::= ID PARENTESIS_A <elementos> PARENTESIS_C
+| ID PARENTESIS_A PARENTESIS_C
 
 
 

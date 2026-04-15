@@ -5,7 +5,20 @@ const Interpretador = require("./Interprete/Interpretador");
 const Entorno = require("./Instrucciones/Entorno");
 
 
-
+/*fmt.Println("Dentro de función")
+var condicion bool = true
+var condicion2 bool= true
+if condicion {
+// Bloque de sentencias para el if
+fmt.Println("Dentro de if: ", condicion)
+fmt.Println("Dentro de if: ", condicion2)
+} else if condicion {
+// Bloque de sentencias para el else if
+fmt.Println("Dentro de else-if: ", condicion)
+fmt.Println("Dentro de else-if: ", condicion2)
+} else {
+fmt.Println("Dentro de else: ", condicion)
+fmt.Println("Dentro de else: ", condicion2)*/
 
 
 const cod2 = `func x() {
@@ -22,17 +35,18 @@ fmt.Println("Dentro de else-if: ", condicion)
 fmt.Println("Dentro de else-if: ", condicion2)
 } else {
 fmt.Println("Dentro de else: ", condicion)
-fmt.Println("Dentro de else: ", condicion2)
+fmt.Println("Dentro de else: ", condicion2)}
 }
+x()`;
 
-}`;
+const ast = parser.parse(cod2);
 
-const ast = parser.parse(cod2)
+/*console.log("RESULTADO FINAL:");
 console.log(ast);
-console.log(typeof ast);
-//console.log("AST:", ast);
+console.log("TIPO:", typeof ast);*/
+
 //console.log(JSON.stringify(ast, null, 2));
-//const resultado= Interpretador(ast);
+const resultado= Interpretador(ast);
 
 console.log();
 

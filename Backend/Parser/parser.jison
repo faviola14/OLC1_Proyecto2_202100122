@@ -381,9 +381,9 @@
 
 
 
-programa: funciones EOF { 
-    console.log("Programa analizado correctamente.");
-    $$ = { tipo: 'Programa', funciones: $1 };
+programa: funciones instrucciones EOF { 
+    /*console.log("Program:",$1);*/
+    return { tipo: "Programa", funciones: $1, instrucciones: $2 };
     /*TablaSimbolos.crearReporteSimbolos();
     TablaSimbolos.imprimirTabla();*/
 }
@@ -557,7 +557,7 @@ ifs: if elseif else
 | if elseif 
 { $$ = { tipo: 'IfElseIf', if: $1, elseif: $2 }; }
 | if else
-{ $$ = { tipo: 'IfCompleto', if: $1, elseif: $2, else: $3 }; }
+{ $$ = { tipo: 'IfElse', if: $1, else: $3 }; }
 | if
 { $$ = $1; }
 ;
@@ -886,4 +886,6 @@ typeof: ID PUNTO TYPEOF PARENTESIS_A valor PARENTESIS_C
 /* ACCESO FUNC */
 accesofunc: ID PARENTESIS_A elementos PARENTESIS_C 
 {$$ = { tipo: 'AccesoFuncion', id: $1, argumentos: $3 }; }
+| ID PARENTESIS_A PARENTESIS_C 
+{ $$ = { tipo: 'AccesoFuncion', id: $1, argumentos: [] }; }
 ;

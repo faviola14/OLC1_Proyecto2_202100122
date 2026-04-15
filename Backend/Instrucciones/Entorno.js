@@ -39,9 +39,12 @@ class Entorno {
     }
 
     existe(id) {
-    if (id in this.valores) return true;
-    if (this.padre) return this.padre.existe(id);
-    return false;
+    let actual = this;
+    while (actual != null) {
+        if (actual.tabla.has(id)) return true;
+        actual = actual.padre;
     }
+    return false;
+}
 }
 module.exports = Entorno;
