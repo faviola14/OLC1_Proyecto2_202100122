@@ -14,7 +14,7 @@ class Numero extends Nodo {
 class Cadena extends Nodo {
     constructor(valor) {
         super();
-        this.valor = valor;
+        this.valor =  valor.slice(1, -1);;
     }
 
     evaluar() {
@@ -29,7 +29,8 @@ class Identificador extends Nodo {
     }
 
     evaluar(entorno) {
-        return entorno.obtener(this.id);
+        const variable = entorno.obtener(this.id);
+    return variable.valor; ;
     }
 }
 

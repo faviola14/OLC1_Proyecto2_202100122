@@ -150,7 +150,6 @@ class IfCompleto {
     evaluar(entorno) {
         if (this.ifNode) {
             const cond = this.ifNode.condicion.evaluar(entorno);
-            console.log("CONDICION:", cond, typeof cond);
             if (cond.valor === true) {
                 
                 this.ifNode.instrucciones.forEach(i => i.evaluar(entorno));

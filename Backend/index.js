@@ -7,13 +7,20 @@ const Interpretador = require("./Interprete/Interpretador");
 
 const cod2 = `func x() {
 fmt.Println("Dentro de función")
-var condicion bool = true
-var condicion2 bool= false
+var condicion bool = false
+var condicion2 bool= true
 if condicion {
 // Bloque de sentencias para el if
 fmt.Println("Dentro de if: ", condicion)
 fmt.Println("Dentro de if: ", condicion2)
-}  
+}  else if condicion2 {
+// Bloque de sentencias para el else if
+fmt.Println("Dentro de else-if: ", condicion)
+fmt.Println("Dentro de else-if: ", condicion2)
+} else {
+fmt.Println("Dentro de else: ", condicion)
+fmt.Println("Dentro de else: ", condicion2)
+}
 }
 x()`;
 
