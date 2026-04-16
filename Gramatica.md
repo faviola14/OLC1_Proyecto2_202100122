@@ -95,6 +95,8 @@
 | ID 
 | <funcionesestructura> 
 | CADENA
+| TRUE 
+| FALSE
 
 # ASIGNACIONES VARIABLES
 <asignacion> ::= ID IGUAL <operacion>

@@ -12,6 +12,11 @@
 -> bool
 -> rune
 
+#### Booleanos
+
+-> true
+-> false
+
 #### Tipos Compuestos
 
 -> slice

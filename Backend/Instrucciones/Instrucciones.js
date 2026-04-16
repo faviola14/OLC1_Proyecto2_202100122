@@ -1,3 +1,5 @@
+const Entorno = require("../Instrucciones/Entorno");
+
 class Declaracion {
     constructor(id, tipo, valor) {
         this.id = id;
@@ -5,8 +7,9 @@ class Declaracion {
         this.valor = valor;
     }
     evaluar(entorno) {
-        console.log("entorno:", entorno);
+        /*console.log("entorno:", entorno);
         console.log("existe:", typeof entorno.existe);
+        console.log(entorno instanceof Entorno);*/
         if (entorno.existe(this.id)) {
             throw new Error(`La variable ${this.id} ya ha sido declarada.`);
         }
@@ -48,9 +51,9 @@ class If {
         this.instrucciones = instrucciones;
     }
     evaluar(entorno) {
-        const condicionEvaluada = this.condicion.evaluar(entorno);
-        if (condicionEvaluada) {
-            const nuevoEntorno = { ...entorno };
+        const cond = this.condicion.evaluar(entorno);
+        if (cond.valor === true) {
+            const nuevoEntorno = new Entorno(entorno);
             for (let i = 0; i < this.instrucciones.length; i++) {
                 const instruccion = this.instrucciones[i];
                 instruccion.evaluar(nuevoEntorno);
@@ -67,7 +70,7 @@ class ElseIf {
     evaluar(entorno) {
         const condicionEvaluada = this.condicion.evaluar(entorno);
         if (condicionEvaluada) {
-            const nuevoEntorno = { ...entorno };
+            const nuevoEntorno = new Entorno(entorno);
             for (let i = 0; i < this.instrucciones.length; i++) {
                 const instruccion = this.instrucciones[i];
                 instruccion.evaluar(nuevoEntorno);
@@ -77,36 +80,13 @@ class ElseIf {
     }
 }
 
-class IfElse{
-    constructor(condicion, instruccionesIf, instruccionesElse) {
-        this.condicion = condicion;
-        this.instruccionesIf = instruccionesIf;
-        this.instruccionesElse = instruccionesElse;
-    }
-    evaluar(entorno) {
-        const condicionEvaluada = this.condicion.evaluar(entorno);
-        if (condicionEvaluada) {
-            const nuevoEntorno = { ...entorno };
-            for (let i = 0; i < this.instruccionesIf.length; i++) {
-                const instruccion = this.instruccionesIf[i];
-                instruccion.evaluar(nuevoEntorno);
-            }
-        } else {
-            const nuevoEntorno = { ...entorno };
-            for (let i = 0; i < this.instruccionesElse.length; i++) {
-                const instruccion = this.instruccionesElse[i];
-                instruccion.evaluar(nuevoEntorno);
-            }
-        }
-        return null;
-    }
-}
+
 class Else {
     constructor(instrucciones) {
         this.instrucciones = instrucciones;
     }
     evaluar(entorno) {
-        const nuevoEntorno = { ...entorno };
+        const nuevoEntorno = new Entorno(entorno);
         for (let i = 0; i < this.instrucciones.length; i++) {
             const instruccion = this.instrucciones[i];
             instruccion.evaluar(nuevoEntorno);
@@ -114,28 +94,79 @@ class Else {
         return null;
     }
 }
-
-class IfCompleto { //{ tipo: 'IfCompleto', if: $1, elseif: $2, else: $3 };
-    constructor(instruccionesIf, instruccionesElseIf, instruccionesElse) {
-        this.instruccionesIf = instruccionesIf;
-        this.instruccionesElseIf = instruccionesElseIf;
-        this.instruccionesElse = instruccionesElse; 
+class IfElseIf{
+    constructor(ifNode, elseIfNode, elseNode) {
+        this.ifNode = ifNode;
+        this.elseIfNode = elseIfNode;
+        this.elseNode = elseNode;
     }
     evaluar(entorno) {
-        const nuevoEntorno = { ...entorno };
-        for (let i = 0; i < this.instruccionesIf.length; i++) {
-            const instruccion = this.instruccionesIf[i];
-            instruccion.evaluar(nuevoEntorno);
+        if (this.ifNode) {
+            const cond = this.ifNode.condicion.evaluar(entorno);
+            console.log("CONDICION:", cond, typeof cond);
+            if (cond.valor === true) {
+                
+                this.ifNode.instrucciones.forEach(i => i.evaluar(entorno));
+                return;
+            }
         }
-        for (let i = 0; i < this.instruccionesElseIf.length; i++) {
-            const instruccion = this.instruccionesElseIf[i];
-            instruccion.evaluar(nuevoEntorno);
+        if (this.elseIfNode) {
+            const cond2 = this.elseIfNode.condicion.evaluar(entorno);
+            if (cond2.valor === true) {
+                this.elseIfNode.instrucciones.forEach(i => i.evaluar(entorno));
+                return;
+            }
         }
-        for (let i = 0; i < this.instruccionesElse.length; i++) {
-            const instruccion = this.instruccionesElse[i];
-            instruccion.evaluar(nuevoEntorno);
+    }
+}
+class IfElse{
+    constructor( instruccionesIf, instruccionesElse) {
+        this.ifNode = instruccionesIf;
+        this.elseNode = instruccionesElse;
+    }
+    evaluar(entorno) {
+        if (this.ifNode) {
+            const cond = this.ifNode.condicion.evaluar(entorno);
+            console.log("CONDICION:", cond, typeof cond);
+            if (cond.valor === true) {
+                
+                this.ifNode.instrucciones.forEach(i => i.evaluar(entorno));
+                return;
+            }
         }
-        return null;
+        if (this.elseNode) {
+            this.elseNode.instrucciones.forEach(i => i.evaluar(entorno));
+        }
+    
+    }
+}
+
+class IfCompleto {
+    constructor(ifNode, elseIfNode, elseNode) {
+        this.ifNode = ifNode;
+        this.elseIfNode = elseIfNode;
+        this.elseNode = elseNode;
+    }
+    evaluar(entorno) {
+        if (this.ifNode) {
+            const cond = this.ifNode.condicion.evaluar(entorno);
+            console.log("CONDICION:", cond, typeof cond);
+            if (cond.valor === true) {
+                
+                this.ifNode.instrucciones.forEach(i => i.evaluar(entorno));
+                return;
+            }
+        }
+        if (this.elseIfNode) {
+            const cond2 = this.elseIfNode.condicion.evaluar(entorno);
+            if (cond2.valor === true) {
+                this.elseIfNode.instrucciones.forEach(i => i.evaluar(entorno));
+                return;
+            }
+        }
+        if (this.elseNode) {
+            this.elseNode.instrucciones.forEach(i => i.evaluar(entorno));
+        }
     }
 }
 
@@ -147,7 +178,7 @@ class For {
         this.instrucciones = instrucciones;
     }
     evaluar(entorno) {
-        const nuevoEntorno = { ...entorno };
+        const nuevoEntorno = new Entorno(entorno);
         for (let i = 0; i < this.instrucciones.length; i++) {
             const instruccion = this.instrucciones[i];
             instruccion.evaluar(nuevoEntorno);
@@ -164,7 +195,7 @@ class ForRange {
         this.instrucciones = instrucciones;
     }
     evaluar(entorno) {
-        const nuevoEntorno = { ...entorno };
+        const nuevoEntorno = new Entorno(entorno);
         for (let i = 0; i < this.instrucciones.length; i++) {
             const instruccion = this.instrucciones[i];
             instruccion.evaluar(nuevoEntorno);
@@ -186,7 +217,7 @@ class Switch{
             const valorCaso = caso.valor.evaluar(entorno);
             if (valorEvaluado === valorCaso) {
                 casoEncontrado = true;
-                const nuevoEntorno = { ...entorno };
+                const nuevoEntorno = new Entorno(entorno);
                 for (let j = 0; j < caso.instrucciones.length; j++) {
                     const instruccion = caso.instrucciones[j];
                     instruccion.evaluar(nuevoEntorno);
@@ -292,7 +323,7 @@ class Break{
 }
 
 class Continue{
-    evaluar(entorno){
+    evaluar(entorno) {
         return 'continue';
     }
 }   
@@ -325,7 +356,7 @@ class BloqueIndependiente {
         this.instrucciones = instrucciones;
     }
     evaluar(entorno) {
-        const nuevoEntorno = { ...entorno };
+        const nuevoEntorno = new Entorno(entorno);
         for (let i = 0; i < this.instrucciones.length; i++) {
             const instruccion = this.instrucciones[i];
             instruccion.evaluar(nuevoEntorno);
@@ -339,7 +370,7 @@ class Cases{
         this.instrucciones = instrucciones;
     }
     evaluar(entorno) {
-        const nuevoEntorno = { ...entorno };
+        const nuevoEntorno = new Entorno(entorno);
         for (let i = 0; i < this.instrucciones.length; i++) {
             const instruccion = this.instrucciones[i];
             instruccion.evaluar(nuevoEntorno);
@@ -353,7 +384,7 @@ class Default {
         this.instrucciones = instrucciones;
     }
     evaluar(entorno) {
-        const nuevoEntorno = { ...entorno };
+        const nuevoEntorno = new Entorno(entorno);
         for (let i = 0; i < this.instrucciones.length; i++) {
             const instruccion = this.instrucciones[i];
             instruccion.evaluar(nuevoEntorno);
@@ -673,7 +704,7 @@ class AccesoFuncion{
         if (this.argumentos.length !== funcion.parametros.length) {
             throw new Error(`La función ${this.id} espera ${funcion.parametros.length} argumentos, pero se proporcionaron ${this.argumentos.length}.`);
         }
-        const nuevoEntorno = { ...entorno };
+        const nuevoEntorno = new Entorno(entorno);
         for (let i = 0; i < this.argumentos.length; i++) {
             const argValor = this.argumentos[i].evaluar(entorno);
             nuevoEntorno.declarar(funcion.parametros[i].id, { tipo: funcion.parametros[i].tipoDato, valor: argValor });
@@ -692,8 +723,8 @@ class AccesoFuncion{
 }
 
 module.exports = {
-    Declaracion, Asignacion, Imprimir, If, ElseIf, Else,IfElse, IfCompleto, For, Switch, Slice,
-    Struct, Matriz, Funcion, Programa, Return, Break, Continue, Mento, BloqueIndependiente,
+    Declaracion, Asignacion, Imprimir, If, ElseIf, Else, IfElse, IfElseIf, IfCompleto, For, ForRange, Switch,
+    Slice, Struct, Matriz, Funcion, Programa, Return, Break, Continue, Mento, BloqueIndependiente,
     Cases, Default, Inicializacion, Index, Join, Len, Append, AccesoSlice, ModificacionSlice,
     AsignacionMatriz, AccesoMatriz, UsoStruct, AccesoStruct, ModificacionStruct, Atoi, ParseFloat, TypeOf,
     AccesoFuncion

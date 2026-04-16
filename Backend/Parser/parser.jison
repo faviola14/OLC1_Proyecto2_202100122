@@ -47,6 +47,15 @@
                                 return 'RUNE';
                             }
 
+/* BOOLEANOS */
+"true"                      {   const trueToken = new Token("TRUE", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(trueToken);
+                                return 'TRUE';
+                            }
+"false"                      {   const falseToken = new Token("FALSE", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(falseToken);
+                                return 'FALSE';
+                            }
 /* TIPOS COMPUESTOS */
 "slice"                     {   const sliceToken = new Token("SLICE", yytext, yylineno, yylloc.first_column);
                                 TablaTokens.agregarToken(sliceToken);
@@ -348,7 +357,7 @@
 %locations 
 /* operator associations and precedence */
 %token CADENA ID NUMERO NUMERO_DECIMAL 
-%token INT FLOAT STRING RUNE BOOL 
+%token INT FLOAT STRING RUNE BOOL TRUE FALSE
 %token SLICE STRUCT 
 %token NULL
 %token COMILLA_DOBLE BARRA_INVERTIDA SALTO_LINEA RETORNO_CARRO TABULACION
@@ -540,6 +549,10 @@ operacionmenossimple: MENOS operacionmenossimple %prec UMINUS
 { $$ = $1; }
 | CADENA
 { $$ = { tipo: 'Cadena', valor: yytext }; }
+| TRUE
+{ $$ = { tipo: 'Booleano', valor: true }; }
+| FALSE
+{ $$ = { tipo: 'Booleano', valor: false }; }
 ;
 
 /* ASIGNACIONES VARIABLES */
@@ -557,7 +570,7 @@ ifs: if elseif else
 | if elseif 
 { $$ = { tipo: 'IfElseIf', if: $1, elseif: $2 }; }
 | if else
-{ $$ = { tipo: 'IfElse', if: $1, else: $3 }; }
+{ $$ = { tipo: 'IfElse', if: $1, else: $2 }; }
 | if
 { $$ = $1; }
 ;

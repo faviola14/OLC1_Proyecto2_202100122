@@ -1,6 +1,6 @@
 const Entorno = require("../Instrucciones/Entorno");
 const { Numero, Cadena, Identificador, Booleano, Bloque } = require("../Instrucciones/Valores");
-const { Declaracion, Asignacion, Imprimir, If, ElseIf, IfElse, Else, IfCompleto, For, Switch, Slice,
+const { Declaracion, Asignacion, Imprimir, If, IfElseIf,ElseIf, IfElse, Else, IfCompleto, For, ForRange, Switch, Slice,
     Struct, Matriz, Funcion, Programa, Return, Break, Continue, Mento, BloqueIndependiente,
     Cases, Default, Inicializacion, Index, Join, Len, Append, AccesoSlice, ModificacionSlice,
     AsignacionMatriz, AccesoMatriz, UsoStruct, AccesoStruct, ModificacionStruct, Atoi, ParseFloat, TypeOf,
@@ -43,6 +43,16 @@ function aNodo(nodo){
             const condicionElseIf = aNodo(nodo.condicion);
             const instruccionesElseIf = nodo.instrucciones.map(instr => aNodo(instr)).filter(instr => instr !== null && instr !== undefined);
             return new ElseIf(condicionElseIf, instruccionesElseIf);
+        case 'IfElse':
+            return new IfElse(
+                aNodo(nodo.if),
+                nodo.else ? aNodo(nodo.else) : null
+            );
+        case 'IfElseIf':
+            return new IfElseIf(
+                aNodo(nodo.if),
+                nodo.elseif ? aNodo(nodo.elseif) : null
+            );
         case 'Else':
             const instruccionesElse = nodo.instrucciones.map(instr => aNodo(instr)).filter(instr => instr !== null && instr !== undefined);
             return new Else(instruccionesElse);
@@ -154,7 +164,7 @@ function interpretar(nodo) {
         const raiz = aNodo(nodo);
         if (raiz) raiz.evaluar(entorno);
     }
-
+    //console.log(entorno instanceof Entorno);
     return entorno;
 }
 
