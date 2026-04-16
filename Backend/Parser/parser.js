@@ -86,9 +86,10 @@ switch (yystate) {
 case 1:
  
     /*console.log("Program:",$$[$0-2]);*/
+    TablaSimbolos.crearReporteSimbolos();
+    /*TablaSimbolos.imprimirTabla();*/
     return { tipo: "Programa", funciones: $$[$0-2], instrucciones: $$[$0-1] };
-    /*TablaSimbolos.crearReporteSimbolos();
-    TablaSimbolos.imprimirTabla();*/
+    
 
 break;
 case 2: case 12: case 97: case 101: case 130: case 187:
@@ -1295,9 +1296,9 @@ case 71:   const idToken = new Token("ID", yy_.yytext, yy_.yylineno, yy_.yylloc.
                             
 break;
 case 72:   
-                                /*TablaTokens.crearReporteTokens();
+                                TablaTokens.crearReporteTokens();
                                 TablaErrores.crearReporteErrores();
-                                TablaTokens.imprimirTabla();
+                                /*TablaTokens.imprimirTabla();
                                 TablaErrores.imprimirTabla();*/
                                 return 6;
                             

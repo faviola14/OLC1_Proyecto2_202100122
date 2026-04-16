@@ -340,9 +340,9 @@
 
 /* FIN DE DOCUMENTO */
 <<EOF>>                     {   
-                                /*TablaTokens.crearReporteTokens();
+                                TablaTokens.crearReporteTokens();
                                 TablaErrores.crearReporteErrores();
-                                TablaTokens.imprimirTabla();
+                                /*TablaTokens.imprimirTabla();
                                 TablaErrores.imprimirTabla();*/
                                 return 'EOF';
                             }
@@ -392,9 +392,10 @@
 
 programa: funciones instrucciones EOF { 
     /*console.log("Program:",$1);*/
+    TablaSimbolos.crearReporteSimbolos();
+    /*TablaSimbolos.imprimirTabla();*/
     return { tipo: "Programa", funciones: $1, instrucciones: $2 };
-    /*TablaSimbolos.crearReporteSimbolos();
-    TablaSimbolos.imprimirTabla();*/
+    
 }
 ;
 

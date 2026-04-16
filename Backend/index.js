@@ -6,23 +6,23 @@ const Interpretador = require("./Interprete/Interpretador");
 
 
 const cod2 = `func x() {
-fmt.Println("Dentro de función")
-var condicion bool = false
-var condicion2 bool= true
-if condicion {
-// Bloque de sentencias para el if
-fmt.Println("Dentro de if: ", condicion)
-fmt.Println("Dentro de if: ", condicion2)
-}  else if condicion2 {
-// Bloque de sentencias para el else if
-fmt.Println("Dentro de else-if: ", condicion)
-fmt.Println("Dentro de else-if: ", condicion2)
-} else {
-fmt.Println("Dentro de else: ", condicion)
-fmt.Println("Dentro de else: ", condicion2)
+var a float64 = 5 
+var valor int
+var valor2_1 float64 = 10 + 1
+valor3 := "esto es una variable"
+valor3 = "otra cadena"
+i := 10
+?
+fmt.Println(a)
+fmt.Println(valor)
+fmt.Println(valor2_1)
+fmt.Println(valor3)
+fmt.Println(i)
+
 }
-}
-x()`;
+x()
+
+`;
 
 const ast = parser.parse(cod2);
 
@@ -37,20 +37,7 @@ const resultado= Interpretador(ast);
 console.log();
 
 
-/*fmt.Println("Dentro de función")
-var condicion bool = true
-var condicion2 bool= bool
-if condicion {
-// Bloque de sentencias para el if
-fmt.Println("Dentro de if: ", condicion)
-fmt.Println("Dentro de if: ", condicion2)
-} else if condicion {
-// Bloque de sentencias para el else if
-fmt.Println("Dentro de else-if: ", condicion)
-fmt.Println("Dentro de else-if: ", condicion2)
-} else {
-fmt.Println("Dentro de else: ", condicion)
-fmt.Println("Dentro de else: ", condicion2)*/
+
 
 
 const codigo = `
