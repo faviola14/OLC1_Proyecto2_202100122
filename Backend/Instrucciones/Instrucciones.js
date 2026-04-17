@@ -1,4 +1,5 @@
 const Entorno = require("../Instrucciones/Entorno");
+const Tipos = require("../Instrucciones/Tipos");
 
 class Declaracion {
     constructor(id, tipo, valor) {
@@ -7,13 +8,37 @@ class Declaracion {
         this.valor = valor;
     }
     evaluar(entorno) {
-        /*console.log("entorno:", entorno);
-        console.log("existe:", typeof entorno.existe);
-        console.log(entorno instanceof Entorno);*/
-        if (entorno.existe(this.id)) {
+        if (entorno.existeLocal(this.id)) {
             throw new Error(`La variable ${this.id} ya ha sido declarada.`);
         }
-        const valorEvaluado = this.valor ? this.valor.evaluar(entorno) : null;
+        let valorEvaluado;
+        if (this.valor) {
+            valorEvaluado = this.valor.evaluar(entorno);
+        } else {
+            switch (this.tipo) {
+            case 'int':
+                valorEvaluado = 0;
+                break;
+            case 'float64':
+                valorEvaluado = 0.0;
+                break;
+            case 'bool':
+                valorEvaluado = false;
+                break;
+            case 'string':
+                valorEvaluado = "";
+                break;
+            case 'rune':
+                valorEvaluado = 0;
+                break;
+            default:
+                valorEvaluado = null;
+            }
+        }
+        if (this.tipo === "") {
+            this.tipo = Tipos.obtenerTipo(valorEvaluado);
+        }
+        //console.log("tipo: ",this.tipo, "valor: ", valorEvaluado)
         entorno.declarar(this.id, { tipo: this.tipo, valor: valorEvaluado });
         return null;
     }
@@ -25,12 +50,26 @@ class Asignacion {
         this.valor = valor;
     }
     evaluar(entorno) {
-        if (!entorno.obtener(this.id)) {
-            throw new Error(`La variable ${this.id} no ha sido declarada.`);
+        const variable = entorno.obtener(this.id);
+        const nuevoValor = this.valor.evaluar(entorno);
+        const tipoNuevo = Tipos.obtenerTipo(nuevoValor);
+        console.log("variable: ", variable, "nuevoValor: ",nuevoValor ,"tipoNuevo: ", tipoNuevo)
+        if (variable.tipo === 'float64' && tipoNuevo === 'int') {
+            entorno.asignar(this.id, {
+                tipo: 'float64',
+                valor: nuevoValor
+            });
+            return;
         }
-        const valorEvaluado = this.valor.evaluar(entorno);
-        entorno.asignar(this.id, { tipo: entorno.obtener(this.id).tipo, valor: valorEvaluado });
-        return null;
+
+        if (variable.tipo !== tipoNuevo) {
+            throw new Error(`No se puede asignar un valor de tipo diferente a ${variable.tipo}`);
+        }
+
+        entorno.asignar(this.id, {
+            tipo: variable.tipo,
+            valor: nuevoValor
+        });
     }
 }
 
@@ -39,6 +78,7 @@ class Imprimir {
         this.expresiones = expresiones;
     }
     evaluar(entorno) {
+        console.log("IMPRIMIENDO");
         const valores = this.expresiones.map(exp => exp.evaluar(entorno)).filter(instr => instr !== null && instr !== undefined);
         console.log(...valores);
         return null;
@@ -720,6 +760,8 @@ class AccesoFuncion{
         return resultado;
     }
 }
+
+
 
 module.exports = {
     Declaracion, Asignacion, Imprimir, If, ElseIf, Else, IfElse, IfElseIf, IfCompleto, For, ForRange, Switch,

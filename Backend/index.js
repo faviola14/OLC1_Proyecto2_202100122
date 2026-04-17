@@ -4,21 +4,32 @@ const parser = require("./Parser/parser");
 const Interpretador = require("./Interprete/Interpretador");
 
 
+/*`func x() {
+valor := 10
+fmt.Println(valor)
+valor = 200
+fmt.Println(valor)
+valor += 15
+fmt.Println(valor)
+valor -= 15
+fmt.Println(valor)
+}
+x()
+
+`*/
 
 const cod2 = `func x() {
-var a float64 = 5 
-var valor int
-var valor2_1 float64 = 10 + 1
-valor3 := "esto es una variable"
-valor3 = "otra cadena"
-i := 10
-?
-fmt.Println(a)
-fmt.Println(valor)
-fmt.Println(valor2_1)
-fmt.Println(valor3)
-fmt.Println(i)
-
+numero := 1
+switch numero {
+case 1:
+fmt.Println("Uno") // Se ejecuta si numero == 1
+case 2:
+fmt.Println("Dos") // Se ejecuta si numero == 2
+case 3:
+fmt.Println("Tres") // Se ejecuta si numero == 3
+default:
+fmt.Println("Número inválido") // Se ejecuta si ninguno de los casos coincide
+}
 }
 x()
 

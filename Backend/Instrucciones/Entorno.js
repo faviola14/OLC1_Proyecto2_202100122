@@ -45,6 +45,11 @@ class Entorno {
         actual = actual.padre;
     }
     return false;
-}
+    }
+    
+
+    existeLocal(id) {
+        return this.tabla.has(id);
+    }
 }
 module.exports = Entorno;

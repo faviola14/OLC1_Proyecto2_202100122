@@ -1,4 +1,5 @@
 const Nodo = require('./Nodo');
+const Entorno = require("../Instrucciones/Entorno");
 
 class Numero extends Nodo {
     constructor(valor) {
@@ -30,7 +31,7 @@ class Identificador extends Nodo {
 
     evaluar(entorno) {
         const variable = entorno.obtener(this.id);
-    return variable.valor; ;
+        return variable.valor; ;
     }
 }
 

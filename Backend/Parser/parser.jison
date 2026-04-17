@@ -5,13 +5,8 @@
     const TablaTokens = require('../Reports/TablaTokens');
     const TablaSimbolos = require('../Reports/TablaSimbolos');
     const TablaErrores = require('../Reports/TablaErrores');
-    /*const Comparacion=require('../Logica/Comparacion');
-    const Logica=require('../Logica/Logica');
-    const Not=require('../Logica/Not');
-    const Aritmetica=require('../Aritmetica/Aritmetica');
-    const Negativo=require('../Aritmetica/Negativo');
-    const {Declaracion, Asignacion, Imprimir, If, For, Switch, Slice, Struct, Matriz, Funcion,} = require('../Instrucciones/Instrucciones');
-    */
+    const Tipos = require("../Instrucciones/Tipos");
+
     let ambito= "";
     let contadorBloques=0;
 %}
@@ -498,7 +493,7 @@ variable: VAR ID tipo IGUAL valor
 }
 | ID PUNTO_IGUAL valor
 {
-    const variableST = new Simbolo($1,"Variable","",ambito, @1.first_line, @1.first_column);
+    const variableST = new Simbolo($1,"Variable",Tipos.obtenerTipo($3),ambito, @1.first_line, @1.first_column);
     TablaSimbolos.agregarSimbolo(variableST);
     $$={ tipo: 'Declaracion', id: $1, tipoDato: "", valor: $3 };
 }
