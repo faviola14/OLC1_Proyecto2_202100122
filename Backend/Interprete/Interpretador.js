@@ -75,14 +75,15 @@ function aNodo(nodo){
             const instruccionesForRange = nodo.instrucciones.map(instr => aNodo(instr)).filter(instr => instr !== null && instr !== undefined);
             return new ForRange( indice, valor,slice, instruccionesForRange);
         case 'Switch':
-            const exprSwitch = aNodo(nodo.expresion);
+            const defaultCase = nodo.default ? aNodo(nodo.default) : null;
+            const exprSwitch = aNodo(nodo.condicion);
             const casosSwitch = nodo.cases.map(caso => ({
                 valor: aNodo(caso.valor),
                 instrucciones: caso.instrucciones
                     .map(instr => aNodo(instr))
                     .filter(instr => instr !== null && instr !== undefined)
             }));
-            return new Switch(exprSwitch, casosSwitch);
+            return new Switch(exprSwitch, casosSwitch, defaultCase);
         case 'Case':
             const valorCase = aNodo(nodo.valor);
             const instruccionesCase = nodo.instrucciones.map(instr => aNodo(instr)).filter(instr => instr !== null && instr !== undefined);

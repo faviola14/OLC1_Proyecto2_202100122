@@ -243,29 +243,36 @@ class ForRange {
     }
 }
 
-class Switch{
-    constructor(expresion, cases){
+class Switch {
+    constructor(expresion, cases, defaultCase = null) {
         this.expresion = expresion;
         this.casos = cases;
+        this.defaultCase = defaultCase;
     }
+
     evaluar(entorno) {
+        if (!this.expresion) {
+            throw new Error("Switch sin expresión");
+        }
         const valorEvaluado = this.expresion.evaluar(entorno);
         let casoEncontrado = false;
-        for (let i = 0; i < this.cases.length; i++) {
-            const caso = this.cases[i];
+        for (let i = 0; i < this.casos.length; i++) {
+            const caso = this.casos[i];
             const valorCaso = caso.valor.evaluar(entorno);
             if (valorEvaluado === valorCaso) {
                 casoEncontrado = true;
                 const nuevoEntorno = new Entorno(entorno);
                 for (let j = 0; j < caso.instrucciones.length; j++) {
-                    const instruccion = caso.instrucciones[j];
-                    instruccion.evaluar(nuevoEntorno);
+                    caso.instrucciones[j].evaluar(nuevoEntorno);
                 }
                 break;
             }
         }
-        if (!casoEncontrado) {
-            console.log(`No se encontró un caso coincidente para el valor: ${valorEvaluado}`);
+        if (!casoEncontrado && this.defaultCase) {
+            const nuevoEntorno = new Entorno(entorno);
+            for (let i = 0; i < this.defaultCase.instrucciones.length; i++) {
+                this.defaultCase.instrucciones[i].evaluar(nuevoEntorno);
+            }
         }
         return null;
     }

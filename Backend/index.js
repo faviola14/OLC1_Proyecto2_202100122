@@ -5,8 +5,8 @@ const Interpretador = require("./Interprete/Interpretador");
 
 
 /*`func x() {
-valor := 10
-fmt.Println(valor)
+_valor := 10
+fmt.Println(_valor)
 valor = 200
 fmt.Println(valor)
 valor += 15
@@ -19,7 +19,7 @@ x()
 `*/
 
 const cod2 = `func x() {
-numero := 1
+numero := 5
 switch numero {
 case 1:
 fmt.Println("Uno") // Se ejecuta si numero == 1
