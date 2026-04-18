@@ -555,9 +555,9 @@ operacionmenossimple: MENOS operacionmenossimple %prec UMINUS
 asignacion: ID IGUAL operacion
 { $$ = { tipo: 'Asignacion', id: $1, valor: $3 }; }
 | ID ASIGNA_MAS operacion
-{ $$ = { tipo: 'Asignacion', id: $1, valor: $3 }; }
+{ $$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $1 }, operador: '++', cantidad: $3 }; }
 | ID ASIGNA_MENOS operacion
-{ $$ = { tipo: 'Asignacion', id: $1, valor: $3 }; }
+{ $$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $1 }, operador: '--', cantidad: $3 }; }
 ;
 
 /* IF */
@@ -572,7 +572,7 @@ ifs: if elseif else
 ;
 
 if: IF expresionRelacional codigo
-{ $$ = { tipo: 'If', condicion: $2, instrucciones: $4 }; }
+{ $$ = { tipo: 'If', condicion: $2, instrucciones: $3 }; }
 | IF ID codigo
 { $$ = { tipo: 'If', condicion: { tipo: 'Identificador', valor: $2 }, instrucciones: $3 }; }
 ;
@@ -677,16 +677,17 @@ instruccionswitch: variable {$$ = $1;}
 
 /* FOR */ 
 for: FOR expresionRelacional LLAVE_A instruccionesfor LLAVE_C
-{ $$ = { tipo: 'For', condicion: $2, instrucciones: $4 }; }
+{ $$ = { tipo: 'For', init: null, cond: $2, inc: null, instrucciones: $4 }; }
 | FOR ID LLAVE_A instruccionesfor LLAVE_C
-{ $$ = { tipo: 'For', condicion: { tipo: 'Identificador', valor: $2 }, instrucciones: $4 }; }
+{ $$ = { tipo: 'For', init: null, cond: { tipo: 'Identificador', valor: $2 }, inc: null, instrucciones: $4 }; }
 | FOR inicializacion PUNTO_COMA expresionRelacional PUNTO_COMA mento LLAVE_A instruccionesfor LLAVE_C
-{ $$ = { tipo: 'For', condicion: $4,inicializacion: $2, instrucciones: $7 }; }
-| FOR inicializacion PUNTO_COMA ID PUNTO_COMA mento LLAVE_A instruccionesfor LLAVE_C
-{ $$ = { tipo: 'For', condicion: { tipo: 'Identificador', valor: $4 }, inicializacion: $2, instrucciones: $7 }; }
+{ $$ = { tipo: 'For', init: $2, cond: $4, inc: $6, instrucciones: $8 }; }
+| FOR inicializacion PUNTO_COMA expresionRelacional PUNTO_COMA mento LLAVE_A instruccionesfor LLAVE_C
+{ $$ = { tipo: 'For', init: $2, cond: $4, inc: $6, instrucciones: $8 }; }
 | FOR ID COMA valor PUNTO_IGUAL RANGE ID LLAVE_A instruccionesfor LLAVE_C
-{ $$ = { tipo: 'ForRange', indice: { tipo: 'Identificador', valor: $2 }, valor: { tipo: 'Identificador', valor: $4 }, slice: { tipo: 'Identificador', valor: $7 }, instrucciones: $8 }; }
+{ $$ = { tipo: 'ForRange', indice: { tipo: 'Identificador', valor: $2 }, valor: $4, iterable: { tipo: 'Identificador', valor: $7 }, instrucciones: $9 }; }
 ;
+
 inicializacion: ID PUNTO_IGUAL valor 
 { $$={ tipo: 'Inicializacion', id: { tipo: 'Identificador', valor: $1 }, valor: $3 }; }
 ;
@@ -719,9 +720,9 @@ instruccionfor: variable {$$ = $1;}
 ;
 
 mento: ID INCREMENTO
-{ $$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $1 }, operador: '++' }; }
+{ $$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $1 }, operador: '++', cantidad: { tipo: 'Numero', valor: 1 } }; }
 | ID DECREMENTO
-{ $$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $1 }, operador: '--' }; }
+{ $$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $1 }, operador: '--', cantidad: { tipo: 'Numero', valor: 1 } }; }
 ;
 
 /* BREAK */

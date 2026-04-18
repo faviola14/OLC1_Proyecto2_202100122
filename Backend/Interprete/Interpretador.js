@@ -63,17 +63,17 @@ function aNodo(nodo){
                 nodo.else ? aNodo(nodo.else) : null
             );
         case 'For':
-            const idFor = nodo.id;
-            const condicionFor = aNodo(nodo.condicion);
-            const incrementoFor = aNodo(nodo.incremento);
+            const init = aNodo(nodo.init);
+            const condicion = aNodo(nodo.condicion);
+            const incremento = aNodo(nodo.incremento);
             const instruccionesFor = nodo.instrucciones.map(instr => aNodo(instr)).filter(instr => instr !== null && instr !== undefined);
-            return new For(idFor, condicionFor, incrementoFor, instruccionesFor);
+            return new For(init, condicion, incremento, instruccionesFor);
         case 'ForRange':
             const indice = nodo.indice;
             const valor = aNodo(nodo.valor);
-            const slice = aNodo(nodo.slice);
+            const iterable = aNodo(nodo.iterable);
             const instruccionesForRange = nodo.instrucciones.map(instr => aNodo(instr)).filter(instr => instr !== null && instr !== undefined);
-            return new ForRange( indice, valor,slice, instruccionesForRange);
+            return new ForRange( indice, valor, iterable, instruccionesForRange);
         case 'Switch':
             const defaultCase = nodo.default ? aNodo(nodo.default) : null;
             const exprSwitch = aNodo(nodo.condicion);
@@ -137,7 +137,10 @@ function aNodo(nodo){
         case 'Continue':
             return new Continue();
         case 'Mento':
-            return new Mento(nodo.id, nodo.operador);
+            console.log("NODO MENTO:", nodo.cantidad);
+
+            return new Mento(nodo.id.valor, nodo.operador, nodo.cantidad.valor);
+        
         case 'BloqueIndependiente':
             const instruccionesBloque = nodo.instrucciones.map(instr => aNodo(instr)).filter(instr => instr !== null && instr !== undefined);
             return new BloqueIndependiente(instruccionesBloque);

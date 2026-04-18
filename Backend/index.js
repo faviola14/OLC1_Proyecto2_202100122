@@ -2,10 +2,11 @@ console.log("hola mundo")
 
 const parser = require("./Parser/parser");
 const Interpretador = require("./Interprete/Interpretador");
+const AST = require("./Reports/AST");
 
 
 /*`func x() {
-_valor := 10
+valor := 10
 fmt.Println(_valor)
 valor = 200
 fmt.Println(valor)
@@ -19,17 +20,21 @@ x()
 `*/
 
 const cod2 = `func x() {
-numero := 5
-switch numero {
-case 1:
-fmt.Println("Uno") // Se ejecuta si numero == 1
-case 2:
-fmt.Println("Dos") // Se ejecuta si numero == 2
-case 3:
-fmt.Println("Tres") // Se ejecuta si numero == 3
-default:
-fmt.Println("Número inválido") // Se ejecuta si ninguno de los casos coincide
+x := 6
+for x== 6 {
+fmt.Println(x)
+x++
 }
+
+
+/*for z := 1; z <= 5; z++ {
+fmt.Println(z)
+}*/
+
+/*numeros := []int{10, 20, 30, 40, 50}
+for indice, valor := range numeros {
+fmt.Println("índice:", indice, "valor:", valor)
+}*/
 }
 x()
 
@@ -44,8 +49,9 @@ console.log("TIPO:", typeof ast);*/
 
 //console.log(JSON.stringify(ast, null, 2));
 const resultado= Interpretador(ast);
+//astDot = AST(ast);
 
-console.log();
+//console.log(astDot);
 
 
 

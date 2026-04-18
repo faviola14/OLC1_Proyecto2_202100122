@@ -5,29 +5,19 @@ class Comparacion {
         this.derecha = derecha;
     }
 
-    evaluar(registro) {
-        const valIzq = this.obtenerValor(this.izquierda, registro);
-        const valDer = this.obtenerValor(this.derecha, registro);
-
+    evaluar(entorno) {
+        const valIzq = this.izquierda.evaluar(entorno);
+        const valDer = this.derecha.evaluar(entorno);
         if (valIzq == null || valDer == null) return false;
-
         switch (this.operador) {
             case "==": return valIzq === valDer;
             case "!=": return valIzq !== valDer;
-            case ">": return Number(valIzq) > Number(valDer);
-            case "<": return Number(valIzq) < Number(valDer);
-            case ">=": return Number(valIzq) >= Number(valDer);
-            case "<=": return Number(valIzq) <= Number(valDer);
+            case ">": return valIzq > valDer;
+            case "<": return valIzq < valDer;
+            case ">=": return valIzq >= valDer;
+            case "<=": return valIzq <= valDer;
         }
-
         return false;
-    }
-
-    obtenerValor(obj, registro) {
-        if (typeof obj === "string" && obj in registro) {
-            return registro[obj];
-        }
-        return obj;
     }
 }
 

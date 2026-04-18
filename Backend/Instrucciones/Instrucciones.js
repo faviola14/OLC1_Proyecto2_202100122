@@ -53,7 +53,7 @@ class Asignacion {
         const variable = entorno.obtener(this.id);
         const nuevoValor = this.valor.evaluar(entorno);
         const tipoNuevo = Tipos.obtenerTipo(nuevoValor);
-        console.log("variable: ", variable, "nuevoValor: ",nuevoValor ,"tipoNuevo: ", tipoNuevo)
+        //console.log("variable: ", variable, "nuevoValor: ",nuevoValor ,"tipoNuevo: ", tipoNuevo)
         if (variable.tipo === 'float64' && tipoNuevo === 'int') {
             entorno.asignar(this.id, {
                 tipo: 'float64',
@@ -70,6 +70,7 @@ class Asignacion {
             tipo: variable.tipo,
             valor: nuevoValor
         });
+        return null;
     }
 }
 
@@ -78,10 +79,31 @@ class Imprimir {
         this.expresiones = expresiones;
     }
     evaluar(entorno) {
-        console.log("IMPRIMIENDO");
+        /*console.log("IMPRIMIENDO");
         const valores = this.expresiones.map(exp => exp.evaluar(entorno)).filter(instr => instr !== null && instr !== undefined);
         console.log(...valores);
+        return null;*/
+         
+        //console.log("IMPRIMIENDO...");
+
+        try {
+            const valores = this.expresiones.map(exp => {
+                if (!exp) {
+                    //console.log("EXPRESION NULL FALLA");
+                    return null;
+                }
+                return exp.evaluar(entorno);
+            });
+
+            //console.log("VALORES:", valores);
+            //console.log(...valores);
+
+        } catch (e) {
+            console.error("ERROR EN PRINT:", e);
+        }
+
         return null;
+
     }
 }
 
@@ -92,15 +114,10 @@ class If {
     }
     evaluar(entorno) {
         const cond = this.condicion.evaluar(entorno);
-        if (cond.valor === true) {
-            const nuevoEntorno = new Entorno(entorno);
-            for (let i = 0; i < this.instrucciones.length; i++) {
-                const instruccion = this.instrucciones[i];
-                instruccion.evaluar(nuevoEntorno);
-            }
-        }
-        return null;
+    if (cond) {
+        this.instrucciones.forEach(i => i.evaluar(entorno));
     }
+}
 }
 class ElseIf {
     constructor(condicion, instrucciones) {
@@ -108,15 +125,12 @@ class ElseIf {
         this.instrucciones = instrucciones;
     }
     evaluar(entorno) {
-        const condicionEvaluada = this.condicion.evaluar(entorno);
-        if (condicionEvaluada) {
-            const nuevoEntorno = new Entorno(entorno);
-            for (let i = 0; i < this.instrucciones.length; i++) {
-                const instruccion = this.instrucciones[i];
-                instruccion.evaluar(nuevoEntorno);
-            }   
+        const cond = this.condicion.evaluar(entorno);
+        if (cond) {
+            this.instrucciones.forEach(i => i.evaluar(entorno));
+            return true; 
         }
-        return null;
+        return false;
     }
 }
 
@@ -126,10 +140,9 @@ class Else {
         this.instrucciones = instrucciones;
     }
     evaluar(entorno) {
-        const nuevoEntorno = new Entorno(entorno);
         for (let i = 0; i < this.instrucciones.length; i++) {
             const instruccion = this.instrucciones[i];
-            instruccion.evaluar(nuevoEntorno);
+            instruccion.evaluar(entorno);
         }
         return null;
     }
@@ -143,16 +156,14 @@ class IfElseIf{
     evaluar(entorno) {
         if (this.ifNode) {
             const cond = this.ifNode.condicion.evaluar(entorno);
-            console.log("CONDICION:", cond, typeof cond);
-            if (cond.valor === true) {
-                
+            if (cond) {
                 this.ifNode.instrucciones.forEach(i => i.evaluar(entorno));
                 return;
             }
         }
         if (this.elseIfNode) {
             const cond2 = this.elseIfNode.condicion.evaluar(entorno);
-            if (cond2.valor === true) {
+            if (cond2) {
                 this.elseIfNode.instrucciones.forEach(i => i.evaluar(entorno));
                 return;
             }
@@ -167,8 +178,7 @@ class IfElse{
     evaluar(entorno) {
         if (this.ifNode) {
             const cond = this.ifNode.condicion.evaluar(entorno);
-            console.log("CONDICION:", cond, typeof cond);
-            if (cond.valor === true) {
+            if (cond) {
                 
                 this.ifNode.instrucciones.forEach(i => i.evaluar(entorno));
                 return;
@@ -184,21 +194,20 @@ class IfElse{
 class IfCompleto {
     constructor(ifNode, elseIfNode, elseNode) {
         this.ifNode = ifNode;
-        this.elseIfNode = elseIfNode;
+        this.elseIfNode = elseIfNode ;
         this.elseNode = elseNode;
     }
     evaluar(entorno) {
         if (this.ifNode) {
             const cond = this.ifNode.condicion.evaluar(entorno);
-            if (cond.valor === true) {
-                
+            if (cond) {
                 this.ifNode.instrucciones.forEach(i => i.evaluar(entorno));
                 return;
             }
         }
         if (this.elseIfNode) {
-            const cond2 = this.elseIfNode.condicion.evaluar(entorno);
-            if (cond2.valor === true) {
+            const cond = this.elseIfNode.condicion.evaluar(entorno);
+            if (cond) {
                 this.elseIfNode.instrucciones.forEach(i => i.evaluar(entorno));
                 return;
             }
@@ -209,37 +218,49 @@ class IfCompleto {
     }
 }
 
+
 class For {
-    constructor(id, condicion, incremento, instrucciones) {
-        this.id = id;
+    constructor(init, condicion, incremento, instrucciones) {
+        this.init = init;         
         this.condicion = condicion;
-        this.incremento = incremento;
+        this.incremento = incremento; 
         this.instrucciones = instrucciones;
     }
     evaluar(entorno) {
-        const nuevoEntorno = new Entorno(entorno);
-        for (let i = 0; i < this.instrucciones.length; i++) {
-            const instruccion = this.instrucciones[i];
-            instruccion.evaluar(nuevoEntorno);
+        if (this.init) {
+            this.init.evaluar(entorno);
         }
-        return null;
+        while (this.condicion ? Boolean(this.condicion.evaluar(entorno)) : true) {
+            for (let instr of this.instrucciones) {
+                const res = instr.evaluar(entorno);
+                if (res === 'break') return;
+                if (res === 'continue') break;
+            }
+            if (this.incremento) {
+                this.incremento.evaluar(entorno);
+            }
+        }
     }
 }
 
 class ForRange {
-    constructor( indice, valor,slice, instrucciones) {
+    constructor(indice, valor, iterable, instrucciones) {
         this.indice = indice;
         this.valor = valor;
-        this.slice = slice;
+        this.iterable = iterable;
         this.instrucciones = instrucciones;
     }
-    evaluar(entorno) {
-        const nuevoEntorno = new Entorno(entorno);
-        for (let i = 0; i < this.instrucciones.length; i++) {
-            const instruccion = this.instrucciones[i];
-            instruccion.evaluar(nuevoEntorno);
+    evaluar(entorno) {const iterable = this.iterable.evaluar(entorno);
+        for (let i = 0; i < iterable.length; i++) {
+            const nuevoEntorno = new Entorno(entorno);
+            nuevoEntorno.declarar(this.indice, { tipo: 'int', valor: i });
+            nuevoEntorno.declarar(this.valor, { tipo: 'int', valor: iterable[i] });
+            for (let instr of this.instrucciones) {
+                const res = instr.evaluar(nuevoEntorno);
+                if (res === 'break') return;
+                if (res === 'continue') break;
+            }
         }
-        return null;
     }
 }
 
@@ -261,17 +282,15 @@ class Switch {
             const valorCaso = caso.valor.evaluar(entorno);
             if (valorEvaluado === valorCaso) {
                 casoEncontrado = true;
-                const nuevoEntorno = new Entorno(entorno);
                 for (let j = 0; j < caso.instrucciones.length; j++) {
-                    caso.instrucciones[j].evaluar(nuevoEntorno);
+                    caso.instrucciones[j].evaluar(entorno);
                 }
                 break;
             }
         }
         if (!casoEncontrado && this.defaultCase) {
-            const nuevoEntorno = new Entorno(entorno);
             for (let i = 0; i < this.defaultCase.instrucciones.length; i++) {
-                this.defaultCase.instrucciones[i].evaluar(nuevoEntorno);
+                this.defaultCase.instrucciones[i].evaluar(entorno);
             }
         }
         return null;
@@ -349,9 +368,13 @@ class Programa {
     }
     evaluar(entorno) {
         this.funciones.forEach(f => f.evaluar(entorno));
-        this.instrucciones.forEach(i => i.evaluar(entorno));
+        this.instrucciones.forEach((inst, i) => {
+            //console.log("EJECUTANDO:", i, inst.constructor.name);
+            inst.evaluar(entorno);
+            });
     }
 }
+
 
 class Return{
     constructor(valor){
@@ -375,25 +398,28 @@ class Continue{
 }   
 
 class Mento{
-    constructor(id, operador){
+    constructor(id, operador,cantidad){
         this.id = id;
         this.operador = operador;
+        this.cantidad = cantidad;
     }
     evaluar(entorno) {
-        const variable = entorno.obtener(this.id);
+        const id = this.id.id || this.id;
+        const variable = entorno.obtener(id);
         if (!variable) {
-            throw new Error(`La variable ${this.id} no ha sido declarada.`);
+            throw new Error(`La variable ${id} no ha sido declarada.`);
         }
-        if (variable.tipo !== 'int' && variable.tipo !== 'float') {
-            throw new Error(`La variable ${this.id} no es de tipo numérico.`);
-        }
+        let nuevoValor = variable.valor;
         if (this.operador === '++') {
-            variable.valor += 1;
+            //console.log("VALOR ACTUAL: ",variable.valor)
+            nuevoValor = variable.valor + this.cantidad;
         } else if (this.operador === '--') {
-            variable.valor -= 1;
+            nuevoValor = variable.valor - this.cantidad;
         }
-        entorno.asignar(this.id, variable);
-        return null;
+        entorno.asignar(id, {
+            tipo: variable.tipo,
+            valor: nuevoValor
+        });
     }
 }
 
@@ -402,10 +428,9 @@ class BloqueIndependiente {
         this.instrucciones = instrucciones;
     }
     evaluar(entorno) {
-        const nuevoEntorno = new Entorno(entorno);
         for (let i = 0; i < this.instrucciones.length; i++) {
             const instruccion = this.instrucciones[i];
-            instruccion.evaluar(nuevoEntorno);
+            instruccion.evaluar(entorno);
         }
         return null;
     }
@@ -416,10 +441,9 @@ class Cases{
         this.instrucciones = instrucciones;
     }
     evaluar(entorno) {
-        const nuevoEntorno = new Entorno(entorno);
         for (let i = 0; i < this.instrucciones.length; i++) {
             const instruccion = this.instrucciones[i];
-            instruccion.evaluar(nuevoEntorno);
+            instruccion.evaluar(entorno);
         }
         return null;
     }
@@ -430,10 +454,9 @@ class Default {
         this.instrucciones = instrucciones;
     }
     evaluar(entorno) {
-        const nuevoEntorno = new Entorno(entorno);
         for (let i = 0; i < this.instrucciones.length; i++) {
             const instruccion = this.instrucciones[i];
-            instruccion.evaluar(nuevoEntorno);
+            instruccion.evaluar(entorno);
         }
         return null;
     }
@@ -759,7 +782,7 @@ class AccesoFuncion{
         for (let i = 0; i < funcion.instrucciones.length; i++) {
             const instruccion = funcion.instrucciones[i];
             const evalInstruccion = instruccion.evaluar(nuevoEntorno);
-            if (evalInstruccion !== null) {
+            if (evalInstruccion !== null && evalInstruccion !== undefined) {
                 resultado = evalInstruccion;
                 break;
             }
