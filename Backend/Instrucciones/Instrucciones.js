@@ -79,10 +79,10 @@ class Imprimir {
         this.expresiones = expresiones;
     }
     evaluar(entorno) {
-        /*console.log("IMPRIMIENDO");
+        //console.log("IMPRIMIENDO");
         const valores = this.expresiones.map(exp => exp.evaluar(entorno)).filter(instr => instr !== null && instr !== undefined);
         console.log(...valores);
-        return null;*/
+        return null;
          
         //console.log("IMPRIMIENDO...");
 
@@ -240,6 +240,7 @@ class For {
                 this.incremento.evaluar(entorno);
             }
         }
+    
     }
 }
 
@@ -250,13 +251,18 @@ class ForRange {
         this.iterable = iterable;
         this.instrucciones = instrucciones;
     }
-    evaluar(entorno) {const iterable = this.iterable.evaluar(entorno);
+    evaluar(entorno) {
+        const iterable = this.iterable.evaluar(entorno);
+        console.log("ANTES DEL FOR:", entorno);
+        console.log("indice:", this.indice);
+        console.log("valor:", this.valor);
         for (let i = 0; i < iterable.length; i++) {
-            const nuevoEntorno = new Entorno(entorno);
-            nuevoEntorno.declarar(this.indice, { tipo: 'int', valor: i });
-            nuevoEntorno.declarar(this.valor, { tipo: 'int', valor: iterable[i] });
+            //const nuevoEntorno = new Entorno(entorno);
+            entorno.declarar(this.indice.valor, { tipo: 'int', valor: i });
+            console.log("DECLARANDO:", this.indice.valor, this.valor.valor);
+            entorno.declarar(this.valor.valor, { tipo: 'int', valor: iterable[i] });
             for (let instr of this.instrucciones) {
-                const res = instr.evaluar(nuevoEntorno);
+                const res = instr.evaluar(entorno);
                 if (res === 'break') return;
                 if (res === 'continue') break;
             }
@@ -304,11 +310,16 @@ class Slice{
         this.valor = valor;
     }
     evaluar(entorno){
-        if (entorno.obtener(this.id)) {
+        if (entorno.existeLocal(this.id)) {
             throw new Error(`La variable ${this.id} ya ha sido declarada.`);
         }
-        const valorEvaluado = this.valor ? this.valor.evaluar(entorno) : null;
-        entorno.declarar(this.id, { tipo: this.tipo, valor: valorEvaluado });
+        const valorEvaluado = this.valor
+            ? this.valor.map(v => v.evaluar(entorno))
+            : [];
+        entorno.declarar(this.id, {
+            tipo: this.tipo,
+            valor: valorEvaluado
+        });
         return null;
     }
 }
@@ -506,7 +517,7 @@ class Index{
 }
 
 class Join{
-    constructor(expresiones){
+    constructor(id, valor){
         this.expresiones = expresiones;
     }
     evaluar(entorno) {
@@ -559,7 +570,7 @@ class Append{
 class AccesoSlice{
     constructor(id, indice){
         this.id = id;
-        this.indice = indice;
+        this.posicion = posicion;
     }
     evaluar(entorno) {
         const variable = entorno.obtener(this.id);
@@ -569,7 +580,7 @@ class AccesoSlice{
         if (variable.tipo !== 'Slice') {
             throw new Error(`La variable ${this.id} no es un slice.`);
         }
-        const indiceEvaluado = this.indice.evaluar(entorno);
+        const indiceEvaluado = this.posicion.evaluar(entorno);
         if (indiceEvaluado < 0 || indiceEvaluado >= variable.valor.length) {
             throw new Error(`Índice fuera de rango para el slice ${this.id}.`);
         }
@@ -580,7 +591,7 @@ class AccesoSlice{
 class ModificacionSlice{
     constructor(id, indice, valor){
         this.id = id;
-        this.indice = indice;
+        this.posicion = posicion;
         this.valor = valor;
     }
     evaluar(entorno) {
@@ -591,7 +602,7 @@ class ModificacionSlice{
         if (variable.tipo !== 'Slice') {
             throw new Error(`La variable ${this.id} no es un slice.`);
         }
-        const indiceEvaluado = this.indice.evaluar(entorno);
+        const indiceEvaluado = this.posicion.evaluar(entorno);
         if (indiceEvaluado < 0 || indiceEvaluado >= variable.valor.length) {
             throw new Error(`Índice fuera de rango para el slice ${this.id}.`);
         }

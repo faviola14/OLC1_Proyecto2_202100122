@@ -20,21 +20,28 @@ x()
 `*/
 
 const cod2 = `func x() {
-x := 6
-for x== 6 {
-fmt.Println(x)
-x++
+
+/*y := 10
+for ( y>= 5) {
+fmt.Println(y)
+y--
 }
+//fmt.Println(y)*/
 
 
-/*for z := 1; z <= 5; z++ {
+/*for z := 20; z >= 10; z-- {
 fmt.Println(z)
 }*/
 
-/*numeros := []int{10, 20, 30, 40, 50}
+
+
+numeros := []int{10, 20, 30, 40, 50}
+
 for indice, valor := range numeros {
 fmt.Println("índice:", indice, "valor:", valor)
-}*/
+}
+
+fmt.Println("fin")
 }
 x()
 

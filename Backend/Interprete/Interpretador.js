@@ -10,6 +10,7 @@ const Logica = require("../Logica/Logica");
 const Not = require("../Logica/Not");
 const Comparacion = require("../Logica/Comparacion");
 const Negativo = require("../Aritmetica/Negativo");
+const Nodo = require("../Instrucciones/Nodo");
 
 function aNodo(nodo){
     if (!nodo || typeof nodo !== 'object') return null;
@@ -63,9 +64,10 @@ function aNodo(nodo){
                 nodo.else ? aNodo(nodo.else) : null
             );
         case 'For':
+            //console.log(nodo)
             const init = aNodo(nodo.init);
-            const condicion = aNodo(nodo.condicion);
-            const incremento = aNodo(nodo.incremento);
+            const condicion = aNodo(nodo.cond);
+            const incremento = aNodo(nodo.inc);
             const instruccionesFor = nodo.instrucciones.map(instr => aNodo(instr)).filter(instr => instr !== null && instr !== undefined);
             return new For(init, condicion, incremento, instruccionesFor);
         case 'ForRange':
@@ -73,7 +75,7 @@ function aNodo(nodo){
             const valor = aNodo(nodo.valor);
             const iterable = aNodo(nodo.iterable);
             const instruccionesForRange = nodo.instrucciones.map(instr => aNodo(instr)).filter(instr => instr !== null && instr !== undefined);
-            return new ForRange( indice, valor, iterable, instruccionesForRange);
+            return new ForRange(indice, valor, iterable, instruccionesForRange);
         case 'Switch':
             const defaultCase = nodo.default ? aNodo(nodo.default) : null;
             const exprSwitch = aNodo(nodo.condicion);
@@ -95,7 +97,7 @@ function aNodo(nodo){
         case 'Logica':
             const izquierdaLog = aNodo(nodo.izquierda);
             const derechaLog = aNodo(nodo.derecha);
-            return new Logica(izquierdaLog, nodo.operador, derechaLog); 
+            return new Logica(izquierdaLog, nodo.operador, derechaLog);
         case 'Not':
             const valorNot = aNodo(nodo.valor);
             return new Not(valorNot);
@@ -121,14 +123,14 @@ function aNodo(nodo){
             ).filter(instr => instr !== null && instr !== undefined);
             return new Matriz(nodo.id, nodo.tipoDato, valorMatriz);
         case 'Programa':
-    return new Programa(
-        nodo.funciones
-            .map(f => aNodo(f))
-            .filter(f => f !== null && f !== undefined),
-        nodo.instrucciones
-            .map(i => aNodo(i))
-            .filter(i => i !== null && i !== undefined)
-    );
+            return new Programa(
+                nodo.funciones
+                    .map(f => aNodo(f))
+                    .filter(f => f !== null && f !== undefined),
+                nodo.instrucciones
+                    .map(i => aNodo(i))
+                    .filter(i => i !== null && i !== undefined)
+            );
         case 'Return':
             const valorReturn = aNodo(nodo.valor);
             return new Return(valorReturn);
@@ -137,10 +139,8 @@ function aNodo(nodo){
         case 'Continue':
             return new Continue();
         case 'Mento':
-            console.log("NODO MENTO:", nodo.cantidad);
-
+            //console.log("NODO MENTO:", nodo.cantidad);
             return new Mento(nodo.id.valor, nodo.operador, nodo.cantidad.valor);
-        
         case 'BloqueIndependiente':
             const instruccionesBloque = nodo.instrucciones.map(instr => aNodo(instr)).filter(instr => instr !== null && instr !== undefined);
             return new BloqueIndependiente(instruccionesBloque);
@@ -150,6 +150,38 @@ function aNodo(nodo){
         case 'AccesoFuncion':
             const argumentos = nodo.argumentos.map(arg => aNodo(arg)).filter(arg => arg !== null && arg !== undefined);
             return new AccesoFuncion(nodo.id, argumentos);
+        case 'Inicializacion':
+            return new Inicializacion(nodo.id, aNodo(nodo.valor));
+        case 'Index':
+            return new Index(nodo.id, nodo.valor);
+        case 'Join':
+            return new Join(nodo.id, nodo.valor);
+        case 'Len':
+            return new Len(nodo.id);
+        case 'Append':
+            return new Append(nodo.id, nodo.slice, nodo.valor);
+        case 'AccesoSlice':
+            return new AccesoSlice(nodo.id, nodo.posicion);
+        case 'ModificacionSlice':
+            return new ModificacionSlice(nodo.id, nodo.posicion, nodo.valor);
+        case 'AsignacionMatriz':
+            return new AsignacionMatriz(nodo.id, nodo.fila, nodo.columna, nodo.valor);
+        case 'AccesoMatriz':
+            return new AccesoMatriz(nodo.id, nodo.fila, nodo.columna);
+        case 'UsoStruct':
+            return new UsoStruct(nodo.id, nodo.tipoDato, nodo.valor);
+        case 'AccesoStruct':
+            return new AccesoStruct(nodo.id, nodo.atributo);
+        case 'ModificacionStruct':
+            return new ModificacionStruct(nodo.id, nodo.valor);
+        case 'Atoi':
+            return new Atoi(nodo.valor);
+        case 'ParseFloat':
+            return new ParseFloat(nodo.valor);
+        case 'TypeOf':
+            return new TypeOf(nodo.valor);
+        case 'AccesoFuncion':
+            return new AccesoFuncion(nodo.id, nodo.argumentos);
         default:
             throw new Error(`Tipo de nodo desconocido: ${JSON.stringify(nodo)}`);
             //break

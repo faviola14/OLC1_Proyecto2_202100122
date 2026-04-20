@@ -684,8 +684,8 @@ for: FOR expresionRelacional LLAVE_A instruccionesfor LLAVE_C
 { $$ = { tipo: 'For', init: $2, cond: $4, inc: $6, instrucciones: $8 }; }
 | FOR inicializacion PUNTO_COMA expresionRelacional PUNTO_COMA mento LLAVE_A instruccionesfor LLAVE_C
 { $$ = { tipo: 'For', init: $2, cond: $4, inc: $6, instrucciones: $8 }; }
-| FOR ID COMA valor PUNTO_IGUAL RANGE ID LLAVE_A instruccionesfor LLAVE_C
-{ $$ = { tipo: 'ForRange', indice: { tipo: 'Identificador', valor: $2 }, valor: $4, iterable: { tipo: 'Identificador', valor: $7 }, instrucciones: $9 }; }
+| FOR ID COMA ID PUNTO_IGUAL RANGE ID LLAVE_A instruccionesfor LLAVE_C
+{ $$ = { tipo: 'ForRange', indice: { tipo: 'Identificador', valor: $2 }, valor: { tipo: 'Identificador', valor: $4 }, iterable: { tipo: 'Identificador', valor: $7 }, instrucciones: $9 }; }
 ;
 
 inicializacion: ID PUNTO_IGUAL valor 

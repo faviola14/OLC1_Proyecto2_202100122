@@ -18,7 +18,7 @@ class Entorno {
     let actual = this;
     while (actual != null) {
         if (actual.tabla.has(id)) {
-            console.log("GET:", id, actual.tabla.get(id));
+            //console.log("GET:", id, actual.tabla.get(id));
             return actual.tabla.get(id);
         }
         actual = actual.padre;
@@ -32,7 +32,7 @@ class Entorno {
         while (actual != null) {
             if (actual.tabla.has(id)) {
                 actual.tabla.set(id, valor);
-                console.log("SET:", id, valor);
+                //console.log("SET:", id, valor);
                 return;
             }
             actual = actual.padre;

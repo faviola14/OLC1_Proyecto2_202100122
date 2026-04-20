@@ -195,7 +195,7 @@
 | FOR ID LLAVE_A <instruccionesfor> LLAVE_C
 | FOR <inicializacion> PUNTO_COMA <expresionRelacional> PUNTO_COMA <mento> LLAVE_A <instruccionesfor> LLAVE_C
 | FOR ID PUNTO_COMA <expresionRelacional> PUNTO_COMA <mento> LLAVE_A <instruccionesfor> LLAVE_C
-| FOR ID COMA <valor> PUNTO_IGUAL RANGE ID LLAVE_A <instruccionesfor> LLAVE_C
+| FOR ID COMA ID PUNTO_IGUAL RANGE ID LLAVE_A <instruccionesfor> LLAVE_C
 
 <inicializacion> ::= ID PUNTO_IGUAL <valor>
 
