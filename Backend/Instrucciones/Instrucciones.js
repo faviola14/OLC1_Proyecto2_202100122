@@ -13,7 +13,8 @@ class Declaracion {
         }
         let valorEvaluado;
         if (this.valor) {
-            valorEvaluado = this.valor.evaluar(entorno);
+            const resultado = this.valor.evaluar(entorno);
+            valorEvaluado = resultado.valor;
         } else {
             switch (this.tipo) {
             case 'int':
@@ -51,9 +52,18 @@ class Asignacion {
     }
     evaluar(entorno) {
         const variable = entorno.obtener(this.id);
-        const nuevoValor = this.valor.evaluar(entorno);
-        const tipoNuevo = Tipos.obtenerTipo(nuevoValor);
-        //console.log("variable: ", variable, "nuevoValor: ",nuevoValor ,"tipoNuevo: ", tipoNuevo)
+        const resultado = this.valor.evaluar(entorno); 
+        //console.log(this.valor);
+        if (!resultado) {
+            throw new Error("La expresión no devolvió ningún valor");
+        }
+        const tipoNuevo = resultado.tipo;
+        const nuevoValor = resultado.valor;
+        /*console.log("Variable:", variable);
+        console.log("Resultado:", resultado);
+        console.log("Variable tipo:", variable.tipo);
+        console.log("Valor tipo:", tipoNuevo);
+        console.log("Valor:", nuevoValor);*/
         if (variable.tipo === 'float64' && tipoNuevo === 'int') {
             entorno.asignar(this.id, {
                 tipo: 'float64',
@@ -61,11 +71,11 @@ class Asignacion {
             });
             return;
         }
-
         if (variable.tipo !== tipoNuevo) {
-            throw new Error(`No se puede asignar un valor de tipo diferente a ${variable.tipo}`);
+            throw new Error(
+                `No se puede asignar un valor de tipo ${tipoNuevo} a ${variable.tipo}`
+            );
         }
-
         entorno.asignar(this.id, {
             tipo: variable.tipo,
             valor: nuevoValor
@@ -80,7 +90,10 @@ class Imprimir {
     }
     evaluar(entorno) {
         //console.log("IMPRIMIENDO");
-        const valores = this.expresiones.map(exp => exp.evaluar(entorno)).filter(instr => instr !== null && instr !== undefined);
+        const valores = this.expresiones
+            .map(exp => exp.evaluar(entorno))
+            .filter(v => v !== null && v !== undefined)
+            .map(v => v.valor);
         console.log(...valores);
         return null;
          

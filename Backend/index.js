@@ -6,8 +6,10 @@ const AST = require("./Reports/AST");
 
 //console.log(JSON.stringify(ast, null, 2));
 const cod33 = `func x(){
-var inicial rune = 'L'
-fmt.Println(inicial)
+var edad int = 19
+fmt.Println(edad)
+edad = edad + 1
+fmt.Println(edad)
 }
 x()`;
 

@@ -1,5 +1,5 @@
 const Entorno = require("../Instrucciones/Entorno");
-const { Numero, Cadena, Identificador, Booleano, Bloque, Rune} = require("../Instrucciones/Valores");
+const { Numero, Cadena, Identificador, Booleano, Bloque, Rune, NumeroDecimal} = require("../Instrucciones/Valores");
 const { Declaracion, Asignacion, Imprimir, If, IfElseIf,ElseIf, IfElse, Else, IfCompleto, For, ForRange, Switch, Slice,
     Struct, Matriz, Funcion, Programa, Return, Break, Continue, Mento, BloqueIndependiente,
     Cases, Default, Inicializacion, Index, Join, Len, Append, AccesoSlice, ModificacionSlice,
@@ -17,6 +17,8 @@ function aNodo(nodo){
     switch (nodo.tipo) {
         case 'Numero':
             return new Numero(nodo.valor);
+        case 'NumeroDecimal':
+            return new NumeroDecimal(nodo.valor);
         case 'Rune':
             //console.log(JSON.stringify(nodo, null, 2));
             return new Rune(nodo.valor);

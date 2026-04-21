@@ -6,9 +6,8 @@ class Rune extends Nodo{
         super();
         this.valor = valor;
     }
-
     evaluar(entorno) {
-        return this.valor;
+        return { tipo: 'rune', valor: this.valor};
     }
 }
 
@@ -18,9 +17,18 @@ class Numero extends Nodo {
         super();
         this.valor = valor;
     }
-
     evaluar() {
-        return this.valor;
+        return { tipo: 'int', valor: this.valor};
+    }
+}
+
+class NumeroDecimal extends Nodo {
+    constructor(valor) {
+        super();
+        this.valor = valor;
+    }
+    evaluar() {
+        return { tipo: 'float64', valor: this.valor};
     }
 }
 
@@ -29,9 +37,8 @@ class Cadena extends Nodo {
         super();
         this.valor =  valor.slice(1, -1);;
     }
-
     evaluar() {
-        return this.valor;
+        return { tipo: 'string', valor: this.valor};
     }
 }
 
@@ -40,10 +47,9 @@ class Identificador extends Nodo {
         super();
         this.id = id;
     }
-
     evaluar(entorno) {
         const variable = entorno.obtener(this.id);
-        return variable.valor; ;
+        return { tipo: variable.tipo, valor: variable.valor};
     }
 }
 
@@ -52,9 +58,8 @@ class Booleano extends Nodo {
         super();
         this.valor = valor;
     }
-
     evaluar() {
-        return this.valor;
+        return { tipo: 'boolean', valor: this.valor};
     }
 }
 
@@ -73,4 +78,4 @@ class Bloque extends Nodo {
     }
 }
 
-module.exports = { Numero, Cadena, Identificador, Booleano, Bloque,Rune };
+module.exports = { Numero, Cadena, Identificador, Booleano, Bloque,Rune, NumeroDecimal };

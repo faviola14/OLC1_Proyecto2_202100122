@@ -330,14 +330,14 @@
 /* RUNE */
 "'"[^']"'"       {    const RUNEpToken = new Token("RUNEp", yytext, yylineno, yylloc.first_column);
                                 TablaTokens.agregarToken(RUNEpToken);
-                                console.log("TOKEN:", yytext, "=> RUNE");
+                                //console.log("TOKEN:", yytext, "=> RUNE");
                                 return 'RUNEp';
                             } 
 
 /* ID */
 [a-zA-Z_][a-zA-Z0-9_]*      {   const idToken = new Token("ID", yytext, yylineno, yylloc.first_column);
                                 TablaTokens.agregarToken(idToken);
-                                console.log("TOKEN:", yytext, "=> ID");
+                                //console.log("TOKEN:", yytext, "=> ID");
                                 return 'ID';
                             }
 
@@ -546,7 +546,7 @@ operacionmenossimple: MENOS operacionmenossimple %prec UMINUS
 | NUMERO
 { $$ = { tipo: 'Numero', valor: Number(yytext) }; }
 | NUMERO_DECIMAL
-{ $$ = { tipo: 'Numero', valor: Number(yytext) }; }
+{ $$ = { tipo: 'NumeroDecimal', valor: Number(yytext) }; }
 | funcionesestructura
 { $$ = $1; }
 | CADENA

@@ -231,8 +231,11 @@ break;
 case 59: case 86: case 183: case 185:
  this.$ = $$[$0-1]; 
 break;
-case 60: case 61:
+case 60:
  this.$ = { tipo: 'Numero', valor: Number(yytext) }; 
+break;
+case 61:
+ this.$ = { tipo: 'NumeroDecimal', valor: Number(yytext) }; 
 break;
 case 63:
  this.$ = { tipo: 'Cadena', valor: yytext }; 
@@ -1296,13 +1299,13 @@ case 70:   const tabulacionToken = new Token("TABULACION", yy_.yytext, yy_.yylin
 break;
 case 71:    const RUNEpToken = new Token("RUNEp", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
                                 TablaTokens.agregarToken(RUNEpToken);
-                                console.log("TOKEN:", yy_.yytext, "=> RUNE");
+                                //console.log("TOKEN:", yy_.yytext, "=> RUNE");
                                 return 66;
                             
 break;
 case 72:   const idToken = new Token("ID", yy_.yytext, yy_.yylineno, yy_.yylloc.first_column);
                                 TablaTokens.agregarToken(idToken);
-                                console.log("TOKEN:", yy_.yytext, "=> ID");
+                                //console.log("TOKEN:", yy_.yytext, "=> ID");
                                 return 9;
                             
 break;
