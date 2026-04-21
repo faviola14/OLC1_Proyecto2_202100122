@@ -21,21 +21,21 @@ x()
 
 const cod2 = `func x() {
 
-/*y := 10
+y := 10
 for ( y>= 5) {
 fmt.Println(y)
 y--
 }
-//fmt.Println(y)*/
+//fmt.Println(y)
 
 
-/*for z := 20; z >= 10; z-- {
+for z := 20; z >= 10; z-- {
 fmt.Println(z)
-}*/
+}
 
 
 
-numeros := []int{10, 20, 30, 40, 50}
+numeros := []int{17, 20, 30, 40, 50,60}
 
 for indice, valor := range numeros {
 fmt.Println("índice:", indice, "valor:", valor)

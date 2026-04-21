@@ -253,20 +253,35 @@ class ForRange {
     }
     evaluar(entorno) {
         const iterable = this.iterable.evaluar(entorno);
-        console.log("ANTES DEL FOR:", entorno);
-        console.log("indice:", this.indice);
-        console.log("valor:", this.valor);
+        if (!Array.isArray(iterable)) {
+            throw new Error("El iterable en for-range no es un arreglo");
+        }
+        const nombreIndice = this.indice.valor;
+        let nombreValor;
+        if (this.valor.valor) {
+            nombreValor = this.valor.valor;
+        } else if (this.valor.id) {
+            nombreValor = this.valor.id;
+        } else {
+            throw new Error("Identificador de valor inválido en for-range");
+        }
         for (let i = 0; i < iterable.length; i++) {
-            //const nuevoEntorno = new Entorno(entorno);
-            entorno.declarar(this.indice.valor, { tipo: 'int', valor: i });
-            console.log("DECLARANDO:", this.indice.valor, this.valor.valor);
-            entorno.declarar(this.valor.valor, { tipo: 'int', valor: iterable[i] });
+            const nuevoEntorno = new Entorno(entorno);
+            nuevoEntorno.declarar(nombreIndice, {
+                tipo: 'int',
+                valor: i
+            });
+            nuevoEntorno.declarar(nombreValor, {
+                tipo: 'int',
+                valor: iterable[i]
+            });
             for (let instr of this.instrucciones) {
-                const res = instr.evaluar(entorno);
+                const res = instr.evaluar(nuevoEntorno);
                 if (res === 'break') return;
                 if (res === 'continue') break;
             }
         }
+        return null;
     }
 }
 
