@@ -583,21 +583,21 @@ class Append{
 }
 
 class AccesoSlice{
-    constructor(id, indice){
+    constructor(id, posicion){
         this.id = id;
         this.posicion = posicion;
     }
     evaluar(entorno) {
-        const variable = entorno.obtener(this.id);
+        const variable = entorno.obtener(this.id.valor);
         if (!variable) {
-            throw new Error(`La variable ${this.id} no ha sido declarada.`);
+            throw new Error(`La variable ${this.id.valor} no ha sido declarada.`);
         }
-        if (variable.tipo !== 'Slice') {
-            throw new Error(`La variable ${this.id} no es un slice.`);
+        if (!Array.isArray(variable.valor)) {
+            throw new Error(`La variable ${this.id.valor} no es un slice.`);
         }
         const indiceEvaluado = this.posicion.evaluar(entorno);
         if (indiceEvaluado < 0 || indiceEvaluado >= variable.valor.length) {
-            throw new Error(`Índice fuera de rango para el slice ${this.id}.`);
+            throw new Error(`Índice fuera de rango para ${this.id.valor}`);
         }
         return variable.valor[indiceEvaluado];
     }

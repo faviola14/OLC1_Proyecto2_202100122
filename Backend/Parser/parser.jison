@@ -780,31 +780,33 @@ index: INDEX PARENTESIS_A ID COMA valor PARENTESIS_C
 
 /* STRING.JOIN */
 join: JOIN PARENTESIS_A ID COMA valor PARENTESIS_C
-{ $$ = { tipo: 'Join', id: $3, valor: $5 }; }
+{ $$ = { tipo: 'Join', id: { tipo: 'Identificador', valor: $3 }, valor: $5 }; }
 ;
 
 /* LEN */
 len: LEN PARENTESIS_A ID PARENTESIS_C
-{ $$ = { tipo: 'Len', id: $3 }; }
+{ $$ = { tipo: 'Len', id: { tipo: 'Identificador', valor: $3 } }; }
 ;
 
 /* APPEND */
 append: ID IGUAL APPEND PARENTESIS_A ID COMA valor PARENTESIS_C
-{ $$ = { tipo: 'Append', id: $1, slice: $5, valor: $6 }; }
+{ $$ = { tipo: 'Append', id: { tipo: 'Identificador', valor: $1 }, slice: $5, valor: $6 }; }
 ;
 
 /* ACCESO SLICE */
 accesoslice: ID posicionslice
-{ $$ = { tipo: 'AccesoSlice', id: $1, posicion: $2.posicion }; }
+{ $$ = { tipo: 'AccesoSlice', id: { tipo: 'Identificador', valor: $1 }, posicion: $2.posicion }; }
 ;
 
 /* MODIFICACION SLICE */
 modificacionslice: ID posicionslice IGUAL valor
-{ $$ = { tipo: 'ModificacionSlice', id: $1, posicion: $2.posicion, valor: $5 }; }
+{ $$ = { tipo: 'ModificacionSlice', id: { tipo: 'Identificador', valor: $1 }, posicion: $2.posicion, valor: $5 }; }
 ;
 
 posicionslice: CORCHETE_A NUMERO CORCHETE_C
-{ $$ = { posicion: Number(yytext) } }
+{ $$ = { posicion: { tipo: 'Numero', valor: Number($2) } } }
+| CORCHETE_A ID CORCHETE_C
+{ $$ = { posicion: { tipo: 'Identificador', valor: $2 } } }
 ;
 
 /* MATRICES INICIALIZACION MULTIDIMENSIONAL */
@@ -851,7 +853,7 @@ atributo: tipo ID PUNTO_COMA { $$ = {id: $2, tipoDato: $1 }; }
 ;
 
 /* USO STRUCT */
-structuso: ID ID IGUAL LLAVE_A datos LLAVE_C PUNTO_COMA {
+structuso: ID ID IGUAL LLAVE_A datos LLAVE_C {
     $$={ tipo: 'UsoStruct', id: $1, tipoDato: $2, valor: $6 };
 }
 ;
@@ -869,7 +871,7 @@ structacceso: ID PUNTO ID
 ;
 
 /* MODIFICACION STRUCT */
-structmodificacion: structacceso IGUAL valor PUNTO_COMA
+structmodificacion: structacceso IGUAL valor
 { $$ = { tipo: 'ModificacionStruct', id: $1, atributo: $3, valor: $5 }; }
 ;
 

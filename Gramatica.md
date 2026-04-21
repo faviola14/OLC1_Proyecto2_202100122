@@ -27,7 +27,7 @@
 
 <instrucciones> ::= <instrucciones> <instruccion> PUNTO_COMA 
 | <instrucciones> <instruccion> 
-| <instruccion> PUNTO COMA;
+| <instruccion> PUNTO_COMA;
 | <instruccion> 
 | ε
 
@@ -302,9 +302,9 @@
 
 <atributo> ::= <tipo> ID PUNTO_COMA
 
-# USO STRUCT Persona miInstancia = { Nombre: "Alice", Edad: 25, EsEstudiante: false };
+# USO STRUCT Persona miInstancia = { Nombre: "Alice", Edad: 25, EsEstudiante: false }
 
-<structuso> ::= ID ID IGUAL LLAVE_A <datos> LLAVE_C PUNTO_COMA
+<structuso> ::= ID ID IGUAL LLAVE_A <datos> LLAVE_C 
 
 <datos> ::= <datos> COMA <dato>
 | <dato>
@@ -314,8 +314,8 @@
 # ACCESO STRUCT miInstancia.Nombre
 <structacceso> ::= ID PUNTO ID
 
-# MODIFICACION STRUCT miInstancia.Nombre = "Bob"; 
-<structmodificacion> ::= <structacceso> IGUAL <valor> PUNTO_COMA
+# MODIFICACION STRUCT miInstancia.Nombre = "Bob"
+<structmodificacion> ::= <structacceso> IGUAL <valor> 
 
 # PRINT fmt.Println("cadena1", "cadena2")
 <print> ::= PRINT PARENTESIS_A <elementos> PARENTESIS_C
