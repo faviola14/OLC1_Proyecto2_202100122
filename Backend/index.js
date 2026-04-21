@@ -4,20 +4,12 @@ const parser = require("./Parser/parser");
 const Interpretador = require("./Interprete/Interpretador");
 const AST = require("./Reports/AST");
 
-
-/*`func x() {
-valor := 10
-fmt.Println(_valor)
-valor = 200
-fmt.Println(valor)
-valor += 15
-fmt.Println(valor)
-valor -= 15
-fmt.Println(valor)
+//console.log(JSON.stringify(ast, null, 2));
+const cod33 = `func x(){
+var inicial rune = 'L'
+fmt.Println(inicial)
 }
-x()
-
-`*/
+x()`;
 
 const cod2 = `
 struct Persona {
@@ -76,10 +68,11 @@ fmt.Println("Struct:", p)
 imprimirResumen(nombre, edad, activo)
 fmt.Println("Fin del programa")
 }
+main()
 
 `;
 
-const ast = parser.parse(cod2);
+const ast = parser.parse(cod33);
 
 
 /*console.log("RESULTADO FINAL:");

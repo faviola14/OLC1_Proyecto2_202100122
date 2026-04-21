@@ -327,9 +327,17 @@
                                 return 'TABULACION';
                             }
 
+/* RUNE */
+"'"[^']"'"       {    const RUNEpToken = new Token("RUNEp", yytext, yylineno, yylloc.first_column);
+                                TablaTokens.agregarToken(RUNEpToken);
+                                console.log("TOKEN:", yytext, "=> RUNE");
+                                return 'RUNEp';
+                            } 
+
 /* ID */
 [a-zA-Z_][a-zA-Z0-9_]*      {   const idToken = new Token("ID", yytext, yylineno, yylloc.first_column);
                                 TablaTokens.agregarToken(idToken);
+                                console.log("TOKEN:", yytext, "=> ID");
                                 return 'ID';
                             }
 
@@ -351,7 +359,7 @@
 /lex
 %locations 
 /* operator associations and precedence */
-%token CADENA ID NUMERO NUMERO_DECIMAL 
+%token CADENA ID NUMERO NUMERO_DECIMAL RUNEp
 %token INT FLOAT STRING RUNE BOOL TRUE FALSE
 %token SLICE STRUCT 
 %token NULL
@@ -539,8 +547,6 @@ operacionmenossimple: MENOS operacionmenossimple %prec UMINUS
 { $$ = { tipo: 'Numero', valor: Number(yytext) }; }
 | NUMERO_DECIMAL
 { $$ = { tipo: 'Numero', valor: Number(yytext) }; }
-| ID
-{ $$ = { tipo: 'Identificador', valor: $1 }; } 
 | funcionesestructura
 { $$ = $1; }
 | CADENA
@@ -549,6 +555,10 @@ operacionmenossimple: MENOS operacionmenossimple %prec UMINUS
 { $$ = { tipo: 'Booleano', valor: true }; }
 | FALSE
 { $$ = { tipo: 'Booleano', valor: false }; }
+| RUNEp
+{ $$ = { tipo: 'Rune', valor: $1[1]  }; }
+| ID
+{ $$ = { tipo: 'Identificador', valor: $1 }; } 
 ;
 
 /* ASIGNACIONES VARIABLES */
@@ -775,7 +785,7 @@ funcionesestructura: index {$$ = $1;}
 
 /* SLICE.INDEX */
 index: INDEX PARENTESIS_A ID COMA valor PARENTESIS_C
-{ $$ = { tipo: 'Index', id: $3, valor: $5 }; }
+{ $$ = { tipo: 'Index', id: { tipo: 'Identificador', valor: $3 }, valor: $5 }; }
 ;
 
 /* STRING.JOIN */
@@ -814,7 +824,7 @@ matrices: ID PUNTO_IGUAL CORCHETE_A CORCHETE_C CORCHETE_A CORCHETE_C tipo LLAVE_
 {
     const matriz = new Simbolo($1,"Matriz",$6,ambito, @1.first_line, @1.first_column);
     TablaSimbolos.agregarSimbolo(matriz);
-    $$={ tipo: 'Matriz', id: $1, tipoDato: $6, valor: $9 };
+    $$={ tipo: 'Matriz', id: { tipo: 'Identificador', valor: $1 }, tipoDato: $6, valor: $9 };
 }
 ;
 
@@ -833,7 +843,7 @@ asignacionmatriz: accesomatriz IGUAL valor
 
 /* ACCESO MATRIZ */
 accesomatriz: ID CORCHETE_A NUMERO CORCHETE_C CORCHETE_A NUMERO CORCHETE_C
-{ $$ = { tipo: 'AccesoMatriz', id: $1, fila: Number($3), columna: Number($6) }; }
+{ $$ = { tipo: 'AccesoMatriz', id: { tipo: 'Identificador', valor: $1 }, fila: Number($3), columna: Number($6) }; }
 ;
 
 /* STRUCT */
@@ -841,7 +851,7 @@ struct: STRUCT ID LLAVE_A atributos LLAVE_C
 {
     const struct = new Simbolo($2,"Struct","struct",ambito, @2.first_line, @2.first_column);
     TablaSimbolos.agregarSimbolo(struct);
-    $$={ tipo: 'Struct', id: $2, tipoDato: "struct", valor: $4 };
+    $$={ tipo: 'Struct', id: { tipo: 'Identificador', valor: $2 }, tipoDato: "struct", valor: $4 };
 }
 ;
 
@@ -849,12 +859,12 @@ atributos: atributos atributo { $1.push($2); $$ = $1; }
 | atributo { $$ = [$1]; }
 ;
 
-atributo: tipo ID PUNTO_COMA { $$ = {id: $2, tipoDato: $1 }; }
+atributo: tipo ID PUNTO_COMA { $$ = {id: { tipo: 'Identificador', valor: $2 }, tipoDato: $1 }; }
 ;
 
 /* USO STRUCT */
 structuso: ID ID IGUAL LLAVE_A datos LLAVE_C {
-    $$={ tipo: 'UsoStruct', id: $1, tipoDato: $2, valor: $6 };
+    $$={ tipo: 'UsoStruct',tipoStruct:{ tipo: 'Identificador', valor: $1 }, id: { tipo: 'Identificador', valor: $2 }, valor: $6 };
 }
 ;
 
@@ -862,12 +872,12 @@ datos: datos COMA dato { $1.push($3); $$ = $1; }
 | dato { $$ = [$1]; }
 ;
 
-dato: ID DOS_PUNTOS valor { $$ = { id: $1, valor: $3 }; }
+dato: ID DOS_PUNTOS valor { $$ = { id: { tipo: 'Identificador', valor: $1 }, valor: $3 }; }
 ;
 
 /* ACCESO STRUCT */
 structacceso: ID PUNTO ID
-{ $$ = { tipo: 'AccesoStruct', id: $1, atributo: $3 }; }
+{ $$ = { tipo: 'AccesoStruct', id: { tipo: 'Identificador', valor: $1 }, atributo: { tipo: 'Identificador', valor: $3 } }; }
 ;
 
 /* MODIFICACION STRUCT */
@@ -892,12 +902,12 @@ parsefloat: PARSEFLOAT PARENTESIS_A valor PARENTESIS_C
 
 /* TYPEOF */
 typeof: ID PUNTO TYPEOF PARENTESIS_A valor PARENTESIS_C
-{ $$ = { tipo: 'TypeOf', id: $1, valor: $5 }; }
+{ $$ = { tipo: 'TypeOf', id: { tipo: 'Identificador', valor: $1 }, valor: $5 }; }
 ;
 
 /* ACCESO FUNC */
 accesofunc: ID PARENTESIS_A elementos PARENTESIS_C 
-{$$ = { tipo: 'AccesoFuncion', id: $1, argumentos: $3 }; }
+{$$ = { tipo: 'AccesoFuncion', id:{ tipo: 'Identificador', valor: $1 }, argumentos: $3 }; }
 | ID PARENTESIS_A PARENTESIS_C 
-{ $$ = { tipo: 'AccesoFuncion', id: $1, argumentos: [] }; }
+{ $$ = { tipo: 'AccesoFuncion',id: { tipo: 'Identificador', valor: $1 }, argumentos: [] }; }
 ;

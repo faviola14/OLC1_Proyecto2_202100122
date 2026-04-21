@@ -346,11 +346,14 @@ class Struct{
         this.valor = valor;
 }
     evaluar(entorno){
-        if (entorno.obtener(this.id)) {
-            throw new Error(`La variable ${this.id} ya ha sido declarada.`);
+        const nombre = this.id.valor;
+        if (entorno.existeLocal(nombre)) {
+            throw new Error(`El struct ${nombre} ya existe.`);
         }
-        const valorEvaluado = this.valor ? this.valor.evaluar(entorno) : null;
-        entorno.declarar(this.id, { tipo: this.tipo, valor: valorEvaluado });
+        entorno.declarar(nombre, {
+            tipo: 'struct',
+            valor: this.valor   
+        });
         return null;
     }
 }
@@ -563,12 +566,13 @@ class Len{
 }
 
 class Append{
-    constructor(id, valor){
+    constructor(id, slice, valor){
         this.id = id;
+        this.slice = slice;
         this.valor = valor;
     }
     evaluar(entorno) {
-        const variable = entorno.obtener(this.id);
+        const variable = entorno.obtener(this.slice);
         if (!variable) {
             throw new Error(`La variable ${this.id} no ha sido declarada.`);
         }
@@ -604,11 +608,11 @@ class AccesoSlice{
 }
 
 class ModificacionSlice{
-    constructor(id, indice, valor){
-        this.id = id;
-        this.posicion = posicion;
-        this.valor = valor;
-    }
+    constructor(id, posicion, valor) {
+    this.id = id;
+    this.posicion = posicion;
+    this.valor = valor;
+}
     evaluar(entorno) {
         const variable = entorno.obtener(this.id);
         if (!variable) {
@@ -679,23 +683,27 @@ class AccesoMatriz{
 }
 
 class UsoStruct{
-    constructor(id, atributo){
-        this.id = id;
-        this.atributo = atributo;
+    constructor(tipoStruct, id, valor) {
+        this.tipoStruct = tipoStruct; 
+        this.id = id;                
+        this.valor = valor;           
     }
     evaluar(entorno) {
-        const variable = entorno.obtener(this.id);
-        if (!variable) {
-            throw new Error(`La variable ${this.id} no ha sido declarada.`);
+        const nombreStruct = this.tipoStruct.valor;
+        const nombreVar = this.id.valor;
+        const structDef = entorno.obtener(nombreStruct);
+        if (!structDef || structDef.tipo !== 'struct') {
+            throw new Error(`El struct ${nombreStruct} no existe`);
         }
-        if (variable.tipo !== 'Struct') {
-            throw new Error(`La variable ${this.id} no es un struct.`);
+        const nuevoStruct = {};
+        for (let attr of this.valor) {
+            nuevoStruct[attr.id.valor] = attr.valor.evaluar(entorno);
         }
-        const valorAtributo = variable.valor[this.atributo];
-        if (valorAtributo === undefined) {
-            throw new Error(`El atributo ${this.atributo} no existe en el struct ${this.id}.`);
-        }
-        return valorAtributo;
+        entorno.declarar(nombreVar, {
+            tipo: nombreStruct,
+            valor: nuevoStruct
+        });
+        return null;
     }
 }
 
@@ -705,18 +713,18 @@ class AccesoStruct{
         this.atributo = atributo;
     }
     evaluar(entorno) {
-        const variable = entorno.obtener(this.id);
+        const variable = entorno.obtener(this.id.valor);
         if (!variable) {
             throw new Error(`La variable ${this.id} no ha sido declarada.`);
         }
         if (variable.tipo !== 'Struct') {
             throw new Error(`La variable ${this.id} no es un struct.`);
         }
-        const valorAtributo = variable.valor[this.atributo];
-        if (valorAtributo === undefined) {
+        const atributo = this.atributo.valor;
+        if (atributo === undefined) {
             throw new Error(`El atributo ${this.atributo} no existe en el struct ${this.id}.`);
         }
-        return valorAtributo;
+        return variable.valor[atributo];
     }
 }
 
@@ -727,15 +735,15 @@ class ModificacionStruct{
         this.valor = valor;
     }
     evaluar(entorno) {
-        const variable = entorno.obtener(this.id);
+        const variable = entorno.obtener(this.id.id.valor);
         if (!variable) {
             throw new Error(`La variable ${this.id} no ha sido declarada.`);
         }
         if (variable.tipo !== 'Struct') {
             throw new Error(`La variable ${this.id} no es un struct.`);
         }
-        const valorEvaluado = this.valor.evaluar(entorno);
-        variable.valor[this.atributo] = valorEvaluado;
+        const atributo = this.id.atributo.valor;
+        variable.valor[atributo] = this.valor.evaluar(entorno);
         entorno.asignar(this.id, variable);
         return null;
     }
@@ -788,7 +796,7 @@ class AccesoFuncion{
         this.argumentos = argumentos;
     }
     evaluar(entorno) {
-        const variable = entorno.obtener(this.id);
+        const variable = entorno.obtener(this.id.valor);
         if (!variable) {
             throw new Error(`La variable ${this.id} no ha sido declarada.`);
         }

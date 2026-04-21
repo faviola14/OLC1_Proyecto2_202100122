@@ -97,6 +97,7 @@
 | CADENA
 | TRUE 
 | FALSE
+| RUNEp
 
 # ASIGNACIONES VARIABLES
 <asignacion> ::= ID IGUAL <operacion>

@@ -1,6 +1,18 @@
 const Nodo = require('./Nodo');
 const Entorno = require("../Instrucciones/Entorno");
 
+class Rune extends Nodo{
+    constructor(valor) {
+        super();
+        this.valor = valor;
+    }
+
+    evaluar(entorno) {
+        return this.valor;
+    }
+}
+
+
 class Numero extends Nodo {
     constructor(valor) {
         super();
@@ -61,4 +73,4 @@ class Bloque extends Nodo {
     }
 }
 
-module.exports = { Numero, Cadena, Identificador, Booleano, Bloque };
+module.exports = { Numero, Cadena, Identificador, Booleano, Bloque,Rune };
