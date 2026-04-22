@@ -6,10 +6,16 @@ const AST = require("./Reports/AST");
 
 //console.log(JSON.stringify(ast, null, 2));
 const cod33 = `func x(){
-var edad int = 19
-fmt.Println(edad)
-edad = edad + 1
-fmt.Println(edad)
+numeros := []int{1, 2, 3, 4,9}
+numeros = append(numeros, 5)
+fmt.Println( numeros)
+fmt.Println("Cantidad:", len(numeros))
+fmt.Println("Indice de 4:", slices.Index(numeros, 4))
+
+for i := 0; i < len(numeros); i++ {
+fmt.Println("Elemento:", numeros[i])
+}
+
 }
 x()`;
 

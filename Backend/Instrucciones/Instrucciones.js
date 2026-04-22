@@ -96,9 +96,7 @@ class Imprimir {
             .map(v => v.valor);
         console.log(...valores);
         return null;
-         
         //console.log("IMPRIMIENDO...");
-
         try {
             const valores = this.expresiones.map(exp => {
                 if (!exp) {
@@ -107,16 +105,12 @@ class Imprimir {
                 }
                 return exp.evaluar(entorno);
             });
-
             //console.log("VALORES:", valores);
             //console.log(...valores);
-
         } catch (e) {
             console.error("ERROR EN PRINT:", e);
         }
-
         return null;
-
     }
 }
 
@@ -240,6 +234,7 @@ class For {
         this.instrucciones = instrucciones;
     }
     evaluar(entorno) {
+        console.log("LEN:", this.condicion.evaluar(entorno));
         if (this.init) {
             this.init.evaluar(entorno);
         }
@@ -342,8 +337,11 @@ class Slice{
             throw new Error(`La variable ${this.id} ya ha sido declarada.`);
         }
         const valorEvaluado = this.valor
-            ? this.valor.map(v => v.evaluar(entorno))
-            : [];
+        ? this.valor.map(v => {
+            const res = v.evaluar(entorno);
+            return res.valor;   
+        })
+        : [];
         entorno.declarar(this.id, {
             tipo: this.tipo,
             valor: valorEvaluado
@@ -517,33 +515,31 @@ class Inicializacion {
 }
 
 class Index{
-    constructor(id, indice){
+    constructor(id, valor){
         this.id = id;
-        this.indice = indice;
+        this.valor = valor;
     }
     evaluar(entorno) {
-        const variable = entorno.obtener(this.id);  
+        const nombre = this.id.valor;
+        const variable = entorno.obtener(nombre);
         if (!variable) {
-            throw new Error(`La variable ${this.id} no ha sido declarada.`);
+            throw new Error(`La variable ${nombre} no ha sido declarada.`);
         }
-        if (variable.tipo !== 'Slice' && variable.tipo !== 'Matriz') {
-            throw new Error(`La variable ${this.id} no es un slice o matriz.`);
+        if (!Array.isArray(variable.valor)) {
+            throw new Error(`La variable ${nombre} no es un slice.`);
         }
-        const indiceEvaluado = this.indice.evaluar(entorno);
-        if (variable.tipo === 'Slice') {
-            if (indiceEvaluado < 0 || indiceEvaluado >= variable.valor.length) {
-                throw new Error(`Índice fuera de rango para el slice ${this.id}.`);
-            }
-            return variable.valor[indiceEvaluado];
+        let valorEvaluado = this.valor;
+        if (this.valor && typeof this.valor.evaluar === "function") {
+            valorEvaluado = this.valor.evaluar(entorno);
         }
-        if (variable.tipo === 'Matriz') {
-            const fila = Math.floor(indiceEvaluado / variable.valor[0].length);
-            const columna = indiceEvaluado % variable.valor[0].length;
-            if (fila < 0 || fila >= variable.valor.length || columna < 0 || columna >= variable.valor[0].length) {
-                throw new Error(`Índice fuera de rango para la matriz ${this.id}.`);
-            }
-            return variable.valor[fila][columna];
-        }   
+        const valorBuscado = (valorEvaluado && typeof valorEvaluado === "object")
+            ? valorEvaluado.valor
+            : valorEvaluado;
+        const indice = variable.valor.indexOf(valorBuscado);
+        return {
+            tipo: 'int',
+            valor: indice
+        };
     }
 }
 
@@ -562,20 +558,20 @@ class Len{
         this.id = id;
     }
     evaluar(entorno) {
-        const variable = entorno.obtener(this.id);
+        const nombre = this.id.valor;
+        const variable = entorno.obtener(nombre);
         if (!variable) {
-            throw new Error(`La variable ${this.id} no ha sido declarada.`);
+            throw new Error(`La variable ${nombre} no ha sido declarada.`);
         }
-        if (variable.tipo !== 'Slice' && variable.tipo !== 'Matriz') {
-            throw new Error(`La variable ${this.id} no es un slice o matriz.`);
+        if (!Array.isArray(variable.valor)) {
+            throw new Error(`La variable ${nombre} no es un slice o matriz.`);
         }
-        if (variable.tipo === 'Slice') {
-            return variable.valor.length;
-        }
-        if (variable.tipo === 'Matriz') {
-            return variable.valor.length;
-        }
+        return {
+            tipo: 'int',
+            valor: variable.valor.length
+        };
     }
+
 }
 
 class Append{
@@ -585,16 +581,21 @@ class Append{
         this.valor = valor;
     }
     evaluar(entorno) {
-        const variable = entorno.obtener(this.slice);
-        if (!variable) {
-            throw new Error(`La variable ${this.id} no ha sido declarada.`);
+        //console.log(this.valor);
+        const nombre = this.id.valor;
+        const variable = entorno.obtener(nombre);
+        if (!variable || !Array.isArray(variable.valor)) {
+            throw new Error(`La variable ${nombre} no es un slice.`);
         }
-        if (variable.tipo !== 'Slice') {
-            throw new Error(`La variable ${this.id} no es un slice.`);
+        let nuevoElemento;
+        if (this.valor && typeof this.valor.evaluar === "function") {
+            const res = this.valor.evaluar(entorno);
+            nuevoElemento = res.valor;
+        } else {
+            nuevoElemento = this.valor;
         }
-        const valorEvaluado = this.valor.evaluar(entorno);
-        variable.valor.push(valorEvaluado);
-        entorno.asignar(this.id, variable);
+        variable.valor.push(nuevoElemento.valor);
+        entorno.asignar(nombre, variable);
         return null;
     }
 }

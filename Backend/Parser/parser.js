@@ -392,7 +392,7 @@ case 175:
  this.$ = { tipo: 'Len', id: { tipo: 'Identificador', valor: $$[$0-1] } }; 
 break;
 case 176:
- this.$ = { tipo: 'Append', id: { tipo: 'Identificador', valor: $$[$0-7] }, slice: $$[$0-3], valor: $$[$0-2] }; 
+ this.$ = { tipo: 'Append', id: { tipo: 'Identificador', valor: $$[$0-7] }, slice: { tipo: 'Identificador', valor: $$[$0-7] }, valor: $$[$0-1] }; 
 break;
 case 177:
  this.$ = { tipo: 'AccesoSlice', id: { tipo: 'Identificador', valor: $$[$0-1] }, posicion: $$[$0].posicion }; 

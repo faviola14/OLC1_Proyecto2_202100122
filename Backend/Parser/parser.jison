@@ -800,7 +800,7 @@ len: LEN PARENTESIS_A ID PARENTESIS_C
 
 /* APPEND */
 append: ID IGUAL APPEND PARENTESIS_A ID COMA valor PARENTESIS_C
-{ $$ = { tipo: 'Append', id: { tipo: 'Identificador', valor: $1 }, slice: $5, valor: $6 }; }
+{ $$ = { tipo: 'Append', id: { tipo: 'Identificador', valor: $1 }, slice: { tipo: 'Identificador', valor: $1 }, valor: $7 }; }
 ;
 
 /* ACCESO SLICE */
