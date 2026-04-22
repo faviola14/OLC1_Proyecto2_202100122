@@ -208,7 +208,7 @@ case 48: case 53: case 57: case 62: case 74: case 87:
  this.$ = $$[$0]; 
 break;
 case 49:
-this.$= { tipo: 'Cadena', valor: yytext };
+this.$= { tipo: 'string', valor: yytext };
 break;
 case 51:
  this.$ = { tipo: 'Aritmetica', izquierda: $$[$0-2], operador: '+', derecha: $$[$0] }; 
@@ -232,22 +232,22 @@ case 59: case 86: case 183: case 185:
  this.$ = $$[$0-1]; 
 break;
 case 60:
- this.$ = { tipo: 'Numero', valor: Number(yytext) }; 
+ this.$ = { tipo: 'int', valor: Number(yytext) }; 
 break;
 case 61:
- this.$ = { tipo: 'NumeroDecimal', valor: Number(yytext) }; 
+ this.$ = { tipo: 'float64', valor: Number(yytext) }; 
 break;
 case 63:
- this.$ = { tipo: 'Cadena', valor: yytext }; 
+ this.$ = { tipo: 'string', valor: yytext }; 
 break;
 case 64:
- this.$ = { tipo: 'Booleano', valor: true }; 
+ this.$ = { tipo: 'bool', valor: true }; 
 break;
 case 65:
- this.$ = { tipo: 'Booleano', valor: false }; 
+ this.$ = { tipo: 'bool', valor: false }; 
 break;
 case 66:
- this.$ = { tipo: 'Rune', valor: $$[$0][1]  }; 
+ this.$ = { tipo: 'rune', valor: $$[$0][1]  }; 
 break;
 case 67:
  this.$ = { tipo: 'Identificador', valor: $$[$0] }; 
@@ -357,10 +357,10 @@ case 130:
  this.$={ tipo: 'Inicializacion', id: { tipo: 'Identificador', valor: $$[$0-2] }, valor: $$[$0] }; 
 break;
 case 154:
- this.$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $$[$0-1] }, operador: '++', cantidad: { tipo: 'Numero', valor: 1 } }; 
+ this.$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $$[$0-1] }, operador: '++', cantidad: { tipo: 'int', valor: 1 } }; 
 break;
 case 155:
- this.$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $$[$0-1] }, operador: '--', cantidad: { tipo: 'Numero', valor: 1 } }; 
+ this.$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $$[$0-1] }, operador: '--', cantidad: { tipo: 'int', valor: 1 } }; 
 break;
 case 156:
 this.$ = { tipo: 'Break' }; 
@@ -401,7 +401,7 @@ case 178:
  this.$ = { tipo: 'ModificacionSlice', id: { tipo: 'Identificador', valor: $$[$0-3] }, posicion: $$[$0-2].posicion, valor: $$[$01] }; 
 break;
 case 179:
- this.$ = { posicion: { tipo: 'Numero', valor: Number($$[$0-1]) } } 
+ this.$ = { posicion: { tipo: 'int', valor: Number($$[$0-1]) } } 
 break;
 case 180:
  this.$ = { posicion: { tipo: 'Identificador', valor: $$[$0-1] } } 
@@ -421,13 +421,14 @@ case 187:
 break;
 case 188:
 
+    //console.log("ATRIBUTOS RAW:", $$[$0-1]);
     const struct = new Simbolo($$[$0-3],"Struct","struct",ambito, _$[$0-3].first_line, _$[$0-3].first_column);
     TablaSimbolos.agregarSimbolo(struct);
     this.$={ tipo: 'Struct', id: { tipo: 'Identificador', valor: $$[$0-3] }, tipoDato: "struct", valor: $$[$0-1] };
 
 break;
 case 191:
- this.$ = {id: { tipo: 'Identificador', valor: $$[$0-1] }, tipoDato: $$[$0-2] }; 
+ this.$ = {id: { tipo: 'Identificador', valor: $$[$0-1] }, tipo: $$[$0-2] }; 
 break;
 case 192:
 

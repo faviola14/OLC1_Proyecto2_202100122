@@ -352,19 +352,31 @@ class Slice{
 }
 
 class Struct{
-    constructor(id, tipo, valor){
+    constructor(id, tipoDato, valor){
         this.id = id;
-        this.tipo = tipo;
+        this.tipoDato =tipoDato;
         this.valor = valor;
 }
-    evaluar(entorno){
+    evaluar(entorno) {
+        /*console.log("VALOR STRUCT:", this.valor);
+        console.log("TIPO:", typeof this.valor);
+        console.log("STRUCT ATRIBUTOS:", this.valor);*/
         const nombre = this.id.valor;
         if (entorno.existeLocal(nombre)) {
             throw new Error(`El struct ${nombre} ya existe.`);
         }
+        const atributos = {};
+        for (let attr of this.valor) {
+            if (!attr || !attr.id || !attr.tipo) {
+                throw new Error("Atributo inválido en definición de struct");
+            }
+            const nombreAttr = attr.id.valor || attr.id;
+            const tipoAttr = attr.tipo;
+            atributos[nombreAttr] = tipoAttr;
+        }
         entorno.declarar(nombre, {
             tipo: 'struct',
-            valor: this.valor   
+            atributos: atributos
         });
         return null;
     }
@@ -715,15 +727,40 @@ class UsoStruct{
         if (!structDef || structDef.tipo !== 'struct') {
             throw new Error(`El struct ${nombreStruct} no existe`);
         }
+        const atributosDef = structDef.atributos;
         const nuevoStruct = {};
         for (let attr of this.valor) {
-            if (!attr || !attr.id || !attr.valor) {
-                console.log("ATTR:", attr);
+            if (!attr || !attr.id) {
                 throw new Error("Atributo inválido en struct");
             }
-            const nombre = attr.id.valor || attr.id.id;
-            const valorEval = attr.valor.evaluar(entorno);
-            nuevoStruct[nombre] = valorEval.valor;
+            const nombreAttr = attr.id.valor || attr.id;
+            if (!(nombreAttr in atributosDef)) {
+                throw new Error(`El atributo ${nombreAttr} no existe en ${nombreStruct}`);
+            }
+            let resultado;
+            if (attr.valor && typeof attr.valor.evaluar === "function") {
+                resultado = attr.valor.evaluar(entorno);
+            } else if (attr.valor && attr.valor.tipo !== undefined) {
+                resultado = attr.valor;
+            } else {
+                resultado = {
+                    tipo: typeof attr.valor,
+                    valor: attr.valor
+                };
+            }
+            const tipoEsperado = atributosDef[nombreAttr];
+            const tipoRecibido = resultado.tipo;
+            if (tipoEsperado !== tipoRecibido) {
+                throw new Error(
+                    `Tipo incorrecto en atributo ${nombreAttr}: se esperaba ${tipoEsperado} y se recibió ${tipoRecibido}`
+                );
+            }
+            nuevoStruct[nombreAttr] = resultado.valor;
+        }
+        for (let attrDef in atributosDef) {
+            if (!(attrDef in nuevoStruct)) {
+                throw new Error(`Falta el atributo ${attrDef} en ${nombreStruct}`);
+            }
         }
         entorno.declarar(nombreVar, {
             tipo: nombreStruct,

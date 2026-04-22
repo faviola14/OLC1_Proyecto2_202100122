@@ -516,7 +516,7 @@ tipo: INT { $$ = "int"; }
 ;
 
 valor: operacion { $$ = $1; }
-| CADENA {$$= { tipo: 'Cadena', valor: yytext };}
+| CADENA {$$= { tipo: 'string', valor: yytext };}
 | funcionesestructura {$$ = $1;}
 ;
 
@@ -544,19 +544,19 @@ operacionmenossimple: MENOS operacionmenossimple %prec UMINUS
 | PARENTESIS_A operacion PARENTESIS_C
 { $$ = $2; }
 | NUMERO
-{ $$ = { tipo: 'Numero', valor: Number(yytext) }; }
+{ $$ = { tipo: 'int', valor: Number(yytext) }; }
 | NUMERO_DECIMAL
-{ $$ = { tipo: 'NumeroDecimal', valor: Number(yytext) }; }
+{ $$ = { tipo: 'float64', valor: Number(yytext) }; }
 | funcionesestructura
 { $$ = $1; }
 | CADENA
-{ $$ = { tipo: 'Cadena', valor: yytext }; }
+{ $$ = { tipo: 'string', valor: yytext }; }
 | TRUE
-{ $$ = { tipo: 'Booleano', valor: true }; }
+{ $$ = { tipo: 'bool', valor: true }; }
 | FALSE
-{ $$ = { tipo: 'Booleano', valor: false }; }
+{ $$ = { tipo: 'bool', valor: false }; }
 | RUNEp
-{ $$ = { tipo: 'Rune', valor: $1[1]  }; }
+{ $$ = { tipo: 'rune', valor: $1[1]  }; }
 | ID
 { $$ = { tipo: 'Identificador', valor: $1 }; } 
 ;
@@ -730,9 +730,9 @@ instruccionfor: variable {$$ = $1;}
 ;
 
 mento: ID INCREMENTO
-{ $$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $1 }, operador: '++', cantidad: { tipo: 'Numero', valor: 1 } }; }
+{ $$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $1 }, operador: '++', cantidad: { tipo: 'int', valor: 1 } }; }
 | ID DECREMENTO
-{ $$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $1 }, operador: '--', cantidad: { tipo: 'Numero', valor: 1 } }; }
+{ $$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $1 }, operador: '--', cantidad: { tipo: 'int', valor: 1 } }; }
 ;
 
 /* BREAK */
@@ -814,7 +814,7 @@ modificacionslice: ID posicionslice IGUAL valor
 ;
 
 posicionslice: CORCHETE_A NUMERO CORCHETE_C
-{ $$ = { posicion: { tipo: 'Numero', valor: Number($2) } } }
+{ $$ = { posicion: { tipo: 'int', valor: Number($2) } } }
 | CORCHETE_A ID CORCHETE_C
 { $$ = { posicion: { tipo: 'Identificador', valor: $2 } } }
 ;
@@ -849,6 +849,7 @@ accesomatriz: ID CORCHETE_A NUMERO CORCHETE_C CORCHETE_A NUMERO CORCHETE_C
 /* STRUCT */
 struct: STRUCT ID LLAVE_A atributos LLAVE_C
 {
+    //console.log("ATRIBUTOS RAW:", $4);
     const struct = new Simbolo($2,"Struct","struct",ambito, @2.first_line, @2.first_column);
     TablaSimbolos.agregarSimbolo(struct);
     $$={ tipo: 'Struct', id: { tipo: 'Identificador', valor: $2 }, tipoDato: "struct", valor: $4 };
@@ -859,7 +860,8 @@ atributos: atributos atributo { $1.push($2); $$ = $1; }
 | atributo { $$ = [$1]; }
 ;
 
-atributo: tipo ID PUNTO_COMA { $$ = {id: { tipo: 'Identificador', valor: $2 }, tipoDato: $1 }; }
+atributo: tipo ID PUNTO_COMA 
+{ $$ = {id: { tipo: 'Identificador', valor: $2 }, tipo: $1 }; }
 ;
 
 /* USO STRUCT */

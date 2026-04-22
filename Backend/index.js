@@ -10,6 +10,7 @@ string Nombre;
 bool EsEstudiante;
 }
 func x(){
+//fmt.Println("Struct:", Persona)
 Persona p = {Nombre:"Alice", EsEstudiante: true}
 fmt.Println("Struct:", p)
 
@@ -67,6 +68,8 @@ default:
 fmt.Println("Otra edad")
 }
 
+
+//fmt.Println("Struct:", Persona)
 Persona p = {Nombre:"Alice", EsEstudiante: true}
 fmt.Println("Struct:", p)
 
@@ -77,7 +80,7 @@ main()
 
 `;
 
-const ast = parser.parse(cod33);
+const ast = parser.parse(cod2);
 
 
 /*console.log("RESULTADO FINAL:");

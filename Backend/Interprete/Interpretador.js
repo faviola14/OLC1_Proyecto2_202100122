@@ -1,5 +1,5 @@
 const Entorno = require("../Instrucciones/Entorno");
-const { Numero, Cadena, Identificador, Booleano, Bloque, Rune, NumeroDecimal} = require("../Instrucciones/Valores");
+const { int, string, Identificador, bool, Bloque, rune, float64} = require("../Instrucciones/Valores");
 const { Declaracion, Asignacion, Imprimir, If, IfElseIf,ElseIf, IfElse, Else, IfCompleto, For, ForRange, Switch, Slice,
     Struct, Matriz, Funcion, Programa, Return, Break, Continue, Mento, BloqueIndependiente,
     Cases, Default, Inicializacion, Index, Join, Len, Append, AccesoSlice, ModificacionSlice,
@@ -15,19 +15,19 @@ const Nodo = require("../Instrucciones/Nodo");
 function aNodo(nodo){
     if (!nodo || typeof nodo !== 'object') return null;
     switch (nodo.tipo) {
-        case 'Numero':
-            return new Numero(nodo.valor);
-        case 'NumeroDecimal':
-            return new NumeroDecimal(nodo.valor);
-        case 'Rune':
+        case 'int':
+            return new int(nodo.valor);
+        case 'float64':
+            return new float64(nodo.valor);
+        case 'rune':
             //console.log(JSON.stringify(nodo, null, 2));
-            return new Rune(nodo.valor);
-        case 'Cadena':
-            return new Cadena(nodo.valor);
+            return new rune(nodo.valor);
+        case 'string':
+            return new string(nodo.valor);
         case 'Identificador':
             return new Identificador(nodo.valor);
-        case 'Booleano':
-            return new Booleano(nodo.valor);
+        case 'bool':
+            return new bool(nodo.valor);
         case 'Bloque':
             const instrucciones = nodo.instrucciones.map(instr => aNodo(instr)).filter(instr => instr !== null && instr !== undefined);
             return new Bloque(instrucciones);
@@ -120,7 +120,7 @@ function aNodo(nodo){
             const valorSlice = nodo.valor ? nodo.valor.map(v => aNodo(v)) : [];
             return new Slice(nodo.id, nodo.tipoDato, valorSlice);
         case 'Struct':
-            return new Struct(nodo.id, nodo.tipoDato, null);
+            return new Struct(nodo.id, nodo.tipoDato, nodo.valor);
         case 'Matriz':
             const valorMatriz = nodo.valor.map(fila =>
                 fila.map(elem => aNodo(elem))
