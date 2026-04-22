@@ -431,7 +431,7 @@ case 191:
 break;
 case 192:
 
-    this.$={ tipo: 'UsoStruct',tipoStruct:{ tipo: 'Identificador', valor: $$[$0-5] }, id: { tipo: 'Identificador', valor: $$[$0-4] }, valor: $$[$0] };
+    this.$={ tipo: 'UsoStruct',tipoStruct:{ tipo: 'Identificador', valor: $$[$0-5] }, id: { tipo: 'Identificador', valor: $$[$0-4] }, valor: $$[$0-1] };
 
 break;
 case 195:

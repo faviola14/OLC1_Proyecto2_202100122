@@ -5,14 +5,26 @@ class Logica {
         this.derecha = derecha;
     }
 
-    evaluar(registro) {
+    evaluar(entorno) {
+        const izq = this.izquierda.evaluar(entorno);
+        const der = this.derecha.evaluar(entorno);
+        const valIzq = izq.valor;
+        const valDer = der.valor;
+        let resultado;
         switch (this.operador) {
             case "AND":
-                return this.izquierda.evaluar(registro) && this.derecha.evaluar(registro);
+                resultado = valIzq && valDer;
+                break;
             case "OR":
-                return this.izquierda.evaluar(registro) || this.derecha.evaluar(registro);
+                resultado = valIzq || valDer;
+                break;
+            default:
+                throw new Error("Operador lógico desconocido");
         }
-        return false;
+        return {
+            tipo: 'boolean',
+            valor: resultado
+        };
     }
 }
 

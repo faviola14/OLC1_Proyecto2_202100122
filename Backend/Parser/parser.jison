@@ -864,7 +864,7 @@ atributo: tipo ID PUNTO_COMA { $$ = {id: { tipo: 'Identificador', valor: $2 }, t
 
 /* USO STRUCT */
 structuso: ID ID IGUAL LLAVE_A datos LLAVE_C {
-    $$={ tipo: 'UsoStruct',tipoStruct:{ tipo: 'Identificador', valor: $1 }, id: { tipo: 'Identificador', valor: $2 }, valor: $6 };
+    $$={ tipo: 'UsoStruct',tipoStruct:{ tipo: 'Identificador', valor: $1 }, id: { tipo: 'Identificador', valor: $2 }, valor: $5 };
 }
 ;
 

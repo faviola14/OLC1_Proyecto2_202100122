@@ -3,8 +3,12 @@ class Not {
         this.expr = expr;
     }
 
-    evaluar(registro) {
-        return !this.expr.evaluar(registro);
+    evaluar(entorno) {
+        const val = this.expr.evaluar(entorno);
+        return {
+            tipo: 'boolean',
+            valor: !val.valor
+        };
     }
 }
 

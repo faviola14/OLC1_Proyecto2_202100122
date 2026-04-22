@@ -234,11 +234,13 @@ class For {
         this.instrucciones = instrucciones;
     }
     evaluar(entorno) {
-        console.log("LEN:", this.condicion.evaluar(entorno));
         if (this.init) {
             this.init.evaluar(entorno);
         }
-        while (this.condicion ? Boolean(this.condicion.evaluar(entorno)) : true) {
+        //console.log(this.condicion);
+        //console.log(this.condicion.evaluar(entorno).valor);
+        //console.log(this.condicion.evaluar(entorno));
+        while (this.condicion ? this.condicion.evaluar(entorno).valor : true) {
             for (let instr of this.instrucciones) {
                 const res = instr.evaluar(entorno);
                 if (res === 'break') return;
@@ -248,7 +250,6 @@ class For {
                 this.incremento.evaluar(entorno);
             }
         }
-    
     }
 }
 
@@ -304,11 +305,11 @@ class Switch {
         if (!this.expresion) {
             throw new Error("Switch sin expresión");
         }
-        const valorEvaluado = this.expresion.evaluar(entorno);
+        const valorEvaluado = this.expresion.evaluar(entorno).valor;
         let casoEncontrado = false;
         for (let i = 0; i < this.casos.length; i++) {
             const caso = this.casos[i];
-            const valorCaso = caso.valor.evaluar(entorno);
+            const valorCaso = caso.valor.evaluar(entorno).valor;
             if (valorEvaluado === valorCaso) {
                 casoEncontrado = true;
                 for (let j = 0; j < caso.instrucciones.length; j++) {
@@ -508,9 +509,8 @@ class Inicializacion {
         this.valor = valor;
     }
     evaluar(entorno) {
-        const valorEvaluado = this.valor.evaluar(entorno);
-        entorno.declarar(this.id.valor, { tipo: 'int', valor: valorEvaluado });
-        return null;
+        const resultado = this.valor.evaluar(entorno);
+        entorno.declarar(this.id.valor, { tipo: resultado.tipo, valor: resultado.valor });
     }
 }
 
@@ -606,18 +606,24 @@ class AccesoSlice{
         this.posicion = posicion;
     }
     evaluar(entorno) {
-        const variable = entorno.obtener(this.id.valor);
+        const nombre = this.id.valor || this.id.id || this.id;
+        const variable = entorno.obtener(nombre);
         if (!variable) {
-            throw new Error(`La variable ${this.id.valor} no ha sido declarada.`);
+            throw new Error(`La variable ${nombre} no ha sido declarada.`);
         }
         if (!Array.isArray(variable.valor)) {
-            throw new Error(`La variable ${this.id.valor} no es un slice.`);
+            throw new Error(`La variable ${nombre} no es un slice.`);
         }
-        const indiceEvaluado = this.posicion.evaluar(entorno);
+        
+        const indiceEvaluado = obtenerValor(this.posicion, entorno);
+        //console.log("indice evaluado: ",indiceEvaluado)
         if (indiceEvaluado < 0 || indiceEvaluado >= variable.valor.length) {
-            throw new Error(`Índice fuera de rango para ${this.id.valor}`);
+            throw new Error(`Índice fuera de rango para ${nombre}`);
         }
-        return variable.valor[indiceEvaluado];
+        return {
+            tipo: 'int',
+            valor: variable.valor[indiceEvaluado]
+        };
     }
 }
 
@@ -711,7 +717,13 @@ class UsoStruct{
         }
         const nuevoStruct = {};
         for (let attr of this.valor) {
-            nuevoStruct[attr.id.valor] = attr.valor.evaluar(entorno);
+            if (!attr || !attr.id || !attr.valor) {
+                console.log("ATTR:", attr);
+                throw new Error("Atributo inválido en struct");
+            }
+            const nombre = attr.id.valor || attr.id.id;
+            const valorEval = attr.valor.evaluar(entorno);
+            nuevoStruct[nombre] = valorEval.valor;
         }
         entorno.declarar(nombreVar, {
             tipo: nombreStruct,
@@ -839,7 +851,28 @@ class AccesoFuncion{
     }
 }
 
-
+function obtenerValor(obj, entorno) {
+    if (obj && typeof obj.evaluar === "function") {
+        const res = obj.evaluar(entorno);
+        return res.valor;
+    }
+    if (obj && obj.id) {
+        const variable = entorno.obtener(obj.id);
+        return variable.valor;
+    }
+    if (obj && obj.tipo === 'Identificador') {
+        const variable = entorno.obtener(obj.valor);
+        return variable.valor;
+    }
+    if (typeof obj === "string") {
+        const variable = entorno.obtener(obj);
+        return variable.valor;
+    }
+    if (typeof obj === "object" && obj.valor !== undefined) {
+        return obj.valor;
+    }
+    return obj;
+}
 
 module.exports = {
     Declaracion, Asignacion, Imprimir, If, ElseIf, Else, IfElse, IfElseIf, IfCompleto, For, ForRange, Switch,
