@@ -421,10 +421,15 @@ class Programa {
     }
     evaluar(entorno) {
         this.funciones.forEach(f => f.evaluar(entorno));
-        this.instrucciones.forEach((inst, i) => {
-            //console.log("EJECUTANDO:", i, inst.constructor.name);
-            inst.evaluar(entorno);
-            });
+        this.instrucciones.forEach(inst => inst.evaluar(entorno));
+        const main = entorno.obtener("main");
+        if (main && main.tipo === "Función") {
+            const funcion = main.valor;
+            const nuevoEntorno = new Entorno(entorno);
+            for (let instr of funcion.instrucciones) {
+                instr.evaluar(nuevoEntorno);
+            }
+        }
     }
 }
 
@@ -873,7 +878,7 @@ class AccesoFuncion{
         const nuevoEntorno = new Entorno(entorno);
         for (let i = 0; i < this.argumentos.length; i++) {
             const argValor = this.argumentos[i].evaluar(entorno);
-            nuevoEntorno.declarar(funcion.parametros[i].id, { tipo: funcion.parametros[i].tipoDato, valor: argValor });
+            nuevoEntorno.declarar(funcion.parametros[i].id, { tipo: funcion.parametros[i].tipoDato, valor: argValor.valor });
         }
         let resultado = null;
         for (let i = 0; i < funcion.instrucciones.length; i++) {

@@ -76,8 +76,6 @@ fmt.Println("Struct:", p)
 imprimirResumen(nombre, edad, activo)
 fmt.Println("Fin del programa")
 }
-main()
-
 `;
 
 const ast = parser.parse(cod2);
