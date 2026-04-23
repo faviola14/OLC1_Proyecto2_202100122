@@ -12,7 +12,8 @@ const Comparacion = require("../Logica/Comparacion");
 const Negativo = require("../Aritmetica/Negativo");
 const Nodo = require("../Instrucciones/Nodo");
 
-function aNodo(nodo){
+function aNodo(nodo) {
+    //console.log(nodo);
     if (!nodo || typeof nodo !== 'object') return null;
     switch (nodo.tipo) {
         case 'int':
@@ -161,7 +162,7 @@ function aNodo(nodo){
         case 'Join':
             return new Join(nodo.id, nodo.valor);
         case 'Len':
-            return new Len(nodo.id);
+            return new Len(nodo.valor);
         case 'Append':
             return new Append(nodo.id, nodo.slice, nodo.valor);
         case 'AccesoSlice':

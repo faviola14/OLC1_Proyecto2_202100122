@@ -5,76 +5,102 @@ const Interpretador = require("./Interprete/Interpretador");
 const AST = require("./Reports/AST");
 
 //console.log(JSON.stringify(ast, null, 2));
-const cod33 = `struct Persona {
-string Nombre;
-bool EsEstudiante;
+const cod33 = `
+func main(){
+notas := []int{61, 75, 88, 95}
+total := 0
+fmt.Println(total)
+for i := 0; i < len(notas); i++ {
+total += notas[i]
+fmt.Println(total)
 }
-func x(){
-//fmt.Println("Struct:", Persona)
-Persona p = {Nombre:"Alice", EsEstudiante: true}
-fmt.Println("Struct:", p)
-
-}
-x()`;
+fmt.Println(total)
+}`;
 
 const cod2 = `
+
 struct Persona {
 string Nombre;
 bool EsEstudiante;
 }
 
-func imprimirResumen(nombre string, edad int, activo bool) {
-fmt.Println("Resumen:", nombre, edad, activo)
+struct Curso {
+string Nombre;
+Persona Tutor;
+}
+
+func sumarLista(datos []int) int {
+total := 0
+//fmt.Println(total)
+for i := 0; i < len(datos); i++ {
+total += datos[i]
+fmt.Println(datos[i])
+fmt.Println(total)
+}
+//fmt.Println(total)
+return total
+}
+
+func obtenerEstado(nota int) string {
+fmt.Println("nota dentro func: ", nota)
+if nota >= 90 {
+fmt.Println("Sobresaliente")
+return "Sobresaliente"
+} else if nota >= 70 {
+ fmt.Println("Aprobado")
+return "Aprobado"
+} else {
+fmt.Println("Reprobado")
+return "Reprobado"
+}
 }
 
 func main() {
-var edad int = 19
-var promedio float64 = 81.5
-var nombre string = "Lucia"
-var activo bool = true
-var inicial rune = 'L'
-
-fmt.Println("Inicio del programa")
-fmt.Println("Nombre:", nombre)
-fmt.Println("Edad:", edad)
-fmt.Println("Promedio:", promedio)
-fmt.Println("Inicial:", inicial)
-
-edad = edad + 1
-promedio += 3
-nombre = nombre + " Perez"
-
-if activo {
-fmt.Println("Estado activo")
-} else {
-fmt.Println("Estado inactivo")
+notas := []int{61, 75, 88, 95}
+palabras := []string{"Compiladores", "OLC1", "Proyecto"}
+matriz := [][]int{
+{10, 20},
+{30, 40},
+{50, 60}
 }
 
-numeros := []int{1, 2, 3, 4}
-numeros = append(numeros, 5)
-fmt.Println("Cantidad:", len(numeros))
-fmt.Println("Indice de 4:", slices.Index(numeros, 4))
+Persona tutor = {Nombre:"Marcos", EsEstudiante: false}
+Curso c = {Nombre:"GoScript", Tutor: tutor}
 
-for i := 0; i < len(numeros); i++ {
-fmt.Println("Elemento:", numeros[i])
+fmt.Println("Curso:", c)
+fmt.Println("Palabras:", strings.Join(palabras, " | "))
+fmt.Println("Total notas:", sumarLista(notas))
+fmt.Println("Estado de 88:", obtenerEstado(88))
+
+for indice, valor := range notas {
+fmt.Println("Nota en posicion", indice, "=", valor)
 }
 
-switch edad {
-case 18:
-fmt.Println("Tiene 18")
-case 20:
-fmt.Println("Tiene 20")
+for i := 0; i < len(matriz); i++ {
+for j := 0; j < len(matriz[i]); j++ {
+fmt.Println("Matriz", i, j, "=", matriz[i][j])
+}
+}
+
+{
+mensaje := "Bloque interno"
+fmt.Println(mensaje)
+}
+
+contador := 0
+for contador < 3 {
+fmt.Println("Contador:", contador)
+contador++
+}
+
+switch obtenerEstado(61) {
+case "Sobresaliente":
+fmt.Println("Muy alta")
+case "Aprobado":
+fmt.Println("Aceptable")
 default:
-fmt.Println("Otra edad")
+fmt.Println("Necesita mejorar")
 }
-
-
-//fmt.Println("Struct:", Persona)
-Persona p = {Nombre:"Alice", EsEstudiante: true}
-fmt.Println("Struct:", p)
-
-imprimirResumen(nombre, edad, activo)
-fmt.Println("Fin del programa")
 }
 `;
 

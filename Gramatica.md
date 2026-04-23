@@ -15,8 +15,7 @@
 # func <nombreFuncion>(<param1> <tipo1>, <param2> <tipo2>) <tipoRetorno> { // <cuerpo de la función> return <valorDeRetorno> }
 
 <funcion> ::= FUNC ID PARENTESIS_A <parametros> PARENTESIS_C LLAVE_A <instrucciones> LLAVE_C 
-| FUNC ID PARENTESIS_A <parametros> PARENTESIS_C <tipo> LLAVE_A <instrucciones> <retorno> LLAVE_C
-| FUNC ID PARENTESIS_A <parametros> PARENTESIS_C <tipo> LLAVE_A <retorno> LLAVE_C  
+| FUNC ID PARENTESIS_A <parametros> PARENTESIS_C <tipo> LLAVE_A <instrucciones> LLAVE_C
 | <struct>
 
 <parametros> ::= <parametros> COMA <parametro>
@@ -49,6 +48,7 @@
                 | <break>
                 | <continue>
                 | <bloqueindependiente>
+                | <retorno>
 
 # RETURN
 <retorno> ::= RETURN <valor>
@@ -77,6 +77,8 @@
 <valor> ::= operacion
 | CADENA
 | <funcionesestructura> 
+| <accesoslice>
+| <condicion>
 
 # OPERACIONES
 <operacion> ::= <operacion> MAS <operacionsimple>
@@ -185,6 +187,7 @@
                 | <accesofunc>
                 | <break>
                 | <continue>
+                | <retorno>
 
 # FOR
 # for <condición> { // Bloque de sentencias }
@@ -223,6 +226,7 @@
                 | <accesofunc>
                 | <break>
                 | <continue>
+                | <retorno>
 
 <mento> ::= ID INCREMENTO
 | ID DECREMENTO
@@ -249,7 +253,6 @@
 | <join>
 | <len>
 | <accesoslice>
-| <accesomatriz>
 | <structacceso>
 | <atoi>
 | <parsefloat>
@@ -263,13 +266,14 @@
 <join> ::= JOIN PARENTESIS_A ID COMA <valor> PARENTESIS_C
 
 # LEN len(numeros)
-<len> ::= LEN PARENTESIS_A ID PARENTESIS_C
+<len> ::= LEN PARENTESIS_A valor PARENTESIS_C
 
 # APPEND numeros = append(numeros, 4)
 <append> ::= ID IGUAL APPEND PARENTESIS_A ID COMA <valor> PARENTESIS_C
 
 # ACCESO SLICE numeros[2]
-<accesoslice> ::= ID <posicionslice>
+<accesoslice> ::= <accesoslice> <posicionslice>
+ ID <posicionslice>
 
 # MODIFICACIÓN SLICE numeros[2] = 100
 <modificacionslice> ::= ID <posicionslice> IGUAL <valor>

@@ -15,18 +15,24 @@ class Entorno {
     }
 
     obtener(id) {
-    let actual = this;
-    while (actual != null) {
-        if (actual.tabla.has(id)) {
-            //console.log("GET:", id, actual.tabla.get(id));
-            return actual.tabla.get(id);
+        if (typeof id === "object") {
+            if (id.tipo === "Identificador") {
+                id = id.valor;
+            } else if (id.id) {
+                id = id.id;
+            }
         }
-        actual = actual.padre;
+        const variable = this.tabla.get(id);
+        if (variable !== undefined) {
+            return variable;
+        }
+        if (this.padre) {
+            return this.padre.obtener(id);
+        }
+        console.log("GET FALLÓ:", id);
+        throw new Error("Variable no definida: " + id);
     }
-    console.log("GET FALLÓ:", id);
-    throw new Error("Variable no definida: " + id);
-}
-
+    
     asignar(id, valor) {
         let actual = this;
         while (actual != null) {

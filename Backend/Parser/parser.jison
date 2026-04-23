@@ -415,19 +415,12 @@ funcion: FUNC ID PARENTESIS_A parametros PARENTESIS_C LLAVE_A instrucciones LLAV
     ambito=$2;
     $$={ tipo: 'Funcion', id: $2, parametros: $4, tipoRetorno: null, instrucciones: $7 };
 }
-| FUNC ID PARENTESIS_A parametros PARENTESIS_C tipo LLAVE_A instrucciones retorno LLAVE_C
+| FUNC ID PARENTESIS_A parametros PARENTESIS_C tipo LLAVE_A instrucciones LLAVE_C
 {
     const simboloT = new Simbolo($2,"Función",$6,"Global",@2.first_line, @2.first_column);
     TablaSimbolos.agregarSimbolo(simboloT);
     ambito=$2;
     $$={ tipo: 'Funcion', id: $2, parametros: $4, tipoRetorno: $6, instrucciones: $8};
-}
-| FUNC ID PARENTESIS_A parametros PARENTESIS_C tipo LLAVE_A retorno LLAVE_C
-{
-    const simboloR = new Simbolo($2,"Función",$6,"Global",@2.first_line, @2.first_column);
-    TablaSimbolos.agregarSimbolo(simboloR);
-    ambito=$2;
-    $$={ tipo: 'Funcion', id: $2, parametros: $4, tipoRetorno: $6, instrucciones: []};
 }
 | struct { $$ = $1;}
 ;
@@ -466,6 +459,7 @@ instruccion: variable {$$ = $1;}
 | bloqueindependiente {$$ = $1;}
 | break {$$ = $1; }
 | continue {$$ = $1; }
+| retorno {$$ = $1; }
 ;
 
 /* RETURN */
@@ -513,11 +507,14 @@ tipo: INT { $$ = "int"; }
 | BOOL { $$ = "bool"; }
 | RUNE { $$ = "rune"; }
 | CORCHETE_A CORCHETE_C tipo { $$ = "[]" + $3; }
+| ID         { $$ = $1; }  
 ;
 
 valor: operacion { $$ = $1; }
-| CADENA {$$= { tipo: 'string', valor: yytext };}
+| CADENA { $$= { tipo: 'string', valor: yytext.slice(1, -1) }; }
 | funcionesestructura {$$ = $1;}
+| accesoslice{$$ = $1;}
+| condicion { $$ = $1; }
 ;
 
 /* OPERACIONES */
@@ -550,7 +547,7 @@ operacionmenossimple: MENOS operacionmenossimple %prec UMINUS
 | funcionesestructura
 { $$ = $1; }
 | CADENA
-{ $$ = { tipo: 'string', valor: yytext }; }
+{ $$ = { tipo: 'string', valor: yytext.slice(1, -1) }; }
 | TRUE
 { $$ = { tipo: 'bool', valor: true }; }
 | FALSE
@@ -559,6 +556,7 @@ operacionmenossimple: MENOS operacionmenossimple %prec UMINUS
 { $$ = { tipo: 'rune', valor: $1[1]  }; }
 | ID
 { $$ = { tipo: 'Identificador', valor: $1 }; } 
+/*| condicion { $$ = $1; }*/
 ;
 
 /* ASIGNACIONES VARIABLES */
@@ -636,13 +634,13 @@ comparacion: valor IGUALDAD valor
 ;
 
 /* SWITCH */
-switch: SWITCH condicion LLAVE_A cases default LLAVE_C 
+switch: SWITCH valor LLAVE_A cases default LLAVE_C 
 { $$ = { tipo: 'Switch', condicion: $2, cases: $4, default: $5 };}
-| SWITCH PARENTESIS_A condicion PARENTESIS_C LLAVE_A cases default LLAVE_C
+| SWITCH PARENTESIS_A valor PARENTESIS_C LLAVE_A cases default LLAVE_C
 { $$ = { tipo: 'Switch', condicion: $3, cases: $6, default: $7 };}
-| SWITCH condicion LLAVE_A cases LLAVE_C
+| SWITCH valor LLAVE_A cases LLAVE_C
 { $$ = { tipo: 'Switch', condicion: $2, cases: $4, default: null };}
-| SWITCH PARENTESIS_A condicion PARENTESIS_C LLAVE_A cases LLAVE_C
+| SWITCH PARENTESIS_A valor PARENTESIS_C LLAVE_A cases LLAVE_C
 { $$ = { tipo: 'Switch', condicion: $3, cases: $6, default: null };}
 ;
 
@@ -683,6 +681,7 @@ instruccionswitch: variable {$$ = $1;}
 | accesofunc {$$ = $1;}
 | break {$$ = $1;}
 | continue {$$ = $1;}
+| retorno {$$ = $1; }
 ;
 
 /* FOR */ 
@@ -727,6 +726,7 @@ instruccionfor: variable {$$ = $1;}
 | accesofunc {$$ = $1;}
 | break {$$ = $1;}
 | continue {$$ = $1;}
+| retorno {$$ = $1; }
 ;
 
 mento: ID INCREMENTO
@@ -774,8 +774,8 @@ elementos: elementos COMA valor { $1.push($3); $$ = $1; }
 funcionesestructura: index {$$ = $1;}
 | join {$$ = $1;}
 | len {$$ = $1;}
+/* | accesomatriz{$$ = $1;}*/
 | accesoslice{$$ = $1;}
-| accesomatriz{$$ = $1;}
 | structacceso{$$ = $1;}
 | atoi {$$ = $1;}
 | parsefloat {$$ = $1;}
@@ -794,8 +794,8 @@ join: JOIN PARENTESIS_A ID COMA valor PARENTESIS_C
 ;
 
 /* LEN */
-len: LEN PARENTESIS_A ID PARENTESIS_C
-{ $$ = { tipo: 'Len', id: { tipo: 'Identificador', valor: $3 } }; }
+len: LEN PARENTESIS_A valor PARENTESIS_C
+{ $$ = { tipo: 'Len', valor:$3 }; }
 ;
 
 /* APPEND */
@@ -804,7 +804,9 @@ append: ID IGUAL APPEND PARENTESIS_A ID COMA valor PARENTESIS_C
 ;
 
 /* ACCESO SLICE */
-accesoslice: ID posicionslice
+accesoslice: accesoslice posicionslice
+{ $$ = { tipo: 'AccesoSlice', id: $1, posicion: $2.posicion}; }
+| ID posicionslice
 { $$ = { tipo: 'AccesoSlice', id: { tipo: 'Identificador', valor: $1 }, posicion: $2.posicion }; }
 ;
 
@@ -824,7 +826,7 @@ matrices: ID PUNTO_IGUAL CORCHETE_A CORCHETE_C CORCHETE_A CORCHETE_C tipo LLAVE_
 {
     const matriz = new Simbolo($1,"Matriz",$6,ambito, @1.first_line, @1.first_column);
     TablaSimbolos.agregarSimbolo(matriz);
-    $$={ tipo: 'Matriz', id: { tipo: 'Identificador', valor: $1 }, tipoDato: $6, valor: $9 };
+    $$={ tipo: 'Matriz', id: { tipo: 'Identificador', valor: $1 }, tipoDato: $7, valor: $9 };
 }
 ;
 

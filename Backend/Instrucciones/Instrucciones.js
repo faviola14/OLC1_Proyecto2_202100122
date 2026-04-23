@@ -8,6 +8,7 @@ class Declaracion {
         this.valor = valor;
     }
     evaluar(entorno) {
+        //console.log(this);
         if (entorno.existeLocal(this.id)) {
             throw new Error(`La variable ${this.id} ya ha sido declarada.`);
         }
@@ -121,7 +122,7 @@ class If {
     }
     evaluar(entorno) {
         const cond = this.condicion.evaluar(entorno);
-    if (cond) {
+    if (cond.valor) {
         this.instrucciones.forEach(i => i.evaluar(entorno));
     }
 }
@@ -133,7 +134,7 @@ class ElseIf {
     }
     evaluar(entorno) {
         const cond = this.condicion.evaluar(entorno);
-        if (cond) {
+        if (cond.valor) {
             this.instrucciones.forEach(i => i.evaluar(entorno));
             return true; 
         }
@@ -163,14 +164,14 @@ class IfElseIf{
     evaluar(entorno) {
         if (this.ifNode) {
             const cond = this.ifNode.condicion.evaluar(entorno);
-            if (cond) {
+            if (cond.valor) {
                 this.ifNode.instrucciones.forEach(i => i.evaluar(entorno));
                 return;
             }
         }
         if (this.elseIfNode) {
             const cond2 = this.elseIfNode.condicion.evaluar(entorno);
-            if (cond2) {
+            if (cond2.valor) {
                 this.elseIfNode.instrucciones.forEach(i => i.evaluar(entorno));
                 return;
             }
@@ -185,7 +186,7 @@ class IfElse{
     evaluar(entorno) {
         if (this.ifNode) {
             const cond = this.ifNode.condicion.evaluar(entorno);
-            if (cond) {
+            if (cond.valor) {
                 
                 this.ifNode.instrucciones.forEach(i => i.evaluar(entorno));
                 return;
@@ -207,14 +208,14 @@ class IfCompleto {
     evaluar(entorno) {
         if (this.ifNode) {
             const cond = this.ifNode.condicion.evaluar(entorno);
-            if (cond) {
+            if (cond.valor) {
                 this.ifNode.instrucciones.forEach(i => i.evaluar(entorno));
                 return;
             }
         }
         if (this.elseIfNode) {
             const cond = this.elseIfNode.condicion.evaluar(entorno);
-            if (cond) {
+            if (cond.valor) {
                 this.elseIfNode.instrucciones.forEach(i => i.evaluar(entorno));
                 return;
             }
@@ -234,20 +235,19 @@ class For {
         this.instrucciones = instrucciones;
     }
     evaluar(entorno) {
+        const entornoLocal = new Entorno(entorno);
         if (this.init) {
-            this.init.evaluar(entorno);
+            this.init.evaluar(entornoLocal);
         }
-        //console.log(this.condicion);
-        //console.log(this.condicion.evaluar(entorno).valor);
-        //console.log(this.condicion.evaluar(entorno));
-        while (this.condicion ? this.condicion.evaluar(entorno).valor : true) {
+        while (this.condicion.evaluar(entornoLocal).valor) {
             for (let instr of this.instrucciones) {
-                const res = instr.evaluar(entorno);
-                if (res === 'break') return;
-                if (res === 'continue') break;
+                const res = instr.evaluar(entornoLocal);
+                if (res?.tipo === 'Return') return res;
+                if (res?.tipo === 'Break') return null;
+                if (res?.tipo === 'Continue') break;
             }
             if (this.incremento) {
-                this.incremento.evaluar(entorno);
+                this.incremento.evaluar(entornoLocal);
             }
         }
     }
@@ -261,33 +261,30 @@ class ForRange {
         this.instrucciones = instrucciones;
     }
     evaluar(entorno) {
-        const iterable = this.iterable.evaluar(entorno);
+        //console.log("DEBUG ForRange:", this);
+        const iterable = resolverValor(this.iterable, entorno);
         if (!Array.isArray(iterable)) {
             throw new Error("El iterable en for-range no es un arreglo");
         }
-        const nombreIndice = this.indice.valor;
-        let nombreValor;
-        if (this.valor.valor) {
-            nombreValor = this.valor.valor;
-        } else if (this.valor.id) {
-            nombreValor = this.valor.id;
-        } else {
-            throw new Error("Identificador de valor inválido en for-range");
-        }
+        const nombreIndice = this.indice.valor ?? this.indice.id;
+        const nombreValor  = this.valor.valor  ?? this.valor.id;
         for (let i = 0; i < iterable.length; i++) {
             const nuevoEntorno = new Entorno(entorno);
+            /*console.log("NuevoEntorno:", nuevoEntorno);
+            console.log("Declarando:", nombreIndice, nombreValor);*/
             nuevoEntorno.declarar(nombreIndice, {
                 tipo: 'int',
                 valor: i
             });
             nuevoEntorno.declarar(nombreValor, {
-                tipo: 'int',
+                tipo: Tipos.obtenerTipo(iterable[i]),
                 valor: iterable[i]
             });
             for (let instr of this.instrucciones) {
                 const res = instr.evaluar(nuevoEntorno);
-                if (res === 'break') return;
-                if (res === 'continue') break;
+                if (res?.tipo === 'Break') return;
+                if (res?.tipo === 'Continue') break;
+                if (res?.tipo === 'Return') return res;
             }
         }
         return null;
@@ -305,22 +302,29 @@ class Switch {
         if (!this.expresion) {
             throw new Error("Switch sin expresión");
         }
-        const valorEvaluado = this.expresion.evaluar(entorno).valor;
+        const evalExp = this.expresion.evaluar(entorno);
+        const valorEvaluado = evalExp?.valor ?? evalExp;
         let casoEncontrado = false;
-        for (let i = 0; i < this.casos.length; i++) {
-            const caso = this.casos[i];
-            const valorCaso = caso.valor.evaluar(entorno).valor;
+        for (let caso of this.casos) {
+            const evalCase = caso.valor.evaluar(entorno);
+            const valorCaso = evalCase?.valor ?? evalCase;
             if (valorEvaluado === valorCaso) {
                 casoEncontrado = true;
-                for (let j = 0; j < caso.instrucciones.length; j++) {
-                    caso.instrucciones[j].evaluar(entorno);
+                for (let instr of caso.instrucciones) {
+                    const res = instr.evaluar(entorno);
+                    if (res?.tipo === 'Break') return null;
+                    if (res?.tipo === 'Return') return res;
+                    if (res?.tipo === 'Continue') return res;
                 }
-                break;
+                return null;
             }
         }
         if (!casoEncontrado && this.defaultCase) {
-            for (let i = 0; i < this.defaultCase.instrucciones.length; i++) {
-                this.defaultCase.instrucciones[i].evaluar(entorno);
+            for (let instr of this.defaultCase.instrucciones) {
+                const res = instr.evaluar(entorno);
+                if (res?.tipo === 'Break') return null;
+                if (res?.tipo === 'Return') return res;
+                if (res?.tipo === 'Continue') return res;
             }
         }
         return null;
@@ -357,26 +361,15 @@ class Struct{
         this.tipoDato =tipoDato;
         this.valor = valor;
 }
-    evaluar(entorno) {
-        /*console.log("VALOR STRUCT:", this.valor);
-        console.log("TIPO:", typeof this.valor);
-        console.log("STRUCT ATRIBUTOS:", this.valor);*/
+    evaluar(entorno){
         const nombre = this.id.valor;
         if (entorno.existeLocal(nombre)) {
             throw new Error(`El struct ${nombre} ya existe.`);
         }
-        const atributos = {};
-        for (let attr of this.valor) {
-            if (!attr || !attr.id || !attr.tipo) {
-                throw new Error("Atributo inválido en definición de struct");
-            }
-            const nombreAttr = attr.id.valor || attr.id;
-            const tipoAttr = attr.tipo;
-            atributos[nombreAttr] = tipoAttr;
-        }
+        //console.log("atributos: ",this.valor)
         entorno.declarar(nombre, {
-            tipo: 'struct',
-            atributos: atributos
+            tipo: 'struct_def',
+            atributos: this.valor
         });
         return null;
     }
@@ -389,11 +382,17 @@ class Matriz{
         this.valor = valor; 
     }
     evaluar(entorno){
-        if (entorno.existe(this.id)) {
-            throw new Error(`La variable ${this.id} ya ha sido declarada.`);
+        const nombre = this.id.valor;
+        if (entorno.existe(nombre)) {
+            throw new Error(`La variable ${nombre} ya ha sido declarada.`);
         }
-        const valorEvaluado = this.valor;
-        entorno.declarar(this.id, { tipo: this.tipo, valor: valorEvaluado });
+        const valorEvaluado = this.valor.map(fila =>
+            fila.map(col => col.valor)
+        );
+        entorno.declarar(nombre, {
+            tipo: this.tipo,
+            valor: valorEvaluado
+        });
         return null;
     }
 }
@@ -439,19 +438,22 @@ class Return{
         this.valor = valor;
     }
     evaluar(entorno){
-        const valorEvaluado = this.valor.evaluar(entorno);
-        return valorEvaluado;
+        const val = this.valor ? this.valor.evaluar(entorno) : null;
+        return {
+            tipo: 'Return',
+            valor: val
+        };
     }
 }
 class Break{
     evaluar(entorno){
-        return 'break';
+        return { tipo: 'Break' };
     }
 }
 
 class Continue{
     evaluar(entorno) {
-        return 'continue';
+        return { tipo: 'Continue' };
     }
 }   
 
@@ -462,17 +464,24 @@ class Mento{
         this.cantidad = cantidad;
     }
     evaluar(entorno) {
-        const id = this.id.id || this.id;
+        const id = this.id.valor ?? this.id;
         const variable = entorno.obtener(id);
         if (!variable) {
             throw new Error(`La variable ${id} no ha sido declarada.`);
         }
-        let nuevoValor = variable.valor;
+        let incremento = this.cantidad;
+        if (incremento === undefined) {
+            incremento = 1;
+        } else if (typeof incremento.evaluar === "function") {
+            incremento = incremento.evaluar(entorno).valor;
+        } else if (incremento.valor !== undefined) {
+            incremento = incremento.valor;
+        }
+        let nuevoValor;
         if (this.operador === '++') {
-            //console.log("VALOR ACTUAL: ",variable.valor)
-            nuevoValor = variable.valor + this.cantidad;
+            nuevoValor = variable.valor + incremento;
         } else if (this.operador === '--') {
-            nuevoValor = variable.valor - this.cantidad;
+            nuevoValor = variable.valor - incremento;
         }
         entorno.asignar(id, {
             tipo: variable.tipo,
@@ -562,33 +571,36 @@ class Index{
 
 class Join{
     constructor(id, valor){
-        this.expresiones = expresiones;
+        this.id = id;
+        this.valor = valor;
     }
     evaluar(entorno) {
-        const valores = this.expresiones.map(exp => exp.evaluar(entorno));
-        return valores.join(' ');
+        const arr = resolverValor(this.id, entorno);
+        const separador = resolverValor(this.valor, entorno);
+        return {
+            tipo: 'string',
+            valor: arr.join(separador)
+        };
     }
 }
 
 class Len{
-    constructor(id){
-        this.id = id;
+    constructor(valor){
+        this.valor = valor;
     }
     evaluar(entorno) {
-        const nombre = this.id.valor;
-        const variable = entorno.obtener(nombre);
-        if (!variable) {
-            throw new Error(`La variable ${nombre} no ha sido declarada.`);
+        const arr = resolverValor(this.valor, entorno);
+
+        if (!Array.isArray(arr)) {
+            //console.log("DEBUG LEN:", arr);
+            throw new Error("El valor no es un slice o matriz.");
         }
-        if (!Array.isArray(variable.valor)) {
-            throw new Error(`La variable ${nombre} no es un slice o matriz.`);
-        }
+
         return {
             tipo: 'int',
-            valor: variable.valor.length
+            valor: arr.length
         };
     }
-
 }
 
 class Append{
@@ -611,7 +623,7 @@ class Append{
         } else {
             nuevoElemento = this.valor;
         }
-        variable.valor.push(nuevoElemento.valor);
+        variable.valor.push(nuevoElemento);
         entorno.asignar(nombre, variable);
         return null;
     }
@@ -623,23 +635,15 @@ class AccesoSlice{
         this.posicion = posicion;
     }
     evaluar(entorno) {
-        const nombre = this.id.valor || this.id.id || this.id;
-        const variable = entorno.obtener(nombre);
-        if (!variable) {
-            throw new Error(`La variable ${nombre} no ha sido declarada.`);
+        const base = resolverValor(this.id, entorno);
+        const indice = resolverValor(this.posicion, entorno);
+        if (!Array.isArray(base)) {
+            throw new Error("No es un arreglo");
         }
-        if (!Array.isArray(variable.valor)) {
-            throw new Error(`La variable ${nombre} no es un slice.`);
-        }
-        
-        const indiceEvaluado = obtenerValor(this.posicion, entorno);
-        //console.log("indice evaluado: ",indiceEvaluado)
-        if (indiceEvaluado < 0 || indiceEvaluado >= variable.valor.length) {
-            throw new Error(`Índice fuera de rango para ${nombre}`);
-        }
+        const valor = base[indice];
         return {
-            tipo: 'int',
-            valor: variable.valor[indiceEvaluado]
+            tipo: typeof valor === 'number' ? 'int' : 'unknown',
+            valor: valor
         };
     }
 }
@@ -703,7 +707,10 @@ class AccesoMatriz{
         this.columna = columna;
     }
     evaluar(entorno) {
-        const variable = entorno.obtener(this.id);
+        console.log("ACCESO MATRIZ: ",this)
+        const nombre = this.id.valor ?? this.id.id;
+        console.log("BUSCANDO:", id, typeof id);
+        const variable = entorno.obtener(nombre);
         if (!variable) {
             throw new Error(`La variable ${this.id} no ha sido declarada.`);
         }
@@ -715,7 +722,10 @@ class AccesoMatriz{
         if (filaEvaluada < 0 || filaEvaluada >= variable.valor.length || columnaEvaluada < 0 || columnaEvaluada >= variable.valor[0].length) {
             throw new Error(`Índice fuera de rango para la matriz ${this.id}.`);
         }
-        return variable.valor[filaEvaluada][columnaEvaluada];
+        return {
+            tipo: variable.tipo,
+            valor: variable.valor[filaEvaluada][columnaEvaluada]
+        };
     }
 }
 
@@ -725,50 +735,41 @@ class UsoStruct{
         this.id = id;                
         this.valor = valor;           
     }
-    evaluar(entorno) {
+    evaluar(entorno){
         const nombreStruct = this.tipoStruct.valor;
         const nombreVar = this.id.valor;
         const structDef = entorno.obtener(nombreStruct);
-        if (!structDef || structDef.tipo !== 'struct') {
+        if (!structDef || structDef.tipo !== 'struct_def') {
             throw new Error(`El struct ${nombreStruct} no existe`);
         }
         const atributosDef = structDef.atributos;
+        //console.log(atributosDef);
         const nuevoStruct = {};
-        for (let attr of this.valor) {
-            if (!attr || !attr.id) {
-                throw new Error("Atributo inválido en struct");
+        for (let attrDef of atributosDef) {
+            const nombreAttr = attrDef.id.valor;
+            const tipoEsperado = attrDef.tipo;
+            const attrAsignado = this.valor.find(a => a.id.valor === nombreAttr);
+            if (!attrAsignado) {
+                throw new Error(`Falta atributo ${nombreAttr}`);
             }
-            const nombreAttr = attr.id.valor || attr.id;
-            if (!(nombreAttr in atributosDef)) {
-                throw new Error(`El atributo ${nombreAttr} no existe en ${nombreStruct}`);
-            }
-            let resultado;
-            if (attr.valor && typeof attr.valor.evaluar === "function") {
-                resultado = attr.valor.evaluar(entorno);
-            } else if (attr.valor && attr.valor.tipo !== undefined) {
-                resultado = attr.valor;
+            const valorEval = resolver(attrAsignado.valor, entorno);
+            if (tipoEsperado === "int" || tipoEsperado === "string" || tipoEsperado === "bool") {
+                if (valorEval.tipo !== tipoEsperado) {
+                    throw new Error(`Tipo incorrecto en ${nombreAttr}`);
+                }
+                nuevoStruct[nombreAttr] = valorEval.valor;
             } else {
-                resultado = {
-                    tipo: typeof attr.valor,
-                    valor: attr.valor
-                };
-            }
-            const tipoEsperado = atributosDef[nombreAttr];
-            const tipoRecibido = resultado.tipo;
-            if (tipoEsperado !== tipoRecibido) {
-                throw new Error(
-                    `Tipo incorrecto en atributo ${nombreAttr}: se esperaba ${tipoEsperado} y se recibió ${tipoRecibido}`
-                );
-            }
-            nuevoStruct[nombreAttr] = resultado.valor;
-        }
-        for (let attrDef in atributosDef) {
-            if (!(attrDef in nuevoStruct)) {
-                throw new Error(`Falta el atributo ${attrDef} en ${nombreStruct}`);
+                if (valorEval.nombreStruct !== tipoEsperado) {
+                    throw new Error(
+                        `Tipo incorrecto en atributo ${nombreAttr}: se esperaba ${tipoEsperado}`
+                    );
+                }
+                nuevoStruct[nombreAttr] = valorEval.valor;
             }
         }
         entorno.declarar(nombreVar, {
-            tipo: nombreStruct,
+            tipo: 'struct',
+            nombreStruct: nombreStruct,
             valor: nuevoStruct
         });
         return null;
@@ -826,7 +827,10 @@ class Atoi{
         if (isNaN(numero)) {
             throw new Error(`El valor ${valorEvaluado} no se puede convertir a entero.`);
         }
-        return numero;
+        return {
+            tipo: 'int',
+            valor: numero
+        };
     }
 }
     
@@ -840,7 +844,10 @@ class ParseFloat{
         if (isNaN(numero)) {
             throw new Error(`El valor ${valorEvaluado} no se puede convertir a float.`);
         }
-        return numero;
+        return {
+            tipo: 'float64',
+            valor: numero
+        };
     }
 }
 
@@ -854,7 +861,10 @@ class TypeOf{
         if (!variable) {
             throw new Error(`La variable ${this.id} no ha sido declarada.`);
         }
-        return typeof variable.valor;
+        return {
+            tipo: 'string',
+            valor: typeof variable.valor
+        };
     }
 }
     
@@ -884,36 +894,44 @@ class AccesoFuncion{
         for (let i = 0; i < funcion.instrucciones.length; i++) {
             const instruccion = funcion.instrucciones[i];
             const evalInstruccion = instruccion.evaluar(nuevoEntorno);
-            if (evalInstruccion !== null && evalInstruccion !== undefined) {
-                resultado = evalInstruccion;
-                break;
+            if (evalInstruccion?.tipo === 'Return') {
+                return evalInstruccion.valor;
             }
         }
         return resultado;
     }
 }
 
-function obtenerValor(obj, entorno) {
-    if (obj && typeof obj.evaluar === "function") {
-        const res = obj.evaluar(entorno);
-        return res.valor;
+
+
+function resolver(exp, entorno) {
+    if (exp == null) return null;
+    if (typeof exp.evaluar === 'function') {
+        exp = exp.evaluar(entorno);
     }
-    if (obj && obj.id) {
-        const variable = entorno.obtener(obj.id);
-        return variable.valor;
+    if (exp?.tipo === 'Identificador') {
+        const simbolo = entorno.obtener(exp.valor);
+        return simbolo;
     }
-    if (obj && obj.tipo === 'Identificador') {
-        const variable = entorno.obtener(obj.valor);
-        return variable.valor;
+    return exp;
+}
+
+function resolverValor(exp, entorno) {
+    if (exp == null) return null;
+    if (typeof exp.evaluar === "function") {
+        const res = exp.evaluar(entorno);
+        return res?.valor ?? res;
     }
-    if (typeof obj === "string") {
-        const variable = entorno.obtener(obj);
-        return variable.valor;
+    if (exp.tipo === 'Identificador') {
+        return entorno.obtener(exp.valor).valor;
     }
-    if (typeof obj === "object" && obj.valor !== undefined) {
-        return obj.valor;
+    if (exp.id) {
+        return entorno.obtener(exp.id).valor;
     }
-    return obj;
+    if (exp.valor !== undefined) {
+        return exp.valor;
+    }
+    return exp;
 }
 
 module.exports = {

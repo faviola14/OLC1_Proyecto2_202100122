@@ -35,7 +35,7 @@ class float64 extends Nodo {
 class string extends Nodo {
     constructor(valor) {
         super();
-        this.valor =  valor.slice(1, -1);;
+        this.valor =  valor;
     }
     evaluar() {
         return { tipo: 'string', valor: this.valor};
