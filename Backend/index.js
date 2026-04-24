@@ -31,26 +31,18 @@ Persona Tutor;
 
 func sumarLista(datos []int) int {
 total := 0
-//fmt.Println(total)
 for i := 0; i < len(datos); i++ {
 total += datos[i]
-//fmt.Println(datos[i])
-//fmt.Println(total)
 }
-//fmt.Println(total)
 return total
 }
 
 func obtenerEstado(nota int) string {
-fmt.Println("nota dentro func: ", nota)
 if nota >= 90 {
-fmt.Println("Sobresaliente")
 return "Sobresaliente"
 } else if nota >= 70 {
- fmt.Println("Aprobado")
 return "Aprobado"
 } else {
-fmt.Println("Reprobado")
 return "Reprobado"
 }
 }
@@ -102,6 +94,7 @@ default:
 fmt.Println("Necesita mejorar")
 }
 }
+
 `;
 
 const ast = parser.parse(cod2);

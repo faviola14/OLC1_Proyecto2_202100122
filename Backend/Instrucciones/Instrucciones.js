@@ -122,10 +122,16 @@ class If {
     }
     evaluar(entorno) {
         const cond = this.condicion.evaluar(entorno);
-    if (cond.valor) {
-        this.instrucciones.forEach(i => i.evaluar(entorno));
+        if (cond.valor) {
+            for (let instr of this.instrucciones) {
+                const res = instr.evaluar(entorno);
+                if (res?.tipo === 'Return') return res;
+                if (res?.tipo === 'Break') return res;
+                if (res?.tipo === 'Continue') return res;
+            }
+        }
+        return null;
     }
-}
 }
 class ElseIf {
     constructor(condicion, instrucciones) {
@@ -135,8 +141,11 @@ class ElseIf {
     evaluar(entorno) {
         const cond = this.condicion.evaluar(entorno);
         if (cond.valor) {
-            this.instrucciones.forEach(i => i.evaluar(entorno));
-            return true; 
+            for (let instr of this.instrucciones) {
+                const res = instr.evaluar(entorno);
+                if (res?.tipo === 'Return') return res;
+            }
+            return true;
         }
         return false;
     }
@@ -148,9 +157,9 @@ class Else {
         this.instrucciones = instrucciones;
     }
     evaluar(entorno) {
-        for (let i = 0; i < this.instrucciones.length; i++) {
-            const instruccion = this.instrucciones[i];
-            instruccion.evaluar(entorno);
+        for (let instr of this.instrucciones) {
+            const res = instr.evaluar(entorno);
+            if (res?.tipo === 'Return') return res;
         }
         return null;
     }
@@ -207,22 +216,18 @@ class IfCompleto {
     }
     evaluar(entorno) {
         if (this.ifNode) {
-            const cond = this.ifNode.condicion.evaluar(entorno);
-            if (cond.valor) {
-                this.ifNode.instrucciones.forEach(i => i.evaluar(entorno));
-                return;
-            }
+            const resIf = this.ifNode.evaluar(entorno);
+            if (resIf) return resIf;
         }
         if (this.elseIfNode) {
-            const cond = this.elseIfNode.condicion.evaluar(entorno);
-            if (cond.valor) {
-                this.elseIfNode.instrucciones.forEach(i => i.evaluar(entorno));
-                return;
-            }
+            const resElseIf = this.elseIfNode.evaluar(entorno);
+            if (resElseIf && resElseIf.tipo === 'Return') return resElseIf;
         }
         if (this.elseNode) {
-            this.elseNode.instrucciones.forEach(i => i.evaluar(entorno));
+            const resElse = this.elseNode.evaluar(entorno);
+            if (resElse) return resElse;
         }
+        return null;
     }
 }
 
