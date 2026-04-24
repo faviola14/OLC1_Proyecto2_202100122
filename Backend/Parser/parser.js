@@ -382,7 +382,7 @@ case 124:
  this.$ = { tipo: 'AccesoSlice', id: { tipo: 'Identificador', valor: $$[$0-1] }, posicion: $$[$0].posicion }; 
 break;
 case 125:
- this.$ = { tipo: 'ModificacionSlice', id: { tipo: 'Identificador', valor: $$[$0-3] }, posicion: $$[$0-2].posicion, valor: $$[$01] }; 
+ this.$ = { tipo: 'ModificacionSlice', id: { tipo: 'Identificador', valor: $$[$0-3] }, posicion: $$[$0-2].posicion, valor: $$[$0] }; 
 break;
 case 126:
  this.$ = { posicion: { tipo: 'int', valor: Number($$[$0-1]) } } 
@@ -426,7 +426,7 @@ case 143:
  this.$ = { tipo: 'AccesoStruct', id: { tipo: 'Identificador', valor: $$[$0-2] }, atributo: { tipo: 'Identificador', valor: $$[$0] } }; 
 break;
 case 144:
- this.$ = { tipo: 'ModificacionStruct', id: $$[$0-2], atributo: $$[$0], valor: $$[$02] }; 
+ this.$ = { tipo: 'ModificacionStruct', id: $$[$0-2],  valor: $$[$0] }; 
 break;
 case 145:
  this.$ = {tipo: 'Imprimir',expresiones: $$[$0-1]};

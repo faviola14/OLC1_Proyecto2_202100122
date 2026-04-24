@@ -732,7 +732,7 @@ accesoslice: accesoslice posicionslice
 
 /* MODIFICACION SLICE */
 modificacionslice: ID posicionslice IGUAL expresion
-{ $$ = { tipo: 'ModificacionSlice', id: { tipo: 'Identificador', valor: $1 }, posicion: $2.posicion, valor: $5 }; }
+{ $$ = { tipo: 'ModificacionSlice', id: { tipo: 'Identificador', valor: $1 }, posicion: $2.posicion, valor: $4 }; }
 ;
 
 posicionslice: CORCHETE_A NUMERO CORCHETE_C
@@ -807,7 +807,7 @@ structacceso: ID PUNTO ID
 
 /* MODIFICACION STRUCT */
 structmodificacion: structacceso IGUAL expresion
-{ $$ = { tipo: 'ModificacionStruct', id: $1, atributo: $3, valor: $5 }; }
+{ $$ = { tipo: 'ModificacionStruct', id: $1,  valor: $3 }; }
 ;
 
 /* PRINT */
