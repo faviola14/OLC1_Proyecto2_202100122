@@ -563,9 +563,9 @@ operacionmenossimple: MENOS operacionmenossimple %prec UMINUS
 asignacion: ID IGUAL operacion
 { $$ = { tipo: 'Asignacion', id: $1, valor: $3 }; }
 | ID ASIGNA_MAS operacion
-{ $$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $1 }, operador: '++', cantidad: $3 }; }
+{ $$ = { tipo: 'Asignacion', id: $1, valor: { tipo: 'Aritmetica', izquierda: { tipo: 'Identificador', valor: $1 }, operador: '+', derecha: $3 } };  }
 | ID ASIGNA_MENOS operacion
-{ $$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $1 }, operador: '--', cantidad: $3 }; }
+{ $$ = { tipo: 'Asignacion', id: $1, valor: { tipo: 'Aritmetica', izquierda: { tipo: 'Identificador', valor: $1 }, operador: '-', derecha: $3 } };  }
 ;
 
 /* IF */
@@ -730,9 +730,9 @@ instruccionfor: variable {$$ = $1;}
 ;
 
 mento: ID INCREMENTO
-{ $$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $1 }, operador: '++', cantidad: { tipo: 'int', valor: 1 } }; }
+{ $$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $1 }, operador: '++' }; }
 | ID DECREMENTO
-{ $$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $1 }, operador: '--', cantidad: { tipo: 'int', valor: 1 } }; }
+{ $$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $1 }, operador: '--' }; }
 ;
 
 /* BREAK */

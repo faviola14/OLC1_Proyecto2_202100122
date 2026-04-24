@@ -248,10 +248,10 @@ case 71:
  this.$ = { tipo: 'Asignacion', id: $$[$0-2], valor: $$[$0] }; 
 break;
 case 72:
- this.$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $$[$0-2] }, operador: '++', cantidad: $$[$0] }; 
+ this.$ = { tipo: 'Asignacion', id: $$[$0-2], valor: { tipo: 'Aritmetica', izquierda: { tipo: 'Identificador', valor: $$[$0-2] }, operador: '+', derecha: $$[$0] } };  
 break;
 case 73:
- this.$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $$[$0-2] }, operador: '--', cantidad: $$[$0] }; 
+ this.$ = { tipo: 'Asignacion', id: $$[$0-2], valor: { tipo: 'Aritmetica', izquierda: { tipo: 'Identificador', valor: $$[$0-2] }, operador: '-', derecha: $$[$0] } };  
 break;
 case 74:
  this.$ = { tipo: 'IfCompleto', if: $$[$0-2], elseif: $$[$0-1], else: $$[$0] }; 
@@ -349,10 +349,10 @@ case 134:
  this.$={ tipo: 'Inicializacion', id: { tipo: 'Identificador', valor: $$[$0-2] }, valor: $$[$0] }; 
 break;
 case 159:
- this.$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $$[$0-1] }, operador: '++', cantidad: { tipo: 'int', valor: 1 } }; 
+ this.$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $$[$0-1] }, operador: '++' }; 
 break;
 case 160:
- this.$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $$[$0-1] }, operador: '--', cantidad: { tipo: 'int', valor: 1 } }; 
+ this.$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $$[$0-1] }, operador: '--' }; 
 break;
 case 161:
 this.$ = { tipo: 'Break' }; 

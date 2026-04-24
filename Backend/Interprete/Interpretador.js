@@ -145,7 +145,7 @@ function aNodo(nodo) {
             return new Continue();
         case 'Mento':
             //console.log("NODO MENTO:", nodo.cantidad);
-            return new Mento(nodo.id.valor, nodo.operador, nodo.cantidad.valor);
+            return new Mento(nodo.id.valor, nodo.operador);
         case 'BloqueIndependiente':
             const instruccionesBloque = nodo.instrucciones.map(instr => aNodo(instr)).filter(instr => instr !== null && instr !== undefined);
             return new BloqueIndependiente(instruccionesBloque);

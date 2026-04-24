@@ -34,8 +34,8 @@ total := 0
 //fmt.Println(total)
 for i := 0; i < len(datos); i++ {
 total += datos[i]
-fmt.Println(datos[i])
-fmt.Println(total)
+//fmt.Println(datos[i])
+//fmt.Println(total)
 }
 //fmt.Println(total)
 return total

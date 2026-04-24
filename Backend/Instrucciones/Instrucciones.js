@@ -457,11 +457,10 @@ class Continue{
     }
 }   
 
-class Mento{
-    constructor(id, operador,cantidad){
+class Mento {
+    constructor(id, operador) {
         this.id = id;
         this.operador = operador;
-        this.cantidad = cantidad;
     }
     evaluar(entorno) {
         const id = this.id.valor ?? this.id;
@@ -469,19 +468,11 @@ class Mento{
         if (!variable) {
             throw new Error(`La variable ${id} no ha sido declarada.`);
         }
-        let incremento = this.cantidad;
-        if (incremento === undefined) {
-            incremento = 1;
-        } else if (typeof incremento.evaluar === "function") {
-            incremento = incremento.evaluar(entorno).valor;
-        } else if (incremento.valor !== undefined) {
-            incremento = incremento.valor;
-        }
         let nuevoValor;
         if (this.operador === '++') {
-            nuevoValor = variable.valor + incremento;
+            nuevoValor = variable.valor + 1;
         } else if (this.operador === '--') {
-            nuevoValor = variable.valor - incremento;
+            nuevoValor = variable.valor - 1;
         }
         entorno.asignar(id, {
             tipo: variable.tipo,
@@ -709,7 +700,7 @@ class AccesoMatriz{
     evaluar(entorno) {
         console.log("ACCESO MATRIZ: ",this)
         const nombre = this.id.valor ?? this.id.id;
-        console.log("BUSCANDO:", id, typeof id);
+        console.log("BUSCANDO:", nombre, typeof nombre);
         const variable = entorno.obtener(nombre);
         if (!variable) {
             throw new Error(`La variable ${this.id} no ha sido declarada.`);
