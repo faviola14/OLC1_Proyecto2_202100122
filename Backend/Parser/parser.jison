@@ -328,7 +328,7 @@
                             }
 
 /* RUNE */
-"'"[^']"'"       {    const RUNEpToken = new Token("RUNEp", yytext, yylineno, yylloc.first_column);
+"'"[^']"'"                  {    const RUNEpToken = new Token("RUNEp", yytext, yylineno, yylloc.first_column);
                                 TablaTokens.agregarToken(RUNEpToken);
                                 //console.log("TOKEN:", yytext, "=> RUNE");
                                 return 'RUNEp';
@@ -463,7 +463,7 @@ instruccion: variable {$$ = $1;}
 ;
 
 /* RETURN */
-retorno: RETURN valor
+retorno: RETURN expresion
 {$$ = { tipo: 'Return', valor: $2 };}
 | RETURN
 {$$ = { tipo: 'Return', valor: null }; }
@@ -481,7 +481,7 @@ bloqueindependiente: LLAVE_A instrucciones LLAVE_C
 ;
 
 /* VARIABLES */
-variable: VAR ID tipo IGUAL valor
+variable: VAR ID tipo IGUAL expresion
 {
     const variableI = new Simbolo($2,"Variable",$3,ambito, @2.first_line, @2.first_column);
     TablaSimbolos.agregarSimbolo(variableI);
@@ -493,7 +493,7 @@ variable: VAR ID tipo IGUAL valor
     TablaSimbolos.agregarSimbolo(variable);
     $$={ tipo: 'Declaracion', id: $2, tipoDato: $3, valor: null };
 }
-| ID PUNTO_IGUAL valor
+| ID PUNTO_IGUAL expresion
 {
     const variableST = new Simbolo($1,"Variable",Tipos.obtenerTipo($3),ambito, @1.first_line, @1.first_column);
     TablaSimbolos.agregarSimbolo(variableST);
@@ -510,61 +510,66 @@ tipo: INT { $$ = "int"; }
 | ID         { $$ = $1; }  
 ;
 
-valor: operacion { $$ = $1; }
-| CADENA { $$= { tipo: 'string', valor: yytext.slice(1, -1) }; }
-| funcionesestructura {$$ = $1;}
-| accesoslice{$$ = $1;}
-| condicion { $$ = $1; }
-;
-
-/* OPERACIONES */
-operacion: operacion MAS operacionsimple
+expresion: expresion MAS expresion
 { $$ = { tipo: 'Aritmetica', izquierda: $1, operador: '+', derecha: $3 }; }
-| operacion MENOS operacionsimple
+| expresion MENOS expresion
 { $$ = { tipo: 'Aritmetica', izquierda: $1, operador: '-', derecha: $3 }; }
-| operacionsimple
-{ $$ = $1; }
-;
-
-operacionsimple: operacionsimple ASTERISCO operacionmenossimple
+| expresion ASTERISCO expresion
 { $$ = { tipo: 'Aritmetica', izquierda: $1, operador: '*', derecha: $3 }; }
-| operacionsimple BARRA operacionmenossimple
+| expresion BARRA expresion
  { $$ = { tipo: 'Aritmetica', izquierda: $1, operador: '/', derecha: $3 }; }
-| operacionsimple MODULO operacionmenossimple
+| expresion MODULO expresion
 { $$ = { tipo: 'Aritmetica', izquierda: $1, operador: '%', derecha: $3 }; }
-| operacionmenossimple
+| expresion IGUALDAD expresion
+{ $$ = { tipo: 'Comparacion', izquierda: $1, operador: '==', derecha: $3 }; }
+| expresion DESIGUALDAD expresion
+{ $$ = { tipo: 'Comparacion', izquierda: $1, operador: '!=', derecha: $3 }; }
+| expresion MAYOR_IGUAL expresion
+{ $$ = { tipo: 'Comparacion', izquierda: $1, operador: '>=', derecha: $3 }; }
+| expresion MENOR_IGUAL expresion
+{ $$ = { tipo: 'Comparacion', izquierda: $1, operador: '<=', derecha: $3 }; }
+| expresion MAYOR expresion
+{ $$ = { tipo: 'Comparacion', izquierda: $1, operador: '>', derecha: $3 }; }
+| expresion MENOR expresion
+{ $$ = { tipo: 'Comparacion', izquierda: $1, operador: '<', derecha: $3 }; }
+| expresion AND expresion
+{ $$= { tipo: 'Logica', izquierda: $1, operador: 'AND', derecha: $3 }; }
+| expresion OR expresion
+{ $$= { tipo: 'Logica', izquierda: $1, operador: 'OR', derecha: $3 }; }
+| NOT expresion
+{ $$ = { tipo: 'Logica', izquierda: null, operador: 'NOT', derecha: $2 }; }
+| MENOS expresion %prec UMINUS
+{ $$ = { tipo: 'Negativo', valor: $2 }; }
+| PARENTESIS_A expresion PARENTESIS_C
+{ $$ = $2; }
+| literal
 { $$ = $1; }
+| ID 
+{ $$= {tipo: 'Identificador', valor: $1}; }
+| funcionesestructura {$$ = $1;}
 ;
 
-operacionmenossimple: MENOS operacionmenossimple %prec UMINUS
-{ $$ = { tipo: 'Negativo', valor: $2 }; }
-| PARENTESIS_A operacion PARENTESIS_C
-{ $$ = $2; }
+literal: CADENA
+{ $$= { tipo: 'string', valor: yytext.slice(1, -1) }; }
 | NUMERO
 { $$ = { tipo: 'int', valor: Number(yytext) }; }
 | NUMERO_DECIMAL
 { $$ = { tipo: 'float64', valor: Number(yytext) }; }
-| funcionesestructura
-{ $$ = $1; }
-| CADENA
-{ $$ = { tipo: 'string', valor: yytext.slice(1, -1) }; }
 | TRUE
 { $$ = { tipo: 'bool', valor: true }; }
 | FALSE
 { $$ = { tipo: 'bool', valor: false }; }
 | RUNEp
 { $$ = { tipo: 'rune', valor: $1[1]  }; }
-| ID
-{ $$ = { tipo: 'Identificador', valor: $1 }; } 
-/*| condicion { $$ = $1; }*/
 ;
 
+
 /* ASIGNACIONES VARIABLES */
-asignacion: ID IGUAL operacion
+asignacion: ID IGUAL expresion
 { $$ = { tipo: 'Asignacion', id: $1, valor: $3 }; }
-| ID ASIGNA_MAS operacion
+| ID ASIGNA_MAS expresion
 { $$ = { tipo: 'Asignacion', id: $1, valor: { tipo: 'Aritmetica', izquierda: { tipo: 'Identificador', valor: $1 }, operador: '+', derecha: $3 } };  }
-| ID ASIGNA_MENOS operacion
+| ID ASIGNA_MENOS expresion
 { $$ = { tipo: 'Asignacion', id: $1, valor: { tipo: 'Aritmetica', izquierda: { tipo: 'Identificador', valor: $1 }, operador: '-', derecha: $3 } };  }
 ;
 
@@ -579,7 +584,7 @@ ifs: if elseif else
 { $$ = $1; }
 ;
 
-if: IF expresionRelacional codigo
+if: IF expresion codigo
 { $$ = { tipo: 'If', condicion: $2, instrucciones: $3 }; }
 | IF ID codigo
 { $$ = { tipo: 'If', condicion: { tipo: 'Identificador', valor: $2 }, instrucciones: $3 }; }
@@ -589,7 +594,7 @@ else: ELSE codigo
 { $$ = { tipo: 'Else', instrucciones: $2 }; }
 ;
 
-elseif: ELSE IF expresionRelacional codigo
+elseif: ELSE IF expresion codigo
 {$$ = { tipo: 'ElseIf', condicion: $3, instrucciones: $4 };}
 | ELSE IF ID codigo
 {$$ = { tipo: 'ElseIf', condicion: { tipo: 'Identificador', valor: $3 }, instrucciones: $4 };}
@@ -599,48 +604,15 @@ codigo: LLAVE_A instrucciones LLAVE_C
 {$$=$2;}
 ;
 
-condicion: expresionRelacional
-{ $$ = $1; 
-    //console.log("Condición: " + $1);
-}
-| ID 
-{ $$= {tipo: 'Identificador', valor: $1}; }
-;
-
-expresionRelacional: expresionRelacional OR expresionRelacional
-{ $$= { tipo: 'Logica', izquierda: $1, operador: 'OR', derecha: $3 }; }
-| expresionRelacional AND expresionRelacional
-{ $$ = { tipo: 'Logica', izquierda: $1, operador: 'AND', derecha: $3 }; }
-| NOT expresionRelacional
-{ $$ = { tipo: 'Logica', izquierda: null, operador: 'NOT', derecha: $2 }; }
-| PARENTESIS_A expresionRelacional PARENTESIS_C
-{ $$ = $2; }
-| comparacion
-{ $$ = $1; }
-;
-
-comparacion: valor IGUALDAD valor
-{ $$ = { tipo: 'Comparacion', izquierda: $1, operador: '==', derecha: $3 }; }
-| valor DESIGUALDAD valor
-{ $$ = { tipo: 'Comparacion', izquierda: $1, operador: '!=', derecha: $3 }; }
-| valor MAYOR_IGUAL valor
-{ $$ = { tipo: 'Comparacion', izquierda: $1, operador: '>=', derecha: $3 }; }
-| valor MENOR_IGUAL valor
-{ $$ = { tipo: 'Comparacion', izquierda: $1, operador: '<=', derecha: $3 }; }
-| valor MAYOR valor
-{ $$ = { tipo: 'Comparacion', izquierda: $1, operador: '>', derecha: $3 }; }
-| valor MENOR valor
-{ $$ = { tipo: 'Comparacion', izquierda: $1, operador: '<', derecha: $3 }; }
-;
 
 /* SWITCH */
-switch: SWITCH valor LLAVE_A cases default LLAVE_C 
+switch: SWITCH expresion LLAVE_A cases default LLAVE_C 
 { $$ = { tipo: 'Switch', condicion: $2, cases: $4, default: $5 };}
-| SWITCH PARENTESIS_A valor PARENTESIS_C LLAVE_A cases default LLAVE_C
+| SWITCH PARENTESIS_A expresion PARENTESIS_C LLAVE_A cases default LLAVE_C
 { $$ = { tipo: 'Switch', condicion: $3, cases: $6, default: $7 };}
-| SWITCH valor LLAVE_A cases LLAVE_C
+| SWITCH expresion LLAVE_A cases LLAVE_C
 { $$ = { tipo: 'Switch', condicion: $2, cases: $4, default: null };}
-| SWITCH PARENTESIS_A valor PARENTESIS_C LLAVE_A cases LLAVE_C
+| SWITCH PARENTESIS_A expresion PARENTESIS_C LLAVE_A cases LLAVE_C
 { $$ = { tipo: 'Switch', condicion: $3, cases: $6, default: null };}
 ;
 
@@ -648,86 +620,34 @@ cases: cases case { $1.push($2); $$ = $1; }
 | case { $$ = [$1];}
 ;
 
-case: CASE valor DOS_PUNTOS instruccionesswitch 
+case: CASE expresion DOS_PUNTOS instrucciones
 {$$ = { tipo: 'Case', valor: $2, instrucciones: $4 };}
 ;
 
-default: DEFAULT DOS_PUNTOS instruccionesswitch 
+default: DEFAULT DOS_PUNTOS instrucciones 
 {$$ = { tipo: 'Default', instrucciones: $3 };}
 ;
 
-instruccionesswitch: instruccionesswitch instruccionswitch { $1.push($2); $$ = $1; }
-| instruccionesswitch instruccionswitch PUNTO_COMA { $1.push($2); $$ = $1; }
-| instruccionswitch { $$ = [$1];}
-| instruccionswitch PUNTO_COMA { $$ = [$1];}
-| /* vacío */ { $$ = [];}
-; 
 
-instruccionswitch: variable {$$ = $1;}
-| ifs {$$ = $1;}
-| switch {$$ = $1;}
-| for {$$ = $1;}
-| modificacionslice {$$ = $1;}
-| slice {$$ = $1;}
-| append {$$ = $1;}
-| matrices {$$ = $1;}
-| asignacionmatriz {$$ = $1;}
-| struct {$$ = $1;}
-| structuso {$$ = $1;}
-| structmodificacion {$$ = $1;}
-| print {$$ = $1;}
-| asignacion {$$ = $1;}
-| mento {$$ = $1;}
-| accesofunc {$$ = $1;}
-| break {$$ = $1;}
-| continue {$$ = $1;}
-| retorno {$$ = $1; }
-;
 
 /* FOR */ 
-for: FOR expresionRelacional LLAVE_A instruccionesfor LLAVE_C
+for: FOR expresion LLAVE_A instrucciones LLAVE_C
 { $$ = { tipo: 'For', init: null, cond: $2, inc: null, instrucciones: $4 }; }
-| FOR ID LLAVE_A instruccionesfor LLAVE_C
+| FOR ID LLAVE_A instrucciones LLAVE_C
 { $$ = { tipo: 'For', init: null, cond: { tipo: 'Identificador', valor: $2 }, inc: null, instrucciones: $4 }; }
-| FOR inicializacion PUNTO_COMA expresionRelacional PUNTO_COMA mento LLAVE_A instruccionesfor LLAVE_C
+| FOR inicializacion PUNTO_COMA expresion PUNTO_COMA mento LLAVE_A instrucciones LLAVE_C
 { $$ = { tipo: 'For', init: $2, cond: $4, inc: $6, instrucciones: $8 }; }
-| FOR inicializacion PUNTO_COMA expresionRelacional PUNTO_COMA mento LLAVE_A instruccionesfor LLAVE_C
+| FOR inicializacion PUNTO_COMA expresion PUNTO_COMA mento LLAVE_A instrucciones LLAVE_C
 { $$ = { tipo: 'For', init: $2, cond: $4, inc: $6, instrucciones: $8 }; }
-| FOR ID COMA ID PUNTO_IGUAL RANGE ID LLAVE_A instruccionesfor LLAVE_C
+| FOR ID COMA ID PUNTO_IGUAL RANGE ID LLAVE_A instrucciones LLAVE_C
 { $$ = { tipo: 'ForRange', indice: { tipo: 'Identificador', valor: $2 }, valor: { tipo: 'Identificador', valor: $4 }, iterable: { tipo: 'Identificador', valor: $7 }, instrucciones: $9 }; }
 ;
 
-inicializacion: ID PUNTO_IGUAL valor 
+inicializacion: ID PUNTO_IGUAL expresion 
 { $$={ tipo: 'Inicializacion', id: { tipo: 'Identificador', valor: $1 }, valor: $3 }; }
 ;
 
-instruccionesfor: instruccionesfor instruccionfor { $1.push($2); $$ = $1; }
-| instruccionesfor instruccionfor PUNTO_COMA { $1.push($2); $$ = $1; }
-| instruccionfor { $$ = [$1];}
-| instruccionfor PUNTO_COMA { $$ = [$1];}
-| /* vacío */ { $$ = [];}
-; 
 
-instruccionfor: variable {$$ = $1;}
-| ifs {$$ = $1;}
-| switch {$$ = $1;}
-| for {$$ = $1;}
-| modificacionslice {$$ = $1;}
-| slice {$$ = $1;}
-| append {$$ = $1;}
-| matrices {$$ = $1;}
-| asignacionmatriz {$$ = $1;}
-| struct {$$ = $1;}
-| structuso {$$ = $1;}
-| structmodificacion {$$ = $1;}
-| print {$$ = $1;}
-| asignacion {$$ = $1;}
-| mento {$$ = $1;}
-| accesofunc {$$ = $1;}
-| break {$$ = $1;}
-| continue {$$ = $1;}
-| retorno {$$ = $1; }
-;
 
 mento: ID INCREMENTO
 { $$ = { tipo: 'Mento', id: { tipo: 'Identificador', valor: $1 }, operador: '++' }; }
@@ -766,8 +686,8 @@ slice: ID IGUAL tipo LLAVE_A elementos LLAVE_C
 }
 ;
 
-elementos: elementos COMA valor { $1.push($3); $$ = $1; }
-| valor { $$ = [$1]; }
+elementos: elementos COMA expresion { $1.push($3); $$ = $1; }
+| expresion { $$ = [$1]; }
 ;
 
 /* FUNCIONES DE ESTRUCTURAS */
@@ -784,22 +704,22 @@ funcionesestructura: index {$$ = $1;}
 ;
 
 /* SLICE.INDEX */
-index: INDEX PARENTESIS_A ID COMA valor PARENTESIS_C
+index: INDEX PARENTESIS_A ID COMA expresion PARENTESIS_C
 { $$ = { tipo: 'Index', id: { tipo: 'Identificador', valor: $3 }, valor: $5 }; }
 ;
 
 /* STRING.JOIN */
-join: JOIN PARENTESIS_A ID COMA valor PARENTESIS_C
+join: JOIN PARENTESIS_A ID COMA expresion PARENTESIS_C
 { $$ = { tipo: 'Join', id: { tipo: 'Identificador', valor: $3 }, valor: $5 }; }
 ;
 
 /* LEN */
-len: LEN PARENTESIS_A valor PARENTESIS_C
+len: LEN PARENTESIS_A expresion PARENTESIS_C
 { $$ = { tipo: 'Len', valor:$3 }; }
 ;
 
 /* APPEND */
-append: ID IGUAL APPEND PARENTESIS_A ID COMA valor PARENTESIS_C
+append: ID IGUAL APPEND PARENTESIS_A ID COMA expresion PARENTESIS_C
 { $$ = { tipo: 'Append', id: { tipo: 'Identificador', valor: $1 }, slice: { tipo: 'Identificador', valor: $1 }, valor: $7 }; }
 ;
 
@@ -811,7 +731,7 @@ accesoslice: accesoslice posicionslice
 ;
 
 /* MODIFICACION SLICE */
-modificacionslice: ID posicionslice IGUAL valor
+modificacionslice: ID posicionslice IGUAL expresion
 { $$ = { tipo: 'ModificacionSlice', id: { tipo: 'Identificador', valor: $1 }, posicion: $2.posicion, valor: $5 }; }
 ;
 
@@ -839,13 +759,13 @@ fila: LLAVE_A elementos LLAVE_C { $$ = $2; }
 ;
 
 /* ASIGNACIÓN MATRICES */
-asignacionmatriz: accesomatriz IGUAL valor
+asignacionmatriz: accesomatriz IGUAL expresion
 { $$ = { tipo: 'AsignacionMatriz', id: $1.id, fila: $1.fila, columna: $1.columna, valor: $3 }; }
 ;
 
 /* ACCESO MATRIZ */
 accesomatriz: ID CORCHETE_A NUMERO CORCHETE_C CORCHETE_A NUMERO CORCHETE_C
-{ $$ = { tipo: 'AccesoMatriz', id: { tipo: 'Identificador', valor: $1 }, fila: Number($3), columna: Number($6) }; }
+{ $$ = { tipo: 'AccesoMatriz', id: { tipo: 'Identificador', valor: $1 }, fila: $3, columna: $6 }; }
 ;
 
 /* STRUCT */
@@ -876,7 +796,8 @@ datos: datos COMA dato { $1.push($3); $$ = $1; }
 | dato { $$ = [$1]; }
 ;
 
-dato: ID DOS_PUNTOS valor { $$ = { id: { tipo: 'Identificador', valor: $1 }, valor: $3 }; }
+dato: ID DOS_PUNTOS expresion 
+{ $$ = { id: { tipo: 'Identificador', valor: $1 }, valor: $3 }; }
 ;
 
 /* ACCESO STRUCT */
@@ -885,7 +806,7 @@ structacceso: ID PUNTO ID
 ;
 
 /* MODIFICACION STRUCT */
-structmodificacion: structacceso IGUAL valor
+structmodificacion: structacceso IGUAL expresion
 { $$ = { tipo: 'ModificacionStruct', id: $1, atributo: $3, valor: $5 }; }
 ;
 
@@ -895,17 +816,17 @@ print: PRINT PARENTESIS_A elementos PARENTESIS_C
 ;
 
 /* ATOI */
-atoi: ATOI PARENTESIS_A valor PARENTESIS_C
+atoi: ATOI PARENTESIS_A expresion PARENTESIS_C
 { $$ = { tipo: 'Atoi', valor: $3 }; }
 ;
 
 /* PARSEFLOAT */
-parsefloat: PARSEFLOAT PARENTESIS_A valor PARENTESIS_C
+parsefloat: PARSEFLOAT PARENTESIS_A expresion PARENTESIS_C
 { $$ = { tipo: 'ParseFloat', valor: $3 }; }
 ;
 
 /* TYPEOF */
-typeof: ID PUNTO TYPEOF PARENTESIS_A valor PARENTESIS_C
+typeof: ID PUNTO TYPEOF PARENTESIS_A expresion PARENTESIS_C
 { $$ = { tipo: 'TypeOf', id: { tipo: 'Identificador', valor: $1 }, valor: $5 }; }
 ;
 

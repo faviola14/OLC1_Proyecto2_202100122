@@ -51,7 +51,7 @@
                 | <retorno>
 
 # RETURN
-<retorno> ::= RETURN <valor>
+<retorno> ::= RETURN <expresion>
 | RETURN
 
 # BLOQUE INDEPENDIENTE {instrucciones}
@@ -63,9 +63,9 @@
 # var <identificador> <Tipo>
 # <identificador> := <Expresión>
 
-<variable> ::= VAR ID <tipo> IGUAL <valor>
+<variable> ::= VAR ID <tipo> IGUAL <expresion>
 | VAR ID <tipo>
-| ID PUNTO_IGUAL <valor>
+| ID PUNTO_IGUAL <expresion>
 
 <tipo> ::= INT
 | FLOAT
@@ -74,37 +74,39 @@
 | RUNE
 | CORCHETE_A CORCHETE_C <tipo>
 
-<valor> ::= operacion
-| CADENA
-| <funcionesestructura> 
-| <accesoslice>
-| <condicion>
-
-# OPERACIONES
-<operacion> ::= <operacion> MAS <operacionsimple>
-| <operacion> MENOS <operacionsimple>
-| <operacionsimple>
-
-<operacionsimple> ::= <operacionsimple> ASTERISCO <operacionmenossimple>
-| <operacionsimple> BARRA <operacionmenossimple>
-| <operacionsimple> MODULO <operacionmenossimple>
-| <operacionmenossimple>
-
-<operacionmenossimple> ::= MENOS <operacionmenossimple>
-| PARENTESIS_A <operacion> PARENTESIS_C
-| NUMERO
-| NUMERO_DECIMAL
+<expresion>: <expresion> MAS <expresion>
+| <expresion> MENOS <expresion>
+| <expresion> ASTERISCO <expresion>
+| <expresion> BARRA <expresion>
+| <expresion> MODULO <expresion>
+| <expresion> IGUALDAD <expresion>
+| <expresion> DESIGUALDAD <expresion>
+| <expresion> MAYOR_IGUAL <expresion>
+| <expresion> MENOR_IGUAL <expresion>
+| <expresion> MAYOR <expresion>
+| <expresion> MENOR <expresion>
+| <expresion> AND <expresion>
+| <expresion> OR <expresion>
+| NOT <expresion>
+| MENOS <expresion> 
+| PARENTESIS_A <expresion> PARENTESIS_C
+| <literal>
 | ID 
 | <funcionesestructura> 
-| CADENA
-| TRUE 
+;
+
+literal: CADENA
+| NUMERO
+| NUMERO_DECIMAL
+| TRUE
 | FALSE
 | RUNEp
 
+
 # ASIGNACIONES VARIABLES
-<asignacion> ::= ID IGUAL <operacion>
-| ID ASIGNA_MAS <operacion>
-| ID ASIGNA_MENOS <operacion>
+<asignacion> ::= ID IGUAL <expresion>
+| ID ASIGNA_MAS <expresion>
+| ID ASIGNA_MENOS <expresion>
 
 # IF 
 # if condicion { // Bloque de sentencias para el if } else if condicion { // Bloque de sentencias para el else if } else { // Bloque de sentencias para el else }
@@ -114,31 +116,16 @@
 | <if> <else>
 | <if>
 
-<if> ::= IF <expresionRelacional> <codigo>
+<if> ::= IF <expresion> <codigo>
 | IF ID <codigo>
 
 <else> ::= ELSE <codigo>
 
-<elseif> ::= ELSE IF <expresionRelacional> <codigo>
-| ELSE IF <expresionRelacional> <codigo>
+<elseif> ::= ELSE IF <expresion> <codigo>
+| ELSE IF <expresion> <codigo>
 
 <codigo> ::= LLAVE_A <instrucciones> LLAVE_C
 
-<condicion> ::= <expresionRelacional>
-| ID 
-
-<expresionRelacional> ::= <expresionRelacional> OR <expresionRelacional>
-| <expresionRelacional> AND <expresionRelacional>
-| NOT <expresionRelacional>
-| PARENTESIS_A <expresionRelacional> PARENTESIS_C
-| <comparacion>
-
-<comparacion> ::= <valor> IGUALDAD <valor>
-| <valor> DESIGUALDAD <valor>
-| <valor> MAYOR_IGUAL <valor>
-| <valor> MENOR_IGUAL <valor>
-| <valor> MAYOR <valor>
-| <valor> MENOR <valor>
 
 
 # SWITCH
@@ -152,42 +139,20 @@
 # // Declaraciones ejecutadas si ningún caso coincide
 # }
 
-<switch> ::= SWITCH <condicion> LLAVE_A <cases> <default> LLAVE_C 
-| SWITCH PARENTESIS_A <condicion> PARENTESIS_C LLAVE_A <cases> <default> LLAVE_C
-| SWITCH <condicion> LLAVE_A <cases> LLAVE_C 
-| SWITCH PARENTESIS_A <condicion> PARENTESIS_C LLAVE_A <cases>  LLAVE_C
+<switch> ::= SWITCH <expresion> LLAVE_A <cases> <default> LLAVE_C 
+| SWITCH PARENTESIS_A <expresion> PARENTESIS_C LLAVE_A <cases> <default> LLAVE_C
+| SWITCH <expresion> LLAVE_A <cases> LLAVE_C 
+| SWITCH PARENTESIS_A <expresion> PARENTESIS_C LLAVE_A <cases>  LLAVE_C
 
 <cases> ::= <cases> <case>
 | <case>
 
-<case> ::= CASE <valor> DOS_PUNTOS <instruccionesswitch> 
+<case> ::= CASE <expresion> DOS_PUNTOS <instrucciones> 
 
-<default> ::= DEFAULT DOS_PUNTOS <instruccionesswitch>
+<default> ::= DEFAULT DOS_PUNTOS <instrucciones>
 
 
-<instruccionesswitch> ::= <instruccionesswitch> <instruccionswitch> 
-| <instruccionesswitch> <instruccionswitch> PUNTO_COMA
-| <instruccionswitch> 
-| <instruccionswitch> PUNTO_COMA
-| ε
-<instruccionswitch> ::= <variable>
-                | <ifs>
-                | <switch>
-                | <for>
-                | <slice>
-                | <append>
-                | <modificacionslice>
-                | <matrices>
-                | <asignacionmatriz>
-                | <struct>
-                | <structuso>
-                | <structmodificacion>
-                | <print>
-                | <asignacion>
-                | <accesofunc>
-                | <break>
-                | <continue>
-                | <retorno>
+
 
 # FOR
 # for <condición> { // Bloque de sentencias }
@@ -195,38 +160,14 @@
 # for índice, valor := range slice { //...}
 
 
-<for> ::= FOR <expresionRelacional> LLAVE_A <instruccionesfor> LLAVE_C
-| FOR ID LLAVE_A <instruccionesfor> LLAVE_C
-| FOR <inicializacion> PUNTO_COMA <expresionRelacional> PUNTO_COMA <mento> LLAVE_A <instruccionesfor> LLAVE_C
-| FOR ID PUNTO_COMA <expresionRelacional> PUNTO_COMA <mento> LLAVE_A <instruccionesfor> LLAVE_C
-| FOR ID COMA ID PUNTO_IGUAL RANGE ID LLAVE_A <instruccionesfor> LLAVE_C
+<for> ::= FOR <expresionRelacional> LLAVE_A <instrucciones> LLAVE_C
+| FOR ID LLAVE_A <instrucciones> LLAVE_C
+| FOR <inicializacion> PUNTO_COMA <expresionRelacional> PUNTO_COMA <mento> LLAVE_A <instrucciones> LLAVE_C
+| FOR ID PUNTO_COMA <expresionRelacional> PUNTO_COMA <mento> LLAVE_A <instrucciones> LLAVE_C
+| FOR ID COMA ID PUNTO_IGUAL RANGE ID LLAVE_A <instrucciones> LLAVE_C
 
-<inicializacion> ::= ID PUNTO_IGUAL <valor>
+<inicializacion> ::= ID PUNTO_IGUAL <expresion>
 
-<instruccionesfor> ::= <instruccionesfor> <instruccionfor> 
-| <instruccionesfor> <instruccionfor> PUNTO_COMA
-| <instruccionfor> 
-| <instruccionfor> PUNTO_COMA
-| ε
-
-<instruccionfor> ::= <variable>
-                | <ifs>
-                | <switch>
-                | <for>
-                | <slice>
-                | <append>
-                | <modificacionslice>
-                | <matrices>
-                | <asignacionmatriz>
-                | <struct>
-                | <structuso>
-                | <structmodificacion>
-                | <print>
-                | <asignacion>
-                | <accesofunc>
-                | <break>
-                | <continue>
-                | <retorno>
 
 <mento> ::= ID INCREMENTO
 | ID DECREMENTO
@@ -245,8 +186,8 @@
 | ID PUNTO_IGUAL  <tipo> CORCHETE_A <elementos> CORCHETE_C
 | VAR ID  <tipo>
 
-<elementos> ::= <elementos> COMA <valor>
-|<valor>
+<elementos> ::= <elementos> COMA <expresion>
+|<expresion>
 
 # FUNCIONES DE ESTRUCTURAS
 <funcionesestructura> ::= <index>
@@ -260,23 +201,23 @@
 | <accesofunc>
 
 # SLICE.INDEX slices.Index(numeros, 30)
-<index> ::= INDEX PARENTESIS_A ID COMA <valor> PARENTESIS_C
+<index> ::= INDEX PARENTESIS_A ID COMA <expresion> PARENTESIS_C
 
 # STRING.JOIN strings.Join(palabras, " ")
-<join> ::= JOIN PARENTESIS_A ID COMA <valor> PARENTESIS_C
+<join> ::= JOIN PARENTESIS_A ID COMA <expresion> PARENTESIS_C
 
 # LEN len(numeros)
-<len> ::= LEN PARENTESIS_A valor PARENTESIS_C
+<len> ::= LEN PARENTESIS_A <expresion> PARENTESIS_C
 
 # APPEND numeros = append(numeros, 4)
-<append> ::= ID IGUAL APPEND PARENTESIS_A ID COMA <valor> PARENTESIS_C
+<append> ::= ID IGUAL APPEND PARENTESIS_A ID COMA <expresion> PARENTESIS_C
 
 # ACCESO SLICE numeros[2]
 <accesoslice> ::= <accesoslice> <posicionslice>
  ID <posicionslice>
 
 # MODIFICACIÓN SLICE numeros[2] = 100
-<modificacionslice> ::= ID <posicionslice> IGUAL <valor>
+<modificacionslice> ::= ID <posicionslice> IGUAL <expresion>
 
 <posicionslice> ::=  CORCHETE_A NUMERO CORCHETE_C
 
@@ -292,7 +233,7 @@
 <fila> ::= LLAVE_A <elementos> LLAVE_C
 
 #ASIGNACIÓN MATRICES mtx2[0][0] = 7
-<asignacionmatriz> ::= <accesomatriz> IGUAL <valor> 
+<asignacionmatriz> ::= <accesomatriz> IGUAL <expresion> 
 
 # ACCESO MATRIZ mtx2[0][1]
 <accesomatriz> ::= ID CORCHETE_A NUMERO CORCHETE_C CORCHETE_A NUMERO CORCHETE_C
@@ -314,25 +255,25 @@
 <datos> ::= <datos> COMA <dato>
 | <dato>
 
-<dato> ::= ID DOS_PUNTOS <valor>
+<dato> ::= ID DOS_PUNTOS <expresion>
 
 # ACCESO STRUCT miInstancia.Nombre
 <structacceso> ::= ID PUNTO ID
 
 # MODIFICACION STRUCT miInstancia.Nombre = "Bob"
-<structmodificacion> ::= <structacceso> IGUAL <valor> 
+<structmodificacion> ::= <structacceso> IGUAL <expresion> 
 
 # PRINT fmt.Println("cadena1", "cadena2")
 <print> ::= PRINT PARENTESIS_A <elementos> PARENTESIS_C
 
 # ATOI strconv.Atoi("123")
-<atoi>  ::= ATOI PARENTESIS_A <valor> PARENTESIS_C
+<atoi>  ::= ATOI PARENTESIS_A <expresion> PARENTESIS_C
 
 # PARSEFLOAT strconv.ParseFloat("123.45")
-<parsefloat>  ::= PARSEFLOAT PARENTESIS_A <valor> PARENTESIS_C
+<parsefloat>  ::= PARSEFLOAT PARENTESIS_A <expresion> PARENTESIS_C
 
 #TYPEOF
-<typeof> ::=  ID PUNTO TYPEOF PARENTESIS_A <valor> PARENTESIS_C
+<typeof> ::=  ID PUNTO TYPEOF PARENTESIS_A <expresion> PARENTESIS_C
 
 # acceso función suma(3, 7)
 <accesofunc> ::= ID PARENTESIS_A <elementos> PARENTESIS_C

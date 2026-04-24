@@ -491,13 +491,15 @@ class BloqueIndependiente {
         this.instrucciones = instrucciones;
     }
     evaluar(entorno) {
+        const nuevoEntorno = new Entorno(entorno);
         for (let i = 0; i < this.instrucciones.length; i++) {
             const instruccion = this.instrucciones[i];
-            instruccion.evaluar(entorno);
+            instruccion.evaluar(nuevoEntorno);
         }
         return null;
     }
 }   
+
 class Cases{
     constructor(valor, instrucciones){
         this.valor = valor;
@@ -585,13 +587,16 @@ class Len{
         this.valor = valor;
     }
     evaluar(entorno) {
-        const arr = resolverValor(this.valor, entorno);
-
+        let arr;
+        if (typeof this.valor.evaluar === "function") {
+            const res = this.valor.evaluar(entorno);
+            arr = res.valor;
+        } else {
+            arr = resolverValor(this.valor, entorno);
+        }
         if (!Array.isArray(arr)) {
-            //console.log("DEBUG LEN:", arr);
             throw new Error("El valor no es un slice o matriz.");
         }
-
         return {
             tipo: 'int',
             valor: arr.length
@@ -606,7 +611,6 @@ class Append{
         this.valor = valor;
     }
     evaluar(entorno) {
-        //console.log(this.valor);
         const nombre = this.id.valor;
         const variable = entorno.obtener(nombre);
         if (!variable || !Array.isArray(variable.valor)) {
@@ -614,10 +618,9 @@ class Append{
         }
         let nuevoElemento;
         if (this.valor && typeof this.valor.evaluar === "function") {
-            const res = this.valor.evaluar(entorno);
-            nuevoElemento = res.valor;
+            nuevoElemento = this.valor.evaluar(entorno); 
         } else {
-            nuevoElemento = this.valor;
+            nuevoElemento = this.valor.valor;
         }
         variable.valor.push(nuevoElemento);
         entorno.asignar(nombre, variable);
@@ -638,7 +641,7 @@ class AccesoSlice{
         }
         const valor = base[indice];
         return {
-            tipo: typeof valor === 'number' ? 'int' : 'unknown',
+            tipo: Tipos.obtenerTipo(valor),
             valor: valor
         };
     }
@@ -703,23 +706,18 @@ class AccesoMatriz{
         this.columna = columna;
     }
     evaluar(entorno) {
-        console.log("ACCESO MATRIZ: ",this)
-        const nombre = this.id.valor ?? this.id.id;
-        console.log("BUSCANDO:", nombre, typeof nombre);
+        const nombre = this.id.valor;
         const variable = entorno.obtener(nombre);
         if (!variable) {
-            throw new Error(`La variable ${this.id} no ha sido declarada.`);
+            throw new Error(`La variable ${nombre} no ha sido declarada.`);
         }
-        if (variable.tipo !== 'Matriz') {
-            throw new Error(`La variable ${this.id} no es una matriz.`);
+        if (!Array.isArray(variable.valor)) {
+            throw new Error(`La variable ${nombre} no es una matriz.`);
         }
-        const filaEvaluada = this.fila.evaluar(entorno);
-        const columnaEvaluada = this.columna.evaluar(entorno);
-        if (filaEvaluada < 0 || filaEvaluada >= variable.valor.length || columnaEvaluada < 0 || columnaEvaluada >= variable.valor[0].length) {
-            throw new Error(`Índice fuera de rango para la matriz ${this.id}.`);
-        }
+        const filaEvaluada = resolverValor(this.fila, entorno);
+        const columnaEvaluada = resolverValor(this.columna, entorno);
         return {
-            tipo: variable.tipo,
+            tipo: 'int',
             valor: variable.valor[filaEvaluada][columnaEvaluada]
         };
     }
@@ -782,7 +780,7 @@ class AccesoStruct{
         if (!variable) {
             throw new Error(`La variable ${this.id} no ha sido declarada.`);
         }
-        if (variable.tipo !== 'Struct') {
+        if (variable.tipo !== 'struct') {
             throw new Error(`La variable ${this.id} no es un struct.`);
         }
         const atributo = this.atributo.valor;

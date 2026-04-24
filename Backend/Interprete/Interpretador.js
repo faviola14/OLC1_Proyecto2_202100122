@@ -13,7 +13,7 @@ const Negativo = require("../Aritmetica/Negativo");
 const Nodo = require("../Instrucciones/Nodo");
 
 function aNodo(nodo) {
-    //console.log(nodo);
+    console.log(nodo);
     if (!nodo || typeof nodo !== 'object') return null;
     switch (nodo.tipo) {
         case 'int':

@@ -6,16 +6,21 @@ const AST = require("./Reports/AST");
 
 //console.log(JSON.stringify(ast, null, 2));
 const cod33 = `
-func main(){
-notas := []int{61, 75, 88, 95}
-total := 0
-fmt.Println(total)
-for i := 0; i < len(notas); i++ {
-total += notas[i]
-fmt.Println(total)
+func main() {
+matriz := [][]int{
+{10, 20},
+{30, 40},
+{50, 60}
 }
-fmt.Println(total)
-}`;
+
+for i := 0; i < len(matriz); i++ {
+for j := 0; j < len(matriz[i]); j++ {
+fmt.Println("Matriz", i, j, "=", matriz[i][j])
+}
+}
+
+}
+`;
 
 const cod2 = `
 
@@ -97,7 +102,7 @@ fmt.Println("Necesita mejorar")
 
 `;
 
-const ast = parser.parse(cod2);
+const ast = parser.parse(cod33);
 
 
 /*console.log("RESULTADO FINAL:");
