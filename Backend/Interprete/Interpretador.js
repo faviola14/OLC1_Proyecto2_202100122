@@ -11,6 +11,8 @@ const Not = require("../Logica/Not");
 const Comparacion = require("../Logica/Comparacion");
 const Negativo = require("../Aritmetica/Negativo");
 const Nodo = require("../Instrucciones/Nodo");
+const Consola = require("../Reports/Consola");
+const Errores = require('../Reports/Errores');
 
 function aNodo(nodo) {
     //console.log(nodo);
@@ -188,25 +190,33 @@ function aNodo(nodo) {
         case 'AccesoFuncion':
             return new AccesoFuncion(nodo.id, nodo.argumentos);
         default:
-            throw new Error(`Tipo de nodo desconocido: ${JSON.stringify(nodo)}`);
-            //break
+            Errores.agregar("Fatal", `Tipo de nodo desconocido: ${JSON.stringify(nodo)}`);
+            break
     }
 }
 
 function interpretar(nodo) {
+    /*Consola.limpiar();
+    Errores.limpiar();*/
     const entorno = new Entorno();
-
-    if (Array.isArray(nodo)) {
-        nodo.forEach(n => {
-            const raiz = aNodo(n);
+    try {
+        if (Array.isArray(nodo)) {
+            nodo.forEach(n => {
+                const raiz = aNodo(n);
+                if (raiz) raiz.evaluar(entorno);
+            });
+        } else {
+            const raiz = aNodo(nodo);
             if (raiz) raiz.evaluar(entorno);
-        });
-    } else {
-        const raiz = aNodo(nodo);
-        if (raiz) raiz.evaluar(entorno);
+        }
+    } catch (e) {
+        Errores.agregar("Fatal", e.toString());
     }
-    //console.log(entorno instanceof Entorno);
-    return entorno;
+    return {
+        entorno,
+        consola: Consola.getSalida(),
+        errores: Errores.getErrores()
+    };
 }
 
 module.exports = interpretar ;

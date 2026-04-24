@@ -602,7 +602,6 @@ parse: function parse(input) {
     const ErrorL = require('../Reports/Errores');
     const TablaTokens = require('../Reports/TablaTokens');
     const TablaSimbolos = require('../Reports/TablaSimbolos');
-    const TablaErrores = require('../Reports/TablaErrores');
     const Tipos = require("../Instrucciones/Tipos");
 
     let ambito= "";
@@ -1296,14 +1295,14 @@ case 72:   const idToken = new Token("ID", yy_.yytext, yy_.yylineno, yy_.yylloc.
 break;
 case 73:   
                                 TablaTokens.crearReporteTokens();
-                                TablaErrores.crearReporteErrores();
+                                ErrorL.crearReporteErrores();
                                 /*TablaTokens.imprimirTabla();
                                 TablaErrores.imprimirTabla();*/
                                 return 6;
                             
 break;
-case 74:   const errorL = new ErrorL("Error léxico","El carácter: " + yy_.yytext +" no pertenece al lenguaje", yy_.yylineno, yy_.yylloc.first_column);
-                                TablaErrores.agregarError(errorL);
+case 74:   ErrorL.agregar("Error léxico","El carácter: " + yy_.yytext +" no pertenece al lenguaje", yy_.yylineno, yy_.yylloc.first_column);
+                                
                                 /* return 'INVALID' */
                             
 break;

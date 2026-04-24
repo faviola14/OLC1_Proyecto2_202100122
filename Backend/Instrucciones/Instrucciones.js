@@ -1,5 +1,7 @@
 const Entorno = require("../Instrucciones/Entorno");
 const Tipos = require("../Instrucciones/Tipos");
+const Consola = require("../Reports/Consola");
+const Errores = require('../Reports/Errores');
 
 class Declaracion {
     constructor(id, tipo, valor) {
@@ -10,7 +12,8 @@ class Declaracion {
     evaluar(entorno) {
         //console.log(this);
         if (entorno.existeLocal(this.id)) {
-            throw new Error(`La variable ${this.id} ya ha sido declarada.`);
+            Errores.agregar("Semántico", `La variable ${this.id} ya ha sido declarada.`);
+            return null;
         }
         let valorEvaluado;
         if (this.valor) {
@@ -56,7 +59,8 @@ class Asignacion {
         const resultado = this.valor.evaluar(entorno); 
         //console.log(this.valor);
         if (!resultado) {
-            throw new Error("La expresión no devolvió ningún valor");
+            Errores.agregar("Semántico", "La expresión no devolvió ningún valor para asignar");
+            return null;
         }
         const tipoNuevo = resultado.tipo;
         const nuevoValor = resultado.valor;
@@ -73,9 +77,8 @@ class Asignacion {
             return;
         }
         if (variable.tipo !== tipoNuevo) {
-            throw new Error(
-                `No se puede asignar un valor de tipo ${tipoNuevo} a ${variable.tipo}`
-            );
+            Errores.agregar("Semántico", `No se puede asignar un valor de tipo ${tipoNuevo} a ${variable.tipo}`);
+            return null;
         }
         entorno.asignar(this.id, {
             tipo: variable.tipo,
@@ -90,28 +93,31 @@ class Imprimir {
         this.expresiones = expresiones;
     }
     evaluar(entorno) {
-        //console.log("IMPRIMIENDO");
         const valores = this.expresiones
             .map(exp => exp.evaluar(entorno))
             .filter(v => v !== null && v !== undefined)
-            .map(v => v.valor);
-        console.log(...valores);
+            .map(v => this.formatear(v.valor));
+        Consola.log(...valores);
         return null;
-        //console.log("IMPRIMIENDO...");
         try {
             const valores = this.expresiones.map(exp => {
                 if (!exp) {
-                    //console.log("EXPRESION NULL FALLA");
+                    
                     return null;
                 }
                 return exp.evaluar(entorno);
             });
-            //console.log("VALORES:", valores);
-            //console.log(...valores);
         } catch (e) {
-            console.error("ERROR EN PRINT:", e);
+            Errores.agregar("Semántico", "ERROR EN PRINT:", e);
+            return null;
         }
         return null;
+    }
+    formatear(valor) {
+        if (typeof valor === "object") {
+            return JSON.stringify(valor);
+        }
+        return String(valor);
     }
 }
 
@@ -269,7 +275,8 @@ class ForRange {
         //console.log("DEBUG ForRange:", this);
         const iterable = resolverValor(this.iterable, entorno);
         if (!Array.isArray(iterable)) {
-            throw new Error("El iterable en for-range no es un arreglo");
+            Errores.agregar("Semántico", "El iterable en for-range no es un arreglo");
+            return null;
         }
         const nombreIndice = this.indice.valor ?? this.indice.id;
         const nombreValor  = this.valor.valor  ?? this.valor.id;
@@ -305,7 +312,8 @@ class Switch {
 
     evaluar(entorno) {
         if (!this.expresion) {
-            throw new Error("Switch sin expresión");
+            Errores.agregar("Semántico", "Switch sin expresión");
+            return null;
         }
         const evalExp = this.expresion.evaluar(entorno);
         const valorEvaluado = evalExp?.valor ?? evalExp;
@@ -344,7 +352,8 @@ class Slice{
     }
     evaluar(entorno){
         if (entorno.existeLocal(this.id)) {
-            throw new Error(`La variable ${this.id} ya ha sido declarada.`);
+            Errores.agregar("Semántico", `La variable ${this.id} ya ha sido declarada.`);
+            return null;
         }
         const valorEvaluado = this.valor
         ? this.valor.map(v => {
@@ -369,7 +378,8 @@ class Struct{
     evaluar(entorno){
         const nombre = this.id.valor;
         if (entorno.existeLocal(nombre)) {
-            throw new Error(`El struct ${nombre} ya existe.`);
+            Errores.agregar("Semántico", `El struct ${nombre} ya existe.`);
+            return null;
         }
         //console.log("atributos: ",this.valor)
         entorno.declarar(nombre, {
@@ -389,7 +399,8 @@ class Matriz{
     evaluar(entorno){
         const nombre = this.id.valor;
         if (entorno.existe(nombre)) {
-            throw new Error(`La variable ${nombre} ya ha sido declarada.`);
+            Errores.agregar("Semántico", `La variable ${nombre} ya ha sido declarada.`);
+            return null;
         }
         const valorEvaluado = this.valor.map(fila =>
             fila.map(col => col.valor)
@@ -411,7 +422,8 @@ class Funcion{
     }
     evaluar(entorno){
         if (entorno.existe(this.id)) {
-            throw new Error(`La función ${this.id} ya ha sido declarada.`);
+            Errores.agregar("Semántico", `La función ${this.id} ya ha sido declarada.`);
+            return null;
         }
         entorno.declarar(this.id, { tipo: 'Función', valor: this });
         return null;
@@ -471,7 +483,8 @@ class Mento {
         const id = this.id.valor ?? this.id;
         const variable = entorno.obtener(id);
         if (!variable) {
-            throw new Error(`La variable ${id} no ha sido declarada.`);
+            Errores.agregar("Semántico", `La variable ${id} no ha sido declarada.`);
+            return null;
         }
         let nuevoValor;
         if (this.operador === '++') {
@@ -547,10 +560,12 @@ class Index{
         const nombre = this.id.valor;
         const variable = entorno.obtener(nombre);
         if (!variable) {
-            throw new Error(`La variable ${nombre} no ha sido declarada.`);
+            Errores.agregar("Semántico", `La variable ${nombre} no ha sido declarada.`);
+            return null;
         }
         if (!Array.isArray(variable.valor)) {
-            throw new Error(`La variable ${nombre} no es un slice.`);
+            Errores.agregar("Semántico", `La variable ${nombre} no es un slice.`);
+            return null;
         }
         let valorEvaluado = this.valor;
         if (this.valor && typeof this.valor.evaluar === "function") {
@@ -595,7 +610,8 @@ class Len{
             arr = resolverValor(this.valor, entorno);
         }
         if (!Array.isArray(arr)) {
-            throw new Error("El valor no es un slice o matriz.");
+            Errores.agregar("Semántico", `${arr} no es un slice o matriz.`);
+            return null;
         }
         return {
             tipo: 'int',
@@ -614,7 +630,8 @@ class Append{
         const nombre = this.id.valor;
         const variable = entorno.obtener(nombre);
         if (!variable || !Array.isArray(variable.valor)) {
-            throw new Error(`La variable ${nombre} no es un slice.`);
+            Errores.agregar("Semántico", `La variable ${nombre} no es un slice.`);
+            return null;
         }
         let nuevoElemento;
         if (this.valor && typeof this.valor.evaluar === "function") {
@@ -637,7 +654,8 @@ class AccesoSlice{
         const base = resolverValor(this.id, entorno);
         const indice = resolverValor(this.posicion, entorno);
         if (!Array.isArray(base)) {
-            throw new Error("No es un arreglo");
+            Errores.agregar("Semántico", ` ${base} No es un arreglo`);
+            return null;
         }
         const valor = base[indice];
         return {
@@ -656,14 +674,17 @@ class ModificacionSlice{
     evaluar(entorno) {
         const variable = entorno.obtener(this.id);
         if (!variable) {
-            throw new Error(`La variable ${this.id} no ha sido declarada.`);
+            Errores.agregar("Semántico", `La variable ${this.id} no ha sido declarada.`);
+            return null;
         }
         if (variable.tipo !== 'Slice') {
-            throw new Error(`La variable ${this.id} no es un slice.`);
+            Errores.agregar("Semántico", `La variable ${this.id} no es un slice.`);
+            return null;
         }
         const indiceEvaluado = this.posicion.evaluar(entorno);
         if (indiceEvaluado < 0 || indiceEvaluado >= variable.valor.length) {
-            throw new Error(`Índice fuera de rango para el slice ${this.id}.`);
+            Errores.agregar("Semántico", `Índice fuera de rango para el slice ${this.id}.`);
+            return null;
         }
         const valorEvaluado = this.valor.evaluar(entorno);
         variable.valor[indiceEvaluado] = valorEvaluado;
@@ -682,15 +703,18 @@ class AsignacionMatriz{
     evaluar(entorno) {
         const variable = entorno.obtener(this.id);
         if (!variable) {
-            throw new Error(`La variable ${this.id} no ha sido declarada.`);
+            Errores.agregar("Semántico", `La variable ${this.id} no ha sido declarada.`);
+            return null;
         }
         if (variable.tipo !== 'Matriz') {
-            throw new Error(`La variable ${this.id} no es una matriz.`);
+            Errores.agregar("Semántico", `La variable ${this.id} no es una matriz.`);
+            return null;
         }
         const filaEvaluada = this.fila.evaluar(entorno);
         const columnaEvaluada = this.columna.evaluar(entorno);
         if (filaEvaluada < 0 || filaEvaluada >= variable.valor.length || columnaEvaluada < 0 || columnaEvaluada >= variable.valor[0].length) {
-            throw new Error(`Índice fuera de rango para la matriz ${this.id}.`);
+            Errores.agregar("Semántico", `Índice fuera de rango para la matriz ${this.id}.`);
+            return null;
         }
         const valorEvaluado = this.valor.evaluar(entorno);
         variable.valor[filaEvaluada][columnaEvaluada] = valorEvaluado;
@@ -709,10 +733,12 @@ class AccesoMatriz{
         const nombre = this.id.valor;
         const variable = entorno.obtener(nombre);
         if (!variable) {
-            throw new Error(`La variable ${nombre} no ha sido declarada.`);
+            Errores.agregar("Semántico", `La variable ${nombre} no ha sido declarada.`);
+            return null;
         }
         if (!Array.isArray(variable.valor)) {
-            throw new Error(`La variable ${nombre} no es una matriz.`);
+            Errores.agregar("Semántico", `La variable ${nombre} no es una matriz.`);
+            return null;
         }
         const filaEvaluada = resolverValor(this.fila, entorno);
         const columnaEvaluada = resolverValor(this.columna, entorno);
@@ -734,7 +760,8 @@ class UsoStruct{
         const nombreVar = this.id.valor;
         const structDef = entorno.obtener(nombreStruct);
         if (!structDef || structDef.tipo !== 'struct_def') {
-            throw new Error(`El struct ${nombreStruct} no existe`);
+            Errores.agregar("Semántico", `El struct ${nombreStruct} no existe`);
+            return null;
         }
         const atributosDef = structDef.atributos;
         //console.log(atributosDef);
@@ -744,19 +771,20 @@ class UsoStruct{
             const tipoEsperado = attrDef.tipo;
             const attrAsignado = this.valor.find(a => a.id.valor === nombreAttr);
             if (!attrAsignado) {
-                throw new Error(`Falta atributo ${nombreAttr}`);
+                Errores.agregar("Semántico", `Falta atributo ${nombreAttr}`);
+                return null;
             }
             const valorEval = resolver(attrAsignado.valor, entorno);
             if (tipoEsperado === "int" || tipoEsperado === "string" || tipoEsperado === "bool") {
                 if (valorEval.tipo !== tipoEsperado) {
-                    throw new Error(`Tipo incorrecto en ${nombreAttr}`);
+                    Errores.agregar("Semántico", `Tipo incorrecto en ${nombreAttr}`);
+                    return null;
                 }
                 nuevoStruct[nombreAttr] = valorEval.valor;
             } else {
                 if (valorEval.nombreStruct !== tipoEsperado) {
-                    throw new Error(
-                        `Tipo incorrecto en atributo ${nombreAttr}: se esperaba ${tipoEsperado}`
-                    );
+                    Errores.agregar("Semántico", `Tipo incorrecto en atributo ${nombreAttr}: se esperaba ${tipoEsperado}`);
+                    return null;
                 }
                 nuevoStruct[nombreAttr] = valorEval.valor;
             }
@@ -778,14 +806,17 @@ class AccesoStruct{
     evaluar(entorno) {
         const variable = entorno.obtener(this.id.valor);
         if (!variable) {
-            throw new Error(`La variable ${this.id} no ha sido declarada.`);
+            Errores.agregar("Semántico", `La variable ${this.id} no ha sido declarada.`);
+            return null;
         }
         if (variable.tipo !== 'struct') {
-            throw new Error(`La variable ${this.id} no es un struct.`);
+            Errores.agregar("Semántico", `La variable ${this.id} no es un struct.`);
+            return null;
         }
         const atributo = this.atributo.valor;
         if (atributo === undefined) {
-            throw new Error(`El atributo ${this.atributo} no existe en el struct ${this.id}.`);
+            Errores.agregar("Semántico", `El atributo ${this.atributo} no existe en el struct ${this.id}.`);
+            return null;
         }
         return variable.valor[atributo];
     }
@@ -800,10 +831,12 @@ class ModificacionStruct{
     evaluar(entorno) {
         const variable = entorno.obtener(this.id.id.valor);
         if (!variable) {
-            throw new Error(`La variable ${this.id} no ha sido declarada.`);
+            Errores.agregar("Semántico", `La variable ${this.id} no ha sido declarada.`);
+            return null;
         }
         if (variable.tipo !== 'Struct') {
-            throw new Error(`La variable ${this.id} no es un struct.`);
+            Errores.agregar("Semántico", `La variable ${this.id} no es un struct.`);
+            return null;
         }
         const atributo = this.id.atributo.valor;
         variable.valor[atributo] = this.valor.evaluar(entorno);
@@ -819,7 +852,8 @@ class Atoi{
         const valorEvaluado = this.valor.evaluar(entorno);
         const numero = parseInt(valorEvaluado, 10);
         if (isNaN(numero)) {
-            throw new Error(`El valor ${valorEvaluado} no se puede convertir a entero.`);
+            Errores.agregar("Semántico", `El valor ${valorEvaluado} no se puede convertir a entero.`);
+            return null;
         }
         return {
             tipo: 'int',
@@ -836,7 +870,8 @@ class ParseFloat{
         const valorEvaluado = this.valor.evaluar(entorno);
         const numero = parseFloat(valorEvaluado);
         if (isNaN(numero)) {
-            throw new Error(`El valor ${valorEvaluado} no se puede convertir a float.`);
+            Errores.agregar("Semántico", `El valor ${valorEvaluado} no se puede convertir a float.`);
+            return null;
         }
         return {
             tipo: 'float64',
@@ -853,7 +888,8 @@ class TypeOf{
     evaluar(entorno) {
         const variable = entorno.obtener(this.id);
         if (!variable) {
-            throw new Error(`La variable ${this.id} no ha sido declarada.`);
+            Errores.agregar("Semántico", `La variable ${this.id} no ha sido declarada.`);
+            return null;
         }
         return {
             tipo: 'string',
@@ -870,14 +906,17 @@ class AccesoFuncion{
     evaluar(entorno) {
         const variable = entorno.obtener(this.id.valor);
         if (!variable) {
-            throw new Error(`La variable ${this.id} no ha sido declarada.`);
+            Errores.agregar("Semántico", `La variable ${this.id} no ha sido declarada.`);
+            return null;
         }
         if (variable.tipo !== 'Función') {
-            throw new Error(`La variable ${this.id} no es una función.`);
+            Errores.agregar("Semántico", `La variable ${this.id} no es una función.`);
+            return null;
         }
         const funcion = variable.valor;
         if (this.argumentos.length !== funcion.parametros.length) {
-            throw new Error(`La función ${this.id} espera ${funcion.parametros.length} argumentos, pero se proporcionaron ${this.argumentos.length}.`);
+            Errores.agregar("Semántico", `La función ${this.id} espera ${funcion.parametros.length} argumentos, pero se proporcionaron ${this.argumentos.length}.`);
+            return null;
         }
         const nuevoEntorno = new Entorno(entorno);
         for (let i = 0; i < this.argumentos.length; i++) {
@@ -895,8 +934,6 @@ class AccesoFuncion{
         return resultado;
     }
 }
-
-
 
 function resolver(exp, entorno) {
     if (exp == null) return null;

@@ -1,3 +1,5 @@
+const Consola = require("../Reports/Consola");
+const Errores = require('../Reports/Errores');
 class Entorno {
     constructor(padre = null) {
         this.tabla = new Map();
@@ -8,7 +10,7 @@ class Entorno {
     declarar(id, valor) {
         if (this.tabla.has(id)) {
             this.errores.push(`Variable ya definida: ${id}`);
-            throw new Error("Variable ya definida: " + id);
+            Errores.agregar("Semántico", "Variable ya definida: " + id);
         } else {
             this.tabla.set(id, valor);
         }
@@ -29,8 +31,8 @@ class Entorno {
         if (this.padre) {
             return this.padre.obtener(id);
         }
-        console.log("GET FALLÓ:", id);
-        throw new Error("Variable no definida: " + id);
+        //console.log("GET FALLÓ:", id);
+        Errores.agregar("Semántico", "Variable no definida: " + id);
     }
     
     asignar(id, valor) {
@@ -44,7 +46,7 @@ class Entorno {
             actual = actual.padre;
         }
         this.errores.push(`Variable no definida: ${id}`);
-        throw new Error("Variable no definida: " + id);
+        Errores.agregar("Semántico", "Variable no definida: " + id);
     }
 
     existe(id) {

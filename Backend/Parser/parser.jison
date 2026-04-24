@@ -4,7 +4,6 @@
     const ErrorL = require('../Reports/Errores');
     const TablaTokens = require('../Reports/TablaTokens');
     const TablaSimbolos = require('../Reports/TablaSimbolos');
-    const TablaErrores = require('../Reports/TablaErrores');
     const Tipos = require("../Instrucciones/Tipos");
 
     let ambito= "";
@@ -344,15 +343,15 @@
 /* FIN DE DOCUMENTO */
 <<EOF>>                     {   
                                 TablaTokens.crearReporteTokens();
-                                TablaErrores.crearReporteErrores();
+                                ErrorL.crearReporteErrores();
                                 /*TablaTokens.imprimirTabla();
                                 TablaErrores.imprimirTabla();*/
                                 return 'EOF';
                             }
 
 /* ERRORES */
-.                           {   const errorL = new ErrorL("Error léxico","El carácter: " + yytext +" no pertenece al lenguaje", yylineno, yylloc.first_column);
-                                TablaErrores.agregarError(errorL);
+.                           {   ErrorL.agregar("Error léxico","El carácter: " + yytext +" no pertenece al lenguaje", yylineno, yylloc.first_column);
+                                
                                 /* return 'INVALID' */
                             }
 
