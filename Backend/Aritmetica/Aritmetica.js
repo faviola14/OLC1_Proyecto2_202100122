@@ -15,8 +15,6 @@ class Aritmetica {
     resolverOperacion(izq, der, op) {
         const t1 = izq.tipo;
         const t2 = der.tipo;
-        //console.log("IZQ:", izq);
-        //console.log("DER:", der);
         /* CONVERSIONES */
         const toNumber = (val, tipo) => {
             switch (tipo) {

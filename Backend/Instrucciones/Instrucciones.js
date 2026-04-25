@@ -10,7 +10,6 @@ class Declaracion {
         this.valor = valor;
     }
     evaluar(entorno) {
-        //console.log(this);
         if (entorno.existeLocal(this.id)) {
             Errores.agregar("Semántico", `La variable ${this.id} ya ha sido declarada.`);
             return null;

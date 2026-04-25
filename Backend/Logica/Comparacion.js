@@ -8,8 +8,6 @@ class Comparacion {
     evaluar(entorno) {
         const izq = this.izquierda.evaluar(entorno);
         const der = this.derecha.evaluar(entorno);
-        //console.log("IZQ: ", izq);
-        //console.log("DER: ", der);
         if (!izq || !der) {
             return { tipo: 'boolean', valor: false };
         }

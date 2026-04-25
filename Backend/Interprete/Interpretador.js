@@ -1,10 +1,10 @@
 const Entorno = require("../Instrucciones/Entorno");
 const { int, string, Identificador, bool, Bloque, rune, float64} = require("../Instrucciones/Valores");
-const { Declaracion, Asignacion, Imprimir, If, IfElseIf,ElseIf, IfElse, Else, IfCompleto, For, ForRange, Switch, Slice,
-    Struct, Matriz, Funcion, Programa, Return, Break, Continue, Mento, BloqueIndependiente,
-    Cases, Default, Inicializacion, Index, Join, Len, Append, AccesoSlice, ModificacionSlice,
-    AsignacionMatriz, AccesoMatriz, UsoStruct, AccesoStruct, ModificacionStruct, Atoi, ParseFloat, TypeOf,
-    AccesoFuncion } = require("../Instrucciones/Instrucciones");
+const { Declaracion, Asignacion, Imprimir, If, IfElseIf, ElseIf, IfElse, Else, IfCompleto, For, ForRange,
+    Switch, Slice, Struct, Matriz, Funcion, Programa, Return, Break, Continue, Mento, BloqueIndependiente,
+    Cases, Default, Inicializacion, Index, Join, Len, Append, AccesoSlice, ModificacionSlice, AsignacionMatriz,
+    AccesoMatriz, UsoStruct, AccesoStruct, ModificacionStruct, Atoi, ParseFloat, TypeOf, AccesoFuncion
+    } = require("../Instrucciones/Instrucciones");
 const Aritmetica = require("../Aritmetica/Aritmetica");
 const Logica = require("../Logica/Logica");
 const Not = require("../Logica/Not");
@@ -196,8 +196,6 @@ function aNodo(nodo) {
 }
 
 function interpretar(nodo) {
-    /*Consola.limpiar();
-    Errores.limpiar();*/
     const entorno = new Entorno();
     try {
         if (Array.isArray(nodo)) {

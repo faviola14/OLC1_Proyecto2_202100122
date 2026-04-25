@@ -6,24 +6,8 @@ const fs = require("fs");
 const { exec } = require("child_process");
 const Consola = require("./Reports/Consola");
 const Errores = require("./Reports/Errores");
-
-//console.log(JSON.stringify(ast, null, 2));
-const cod33 = `
-`;
-/*
-const ast = parser.parse(cod33);
-
-const dot = generarAST(ast);
-fs.writeFileSync("ast.dot", dot);
-exec("dot -Tpdf ast.dot -o ast.pdf");
-const resultado = Interpretador(ast);
-console.log("AST generado");
-console.log(Consola.getSalida());
-*/
-
 const express = require("express");
 const cors = require("cors");
-
 
 const app = express();
 app.use(cors());
