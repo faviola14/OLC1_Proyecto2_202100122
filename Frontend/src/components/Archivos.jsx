@@ -18,12 +18,12 @@ function Archivos({ archivos, seleccionarArchivo, eliminarArchivo, crearArchivo,
         onChange={subirArchivo}
       />
 
-      <ul>
-        {archivos.map((archivo, index) => (
+      <ul> 
+        {archivos.map((archivo, index) => ( 
           <li key={index} className={`archivo-item ${archivoActivo?.nombre === archivo.nombre ? "activo" : ""}`}>
             
             <span onClick={() => seleccionarArchivo(archivo)}>
-              {archivo.nombre}
+              💜 {archivo.nombre}
             </span>
 
             <button
