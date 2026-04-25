@@ -1,0 +1,10 @@
+digraph AST {
+node [shape=box];
+n266 [label="Programa"];
+n267 [label="Funcion"];
+n268 [label="Imprimir"];
+n269 [label="string\nhola mundo"];
+n268 -> n269;
+n267 -> n268;
+n266 -> n267;
+}
