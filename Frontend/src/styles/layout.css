@@ -111,3 +111,33 @@
 .btnA:active {
     transform: scale(0.95);
 }
+
+.archivo-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px;
+    cursor: pointer;
+    
+}
+
+.archivo-item.activo {
+    background-color: #9f5a63;
+    color: white;
+    border-radius: 4px;
+}
+
+.archivo-item span {
+    cursor: pointer;
+    flex: 1;
+}
+
+.btn-eliminar {
+    background: transparent;
+    border: none;
+    color: red;
+    cursor: pointer;
+}
+
+.btn-eliminar:hover {
+    color: #ff4d4d;
+}

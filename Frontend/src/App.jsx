@@ -67,6 +67,7 @@ function App() {
   
 
   const seleccionarArchivo = (archivo) => {
+    //console.log("Seleccionado:", archivo);
     setArchivoActivo(archivo);
     setContenidoEditor(archivo.contenido);
   };
@@ -110,6 +111,16 @@ function App() {
     setContenidoEditor("");
   };
 
+  const eliminarArchivo = (archivo) => {
+  const confirmacion = confirm(`¿Eliminar ${archivo.nombre}?`);
+  if (!confirmacion) return;
+  setArchivos(prev => prev.filter(a => a.nombre !== archivo.nombre));
+  if (archivoActivo?.nombre === archivo.nombre) {
+    setArchivoActivo(null);
+    setContenidoEditor("");
+  }
+};
+
   return (
     <Layout
       contenidoEditor={contenidoEditor}
@@ -124,6 +135,8 @@ function App() {
       fileInputRef={fileInputRef}
       guardarArchivo={guardarArchivo}
       crearArchivo={crearArchivo}
+      archivoActivo={archivoActivo}
+      eliminarArchivo={eliminarArchivo}
     />
   );
 }

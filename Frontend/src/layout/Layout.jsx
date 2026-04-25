@@ -6,14 +6,16 @@ import "../styles/layout.css";
 
 
 function Layout({ contenidoEditor, setContenidoEditor, ejecutar, output, reporteHTML, archivos,
-  subirArchivo, seleccionarArchivo, fileInputRef, guardarArchivo, crearArchivo }) {
+  subirArchivo, seleccionarArchivo, fileInputRef, guardarArchivo, crearArchivo, eliminarArchivo, archivoActivo }) {
   return (
     <div className="container">
       <Archivos
         archivos={archivos}
+        archivoActivo={archivoActivo}
         subirArchivo={subirArchivo}
         seleccionarArchivo={seleccionarArchivo}
-        crearArchivo={crearArchivo} 
+        crearArchivo={crearArchivo}
+        eliminarArchivo={eliminarArchivo}
         fileInputRef={fileInputRef}
       />
 
