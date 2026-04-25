@@ -1,7 +1,11 @@
-function Barra({ ejecutar, reporteHTML }) {
+function Barra({ ejecutar, reporteHTML, guardarArchivo }) {
   return (
     <div className="barra">
       <button className="btn ejecutar" onClick={ejecutar}>Ejecutar</button>
+
+      <button className="btn" onClick={guardarArchivo}>
+        Guardar
+      </button>
 
       <button
         className="btn"

@@ -5,19 +5,26 @@ import Archivos from "../components/Archivos";
 import "../styles/layout.css";
 
 
-function Layout({ contenidoEditor, setContenidoEditor, ejecutar, output,reporteHTML}) {
+function Layout({ contenidoEditor, setContenidoEditor, ejecutar, output, reporteHTML, archivos,
+  subirArchivo, seleccionarArchivo, fileInputRef, guardarArchivo, crearArchivo }) {
   return (
-     <div className="container">
-      <Archivos />
+    <div className="container">
+      <Archivos
+        archivos={archivos}
+        subirArchivo={subirArchivo}
+        seleccionarArchivo={seleccionarArchivo}
+        crearArchivo={crearArchivo} 
+        fileInputRef={fileInputRef}
+      />
 
         <div className="main">
-        <Barra ejecutar={ejecutar} reporteHTML={reporteHTML} />
+        <Barra ejecutar={ejecutar} reporteHTML={reporteHTML} guardarArchivo={guardarArchivo}/>
 
         <Editor
           contenidoEditor={contenidoEditor}
           setContenidoEditor={setContenidoEditor}
         />
-         <Consola output={output} />
+        <Consola output={output} />
 
       </div>
       </div>

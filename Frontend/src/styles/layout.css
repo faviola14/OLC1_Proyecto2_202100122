@@ -29,19 +29,6 @@
     background: #37373d;
 }
 
-.boton {
-    background: #0e639c;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.boton:hover {
-    background: #1177bb;
-}
-
 .main {
     display: flex;
     flex-direction: column;
@@ -68,23 +55,19 @@
 }
 
 .editor::selection {
-    background: #264f78;
+    background: #9f5a63;
 }
 
 .consola {
     background-color: #1e1e1e;
     border-top: 1px solid #333;
     color: #d4d4d4;
-
     font-family: "Consolas", "Courier New", monospace;
     font-size: 13px;
-
     padding: 12px;
     height: 200px;
-
     overflow-y: auto;
     white-space: pre-wrap;
-
     text-align: left;
 }
 
@@ -92,22 +75,39 @@
     background: #3c3c3c;
     color: #ffffff;
     border: none;
-
     padding: 6px 12px;
     margin-right: 8px;
-
     border-radius: 4px;
     cursor: pointer;
-
     font-size: 13px;
     transition: all 0.2s ease;
 }
 
 .btn:hover {
-    background: #505050;
+    background: #9f5a63;
 }
 
 .btn:active {
     transform: scale(0.95);
 }
 
+.btnA {
+    background: #3c3c3c;
+    color: #ffffff;
+    border: none;
+    padding: 6px 12px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.btnA:hover {
+    background: #9f5a63;
+}
+
+.btnA:active {
+    transform: scale(0.95);
+}
