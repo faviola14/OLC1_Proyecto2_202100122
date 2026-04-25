@@ -5,13 +5,13 @@ import Archivos from "../components/Archivos";
 import "../styles/layout.css";
 
 
-function Layout({ contenidoEditor, setContenidoEditor, ejecutar, output }) {
+function Layout({ contenidoEditor, setContenidoEditor, ejecutar, output,reporteHTML}) {
   return (
      <div className="container">
       <Archivos />
 
         <div className="main">
-        <Barra ejecutar={ejecutar} />
+        <Barra ejecutar={ejecutar} reporteHTML={reporteHTML} />
 
         <Editor
           contenidoEditor={contenidoEditor}

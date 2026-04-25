@@ -3,8 +3,8 @@ import Layout from "./layout/Layout";
 
 function App() {
 
- 
   const [contenidoEditor, setContenidoEditor] = useState("");
+  const [reporteHTML, setReporteHTML] = useState("");
 
   
   const [output, setOutput] = useState("");
@@ -34,6 +34,7 @@ function App() {
         }
 
         setOutput(salida);
+        setReporteHTML(data.htmlErrores);
       } else {
         let salida = data.consola + "\n\nErrores:\n";
         data.errores.forEach(err => {
@@ -41,6 +42,7 @@ function App() {
         });
 
         setOutput(salida);
+        setReporteHTML(data.htmlErrores);
       }
 
     } catch (error) {
@@ -54,6 +56,7 @@ function App() {
       setContenidoEditor={setContenidoEditor}
       ejecutar={ejecutar}
       output={output}
+      reporteHTML={reporteHTML}
     />
   );
 }

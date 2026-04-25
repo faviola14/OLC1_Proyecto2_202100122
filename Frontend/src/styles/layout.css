@@ -1,13 +1,45 @@
 .container {
     display: grid;
-    grid-template-columns: 250px 1fr;
+    grid-template-columns: 240px 1fr;
     height: 100vh;
+    background: #1e1e1e;
 }
 
 .archivos {
-    background: #f4f4f4;
-    padding: 10px;
-    border-right: 1px solid #ccc;
+    background: #252526;
+    color: #ccc;
+    padding: 12px;
+    border-right: 1px solid #333;
+    font-size: 14px;
+}
+
+.archivos h3 {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+.archivos div {
+    padding: 6px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.archivos div:hover {
+    background: #37373d;
+}
+
+.boton {
+    background: #0e639c;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.boton:hover {
+    background: #1177bb;
 }
 
 .main {
@@ -16,26 +48,66 @@
 }
 
 .barra {
-    background: #ddd;
+    background: #2d2d2d;
     padding: 10px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #1e1e1e;
 }
 
 .editor {
-    font-family: "Consolas", "Courier New", monospace;
     flex: 1;
-    padding: 10px;
-}
-
-.consola {
-    background-color: #1e1e1e;
+    background: #1e1e1e;
     color: #d4d4d4;
     font-family: "Consolas", "Courier New", monospace;
     font-size: 14px;
     padding: 16px;
-    border-radius: 8px;
-    width: 100%;
-    height: 300px;
+    border: none;
+    outline: none;
+    resize: none;
+}
+
+.editor::selection {
+    background: #264f78;
+}
+
+.consola {
+    background-color: #1e1e1e;
+    border-top: 1px solid #333;
+    color: #d4d4d4;
+
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 13px;
+
+    padding: 12px;
+    height: 200px;
+
     overflow-y: auto;
     white-space: pre-wrap;
+
     text-align: left;
 }
+
+.btn {
+    background: #3c3c3c;
+    color: #ffffff;
+    border: none;
+
+    padding: 6px 12px;
+    margin-right: 8px;
+
+    border-radius: 4px;
+    cursor: pointer;
+
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    background: #505050;
+}
+
+.btn:active {
+    transform: scale(0.95);
+}
+

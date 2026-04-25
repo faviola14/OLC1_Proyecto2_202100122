@@ -3,7 +3,7 @@ function Archivos() {
     <div className="archivos">
       <h3>Archivos</h3>
 
-      <button>+ Subir Archivo</button>
+      <button className="btn">+ Subir Archivo</button>
 
       <ul>
         <li>main.gst</li>
