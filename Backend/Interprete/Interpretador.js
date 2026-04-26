@@ -13,9 +13,15 @@ const Negativo = require("../Aritmetica/Negativo");
 const Nodo = require("../Instrucciones/Nodo");
 const Consola = require("../Reports/Consola");
 const Errores = require('../Reports/Errores');
+/* El código define una función llamada `aNodo` que toma un objeto `nodo` como argumento y devuelve 
+una instancia de una clase específica según el tipo de nodo. La función utiliza una estructura de control 
+`switch` para determinar el tipo de nodo y crear la instancia correspondiente. Si el tipo de nodo no 
+coincide con ninguno de los casos definidos, se agrega un error a la lista de errores utilizando la clase 
+`Errores`. La función también maneja casos específicos para nodos como `Bloque`, `Declaracion`, 
+`Asignacion`, `Imprimir`, `If`, `ElseIf`, `IfElse`, `For`, `Switch`, entre otros, creando instancias 
+de las clases correspondientes y evaluando sus instrucciones o valores según sea necesario. */
 
 function aNodo(nodo) {
-    //console.log(nodo);
     if (!nodo || typeof nodo !== 'object') return null;
     switch (nodo.tipo) {
         case 'int':
@@ -23,7 +29,6 @@ function aNodo(nodo) {
         case 'float64':
             return new float64(nodo.valor);
         case 'rune':
-            //console.log(JSON.stringify(nodo, null, 2));
             return new rune(nodo.valor);
         case 'string':
             return new string(nodo.valor);
@@ -71,7 +76,6 @@ function aNodo(nodo) {
                 nodo.else ? aNodo(nodo.else) : null
             );
         case 'For':
-            //console.log(nodo)
             const init = aNodo(nodo.init);
             const condicion = aNodo(nodo.cond);
             const incremento = aNodo(nodo.inc);
@@ -146,7 +150,6 @@ function aNodo(nodo) {
         case 'Continue':
             return new Continue();
         case 'Mento':
-            //console.log("NODO MENTO:", nodo.cantidad);
             return new Mento(nodo.id.valor, nodo.operador);
         case 'BloqueIndependiente':
             const instruccionesBloque = nodo.instrucciones.map(instr => aNodo(instr)).filter(instr => instr !== null && instr !== undefined);

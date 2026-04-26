@@ -1,3 +1,5 @@
+/* layout.css: Estilos para la estructura general de la aplicación, incluyendo el contenedor principal,
+la barra lateral de archivos, el área de edición y la consola. */
 .container {
     display: grid;
     grid-template-columns: 240px 1fr;

@@ -1,3 +1,4 @@
+/* Consola.js: Módulo para manejar la salida de la consola en los reportes. */
 class Consola {
     static salida = [];
 

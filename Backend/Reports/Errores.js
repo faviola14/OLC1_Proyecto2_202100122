@@ -1,3 +1,4 @@
+/* Errores.js: Módulo para manejar la lista de errores y generar reportes en HTML. */
 const fs = require("fs");
 
 class Errores {

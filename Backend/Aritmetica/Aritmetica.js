@@ -1,3 +1,10 @@
+/* La clase `Aritmetica` en JavaScript representa una operación aritmética que se puede evaluar 
+en un entorno dado. La clase tiene un constructor que recibe los operandos izquierdo y derecho, 
+así como el operador a aplicar. El método `evaluar` se encarga de evaluar la operación utilizando 
+los valores de los operandos en el entorno proporcionado, mientras que el método `resolverOperacion` 
+realiza la operación aritmética correspondiente según el tipo de datos de los operandos y el operador 
+especificado. */
+
 class Aritmetica {
     constructor(izquierda, operador, derecha) {
         this.izquierda = izquierda;
@@ -5,6 +12,11 @@ class Aritmetica {
         this.derecha = derecha;
     }
 
+    /* El método `evaluar` de la clase `Aritmetica` se encarga de evaluar una operación aritmética utilizando
+los operandos izquierdo y derecho en un entorno dado. Primero, evalúa ambos operandos utilizando el
+método `evaluar` de cada uno, y luego llama al método `resolverOperacion` para realizar la operación
+correspondiente según el operador especificado. El resultado de la operación se devuelve como un
+objeto que contiene el valor resultante y su tipo. */
     evaluar(entorno) {
         const izq = this.izquierda.evaluar(entorno);
         const der = this.derecha.evaluar(entorno);
@@ -12,6 +24,15 @@ class Aritmetica {
         return this.resolverOperacion(izq, der, this.operador);
     }
 
+    /* El método `resolverOperacion` de la clase `Aritmetica` se encarga de realizar una operación aritmética
+entre dos operandos, `izq` y `der`, utilizando un operador especificado por `op`. El método maneja
+diferentes tipos de datos (como `int`, `float64`, `bool`, `string`, y `rune`) y realiza las operaciones
+correspondientes según el tipo de los operandos y el operador. Por ejemplo, para la suma (`+`), si alguno 
+de los operandos es una cadena (`string`), se realiza una concatenación. Para la multiplicación (`*`), 
+si uno de los operandos es una cadena y el otro es un entero, se repite la cadena el número de veces 
+indicado por el entero. El método también maneja conversiones entre tipos cuando sea necesario, y lanza 
+errores para operaciones no válidas o tipos no soportados. El resultado de la operación se devuelve como 
+un objeto que contiene el valor resultante y su tipo. */
     resolverOperacion(izq, der, op) {
         const t1 = izq.tipo;
         const t2 = der.tipo;

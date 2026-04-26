@@ -1,3 +1,4 @@
+/* TablaSimbolos.js: Módulo para manejar la tabla de símbolos y generar reportes en HTML. */
 let listaSimbolos = [];
 
 function inicializarTablaSimbolos() {

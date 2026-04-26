@@ -1,3 +1,5 @@
+/* Consola.jsx: Componente para mostrar la salida de la ejecución del código, incluyendo errores y 
+resultados. */
 function Consola({ output }) {
   return (
     <div className="consola">

@@ -1,4 +1,6 @@
-function Archivos({ archivos, seleccionarArchivo, eliminarArchivo, crearArchivo, subirArchivo, fileInputRef, archivoActivo  }) {
+/* Archivos.jsx: Componente para gestionar la lista de archivos, incluyendo selección, eliminación, 
+creación y subida de archivos. */
+function Archivos({ archivos, seleccionarArchivo, eliminarArchivo, crearArchivo, subirArchivo, fileInputRef, archivoActivo }) {
   return (
     <div className="archivos">
       <h3>Archivos</h3>

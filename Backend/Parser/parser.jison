@@ -1,3 +1,15 @@
+/* Este archivo `parser.jison` define la gramática y las reglas de análisis sintáctico para un 
+el lenguaje GoScrpt. El archivo utiliza la sintaxis de Jison para describir cómo se deben interpretar 
+los tokens generados por el analizador léxico. El bloque `%{ ... %}` al inicio del archivo incluye 
+código JavaScript que se ejecutará antes de que comience el análisis sintáctico, donde se importan 
+varias clases y se inicializan variables para el manejo de tokens, símbolos y errores. La sección `
+%lex ... /lex` define las reglas para reconocer los diferentes tokens del lenguaje, como palabras clave,
+operadores, literales, etc., y también maneja los comentarios y los errores léxicos. La sección `%token` 
+declara los tokens que se utilizarán en la gramática, y la sección `%% ... %%` define las reglas de 
+producción para el lenguaje, especificando cómo se deben combinar los tokens para formar estructuras 
+sintácticas válidas. Cada regla de producción también incluye acciones en JavaScript que se ejecutan 
+cuando se reconoce esa estructura, como la creación de nodos en el AST abstracta o la 
+actualización de tablas de símbolos. */
 %{
     const Token = require('../Reports/Tokens');
     const Simbolo = require('../Reports/Simbolos');

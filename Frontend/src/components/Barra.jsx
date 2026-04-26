@@ -1,3 +1,5 @@
+/* Barra.jsx: Componente que contiene los botones para ejecutar el código, guardar archivos y generar 
+reportes. */
 function Barra({ ejecutar, reporteHTML, guardarArchivo }) {
   return (
     <div className="barra">

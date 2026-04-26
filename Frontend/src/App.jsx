@@ -1,6 +1,6 @@
 import Layout from "./layout/Layout";
 import { useState, useRef } from "react";
-
+/* App.jsx: Componente raíz de la aplicación que maneja el estado global y la lógica principal. */
 function App() {
 
   const [contenidoEditor, setContenidoEditor] = useState("");

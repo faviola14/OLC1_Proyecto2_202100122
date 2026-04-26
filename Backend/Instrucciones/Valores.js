@@ -1,6 +1,9 @@
 const Nodo = require('./Nodo');
 const Entorno = require("../Instrucciones/Entorno");
-
+/* Este código define varias clases que representan diferentes tipos de valores en un lenguaje de 
+programación. Cada clase hereda de la clase `Nodo` y tiene un método `evaluar` que devuelve un objeto 
+con el tipo y el valor correspondiente. 
+Las clases definidas son `rune`, `int`, `float64`, `string`, `Identificador`, `bool` y `Bloque`. */
 class rune extends Nodo{
     constructor(valor) {
         super();

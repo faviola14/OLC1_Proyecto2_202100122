@@ -1,4 +1,5 @@
 /* Reporte de AST (Árbol de Sintaxis Abstracta) */
+/* Este módulo genera un reporte visual del AST utilizando Graphviz. */
 let contador = 0;
 
 function generarAST(nodo) {

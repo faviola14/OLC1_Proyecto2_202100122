@@ -1,3 +1,5 @@
+/* Editor.jsx: Componente para el área de edición de código, donde los usuarios pueden escribir su 
+código. */
 function Editor({ contenidoEditor, setContenidoEditor }) {
   return (
     <div className="editor">

@@ -1,3 +1,4 @@
+/* Simbolos.js: Módulo para representar los símbolos en la tabla de símbolos. */
 class Simbolos {
     constructor(id, tipoSimbolo, tipoDato, ambito, fila, columna) {
         this.id = id;

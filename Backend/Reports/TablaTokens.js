@@ -1,3 +1,4 @@
+/* TablaTokens.js: Módulo para manejar la tabla de tokens y generar reportes en HTML. */
 let listaTokens = [];
 
 function inicializarTablaTokens() {

@@ -2,7 +2,17 @@ const Entorno = require("../Instrucciones/Entorno");
 const Tipos = require("../Instrucciones/Tipos");
 const Consola = require("../Reports/Consola");
 const Errores = require('../Reports/Errores');
-
+/* Este código define varias clases que representan diferentes tipos de instrucciones en un 
+lenguaje de programación. Cada clase tiene un método `evaluar` que toma un entorno como argumento 
+y realiza la acción correspondiente a la instrucción. Por ejemplo, la clase `Declaracion` se encarga 
+de declarar una variable en el entorno, mientras que la clase `Asignacion` asigna un valor a una 
+variable existente. La clase `Imprimir` evalúa una lista de expresiones y las imprime en la consola. 
+Las clases `If`, `ElseIf`, `Else`, `For`, `ForRange`, `Switch`, `Slice`, `Struct`, `Matriz`, `Funcion`, 
+`Programa`, `Return`, `Break`, `Continue`, `Mento`, `BloqueIndependiente`, `Cases`, `Default`, 
+`Inicializacion`, `Index`, `Join`, `Len`, `Append`, `AccesoSlice`, `ModificacionSlice`, 
+`AsignacionMatriz`, `AccesoMatriz`, `UsoStruct`, `AccesoStruct` y `ModificacionStruct` representan otras 
+instrucciones comunes en un lenguaje de programación. En general, estas clases permiten construir un 
+programa completo con funciones, estructuras de control, manejo de errores y operaciones con datos. */
 class Declaracion {
     constructor(id, tipo, valor) {
         this.id = id;
